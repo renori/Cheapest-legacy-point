@@ -3,6 +3,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from cheapest_skillup.classic_trainers import estimate, parse_trainer_sql
 from cheapest_skillup.gamedata import build_data
 from cheapest_skillup.optimizer import Optimizer, cheapest_plan
 from cheapest_skillup.prices import PriceBook, parse_csv
@@ -63,6 +64,39 @@ class TrainerFile(unittest.TestCase):
             self.assertEqual((r.learn_cost, r.orange, r.learn_known), (250, 10, True))
             Path(d, "trainer.json").write_text(json.dumps({"spells": {"7": {"exclude": True}}}))
             self.assertEqual(load_profession("x", Path(d)).recipes, [])
+
+    def test_classic_estimates_apply_unless_you_set_values(self):
+        with tempfile.TemporaryDirectory() as d:
+            Path(d, "recipes").mkdir()
+            Path(d, "recipes", "x.json").write_text(json.dumps({"name": "X", "recipes": [
+                {"name": "Vest", "spell": 7, "skill": [45, 45, 57, 70], "learn": "trainer", "learn_level_known": False, "reagents": {"1": 1}},
+                {"name": "Belt", "spell": 8, "skill": [50, 50, 67, 85], "learn": "trainer", "learn_level_known": False, "reagents": {"1": 1}},
+                {"name": "Kilt", "spell": 9, "skill": [75, 75, 87, 100], "learn": "trainer", "learn_level_known": False, "reagents": {"1": 1}}]}))
+            Path(d, "trainer_classic.json").write_text(json.dumps({"spells": {"7": {"cost": 45, "learn": 10}, "8": {"cost": 45, "learn": 10}}}))
+            Path(d, "trainer.json").write_text(json.dumps({"spells": {"8": {"cost": 60, "learn": None}}}))
+            vest, belt, kilt = load_profession("x", Path(d)).recipes
+            self.assertEqual((vest.learn_cost, vest.fee_from, vest.orange, vest.learn_from, vest.learn_known), (45, "classic", 10, "classic", False))
+            self.assertEqual((belt.learn_cost, belt.fee_from, belt.orange, belt.learn_from), (60, "you", 10, "classic"))
+            self.assertEqual((kilt.learn_cost, kilt.fee_from, kilt.orange, kilt.learn_from), (None, None, 75, "assumed"))
+
+
+class ClassicTrainers(unittest.TestCase):
+    SQL = ("INSERT INTO `npc_trainer_template` VALUES (1,9001,45,197,10,5,NULL,NULL,NULL,0),(2,9001,60,197,10,5,NULL,NULL,NULL,0),"
+           "(1,9002,100,197,90,0,NULL,NULL,NULL,0),(1,9003,10,171,1,0,NULL,NULL,NULL,0);\n"
+           "INSERT INTO `npc_trainer` VALUES (5,9004,500,164,40,0,NULL,NULL,NULL,0);\n")
+
+    def test_parse_and_estimate(self):
+        rows = parse_trainer_sql(self.SQL)
+        self.assertEqual(len(rows), 5)
+        recipes = {
+            100: {"name": "Vest", "learn": "trainer", "skill": [45, 45, 57, 70]},  # taught by 9001
+            200: {"name": "Shirt", "learn": "trainer", "skill": [60, 60, 70, 80]},  # taught by 9002, Forever made it easier
+            300: {"name": "Potion", "learn": "recipe", "skill": [1, 20, 30, 40]},  # not a trainer recipe in Forever
+        }
+        est = estimate(rows, {9001: 100, 9002: 200, 9003: 300}, recipes)
+        self.assertEqual(est[100], {"name": "Vest", "cost": 45, "learn": 10})  # cheapest of two trainers
+        self.assertEqual(est[200]["learn"], 60)  # capped at Forever's yellow level
+        self.assertNotIn(300, est)
 
 
 def row(**kw):

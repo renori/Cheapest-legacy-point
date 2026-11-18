@@ -109,20 +109,27 @@ How each recipe is learned (the *Learn* column):
   they can never be bought.
 * `--sources trainer` (GUI: untick *AH recipe items*) plans without buying any recipe items.
 
-### Trainer fees and learn levels: `data/trainer.json`
+### Trainer fees and learn levels
 
 The game files don't contain trainer fees or the skill a trainer requires; the server sends those.
-`data/trainer.json` lists every trainer recipe with `"cost": null, "learn": null`. Fill in what your
-trainer shows:
+They're filled in from three places, highest priority first:
 
-```json
-"2385": {"name": "Brown Linen Vest", "profession": "Tailoring", "cost": 50, "learn": 10},
-```
+1. **`data/trainer.json`: your values.** It lists every trainer recipe with `"cost": null,
+   "learn": null`. Fill in what your trainer shows (`cost` in copper, 1s 25c = `125`; `learn` = skill
+   needed). Re-running the importer keeps what you entered.
+2. **`data/trainer_classic.json`: Classic estimates.** Classic (1.12) trainer fees and learn levels for
+   the ~400 trainer recipes Forever kept from Classic, from the open-source
+   [CMaNGOS classic-db](https://github.com/cmangos/classic-db) (GPL-3.0). Shown with `~` / *Classic*.
+   A Classic learn level above Forever's yellow level is capped at yellow, since Forever made that
+   recipe easier. To regenerate:
 
-`cost` is in copper (1s 25c = `125`), `learn` is the skill needed to train it. Until you do, unknown
-fees count as 0 (the report says how many) and the learn level is assumed to be the recipe's yellow
-level (marked *est.*), which never schedules a recipe before you can train it. Re-running the importer
-keeps what you entered.
+   ```sh
+   git clone --depth 1 https://github.com/cmangos/classic-db
+   python -m cheapest_skillup.classic_trainers classic-db/Full_DB/ClassicDB_*.sql.gz
+   ```
+3. **Otherwise:** the fee counts as 0 (the report says how many) and the recipe is assumed learnable at
+   its yellow level (*est.*), which never schedules it before you could train it. This applies mostly to
+   Forever-only trainer recipes.
 
 The route only goes through recipes the game data marks as craftable profession recipes. A few
 trainer recipes may not actually be offered by trainers (event or removed recipes); if the plan uses

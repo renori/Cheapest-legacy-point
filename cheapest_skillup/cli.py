@@ -73,8 +73,11 @@ def render(plan: Plan, prices: PriceBook, vendor_names: dict[int, str]) -> str:
             if r.source == "recipe":
                 where = f"buy {' / '.join(item_name(i, prices, vendor_names) for i in r.recipe_items)} on the AH"
             else:
-                where = "trainer" + ("" if r.learn_known else f", learn level not in game data (assumed {r.orange})")
-            out.append(f"  {r.name:<38} {money(c) if c is not None else 'fee unknown':>14}  ({where})")
+                level = {"classic": f"learn at ~{r.orange} (Classic estimate)", "assumed": f"learn level unknown, assumed {r.orange}",
+                         "you": f"learn at {r.orange}", "game": f"learn at {r.orange}"}[r.learn_from]
+                where = f"trainer, {level}"
+            fee = "fee unknown" if c is None else ("~" if r.fee_from == "classic" else "") + money(c)
+            out.append(f"  {r.name:<38} {fee:>14}  ({where})")
 
     if plan.sell_back:
         how = "to a vendor" if plan.sell_back == "vendor" else "on the AH"
@@ -89,7 +92,10 @@ def render(plan: Plan, prices: PriceBook, vendor_names: dict[int, str]) -> str:
     if plan.learn_total:
         out.append(f"Learning recipes: {money(plan.learn_total)}")
     unknown = sum(1 for r, c in plan.learn_costs if c is None)
-    out.append(f"Grand total: {money(plan.grand_total)}" + (f"  (+ {unknown} trainer fee(s) not entered in data/trainer.json)" if unknown else ""))
+    estimated = sum(1 for r, c in plan.learn_costs if c is not None and r.fee_from == "classic")
+    notes = ([f"{estimated} trainer fee(s) are Classic estimates"] if estimated else []) + \
+            ([f"{unknown} unknown, counted as 0"] if unknown else [])
+    out.append(f"Grand total: {money(plan.grand_total)}" + (f"  ({'; '.join(notes)} - see data/trainer.json)" if notes else ""))
     if plan.unpriced:
         out.append("Warning: no price found for " + ", ".join(item_name(i, prices, vendor_names) for i in plan.unpriced))
     return "\n".join(out)
@@ -111,7 +117,7 @@ def plan_to_dict(plan: Plan, prices: PriceBook, vendor_names: dict[int, str]) ->
         "grand_total_copper": round(plan.grand_total),
         "learn": [
             {"recipe": r.name, "spell": r.spell, "how": r.source, "cost_copper": c, "learn_level": r.orange,
-             "learn_level_known": r.learn_known, "recipe_items": [{"item_id": i, "name": item_name(i, prices, vendor_names)} for i in r.recipe_items]}
+             "learn_level_known": r.learn_known, "learn_from": r.learn_from, "fee_from": r.fee_from, "recipe_items": [{"item_id": i, "name": item_name(i, prices, vendor_names)} for i in r.recipe_items]}
             for r, c in plan.learn_costs if r.source != "auto"
         ],
         "sell_back": plan.sell_back,

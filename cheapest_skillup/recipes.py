@@ -26,6 +26,8 @@ class Recipe:
     spell: int | None = None
     learn_known: bool = True  # False: learn level not in game data, assumed = yellow
     recipe_items: list[int] = field(default_factory=list)  # items that teach it (source "recipe")
+    fee_from: str | None = None  # trainer fee origin: "you" (trainer.json), "classic" (estimate), None
+    learn_from: str = "game"  # learn level origin: "game", "you", "classic", "assumed" (= yellow)
 
     def skillup_chance(self, skill: int) -> float:
         """Chance one craft raises `skill` by a point (Classic formula)."""
@@ -66,36 +68,42 @@ def _recipe(d: dict) -> Recipe:
     )
 
 
-def load_trainer(data_dir: Path = DATA_DIR) -> dict[int, dict]:
-    """Trainer fees and learn levels you entered in data/trainer.json, by spell id."""
-    path = data_dir / "trainer.json"
+def load_trainer(data_dir: Path = DATA_DIR, name: str = "trainer.json") -> dict[int, dict]:
+    """Trainer fees and learn levels by spell id: data/trainer.json (yours) or trainer_classic.json."""
+    path = data_dir / name
     if not path.exists():
         return {}
     d = json.loads(path.read_text(encoding="utf-8"))
     return {int(k): v for k, v in d.get("spells", {}).items()}
 
 
-def _apply_trainer(r: Recipe, info: dict | None) -> None:
+def _apply_trainer(r: Recipe, info: dict | None, origin: str) -> None:
     if r.source != "trainer" or not info:
         return
     if info.get("cost") is not None:
         r.learn_cost = int(info["cost"])
+        r.fee_from = origin
     if info.get("learn") is not None:
         r.orange = max(1, min(int(info["learn"]), r.grey - 1))
-        r.learn_known = True
+        r.learn_known = origin == "you"
+        r.learn_from = origin
 
 
 def load_profession(key: str, data_dir: Path = DATA_DIR) -> Profession:
     path = data_dir / "recipes" / f"{key}.json"
     d = json.loads(path.read_text(encoding="utf-8"))
-    trainer = load_trainer(data_dir)
+    yours = load_trainer(data_dir)
+    classic = load_trainer(data_dir, "trainer_classic.json")
     recipes = []
     for raw in d["recipes"]:
         r = _recipe(raw)
-        info = trainer.get(r.spell) if r.spell else None
+        if r.source == "trainer" and not r.learn_known:
+            r.learn_from = "assumed"
+        info = yours.get(r.spell) if r.spell else None
         if info and info.get("exclude"):
             continue  # you marked it as not available
-        _apply_trainer(r, info)
+        _apply_trainer(r, classic.get(r.spell) if r.spell else None, "classic")
+        _apply_trainer(r, info, "you")  # your values win
         recipes.append(r)
     return Profession(key=key, name=d["name"], recipes=recipes, note=d.get("note", ""))
 

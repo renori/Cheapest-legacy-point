@@ -234,13 +234,17 @@ function showError(msg) {
 
 const fullCost = p => p.grand_total_copper;
 const HOW = {auto: "Known", trainer: "Trainer", recipe: "AH recipe"};
+const LEARN_NOTE = {
+  classic: '<span class="src" title="Classic trainer requirement, used as an estimate"> Classic</span>',
+  assumed: '<span class="src" title="Unknown; assumed to be the recipe\'s yellow level. Correct it in data/trainer.json."> est.</span>',
+};
 
 function render() {
   const d = LAST, out = $("#out");
   const scanned = new Date(d.prices_updated);
   const when = isNaN(scanned) ? d.prices_updated : scanned.toLocaleString();
   let h = `<div class="meta">${esc(PRICE_LABEL[d.price_field] || d.price_field)} from TSM <b>${esc(d.auction_house)}</b> · scanned ${esc(when)}</div>`;
-  h += `<div class="warn">Recipes come from WoW Forever's game data. Trainer fees and trainer learn levels aren't in it: unknown fees count as 0 and "est." learn levels assume the recipe's yellow level. Fill in <code>data/trainer.json</code> to correct them.</div>`;
+  h += `<div class="warn">Recipes come from WoW Forever's game data. Trainer fees and learn levels aren't in it, so Classic trainer values are used as estimates where they exist; the rest count as free and learnable at the recipe's yellow level. Your own values in <code>data/trainer.json</code> override both.</div>`;
 
   if (d.plans.length > 1) {
     const sorted = [...d.plans].sort((a, b) => fullCost(a) - fullCost(b));
@@ -302,9 +306,13 @@ function renderDetail(p) {
     h += `<h3>Recipes to learn</h3><div class="table-wrap"><table><thead><tr><th>Recipe</th><th>From</th><th class="num">Learn at</th><th class="num">Cost</th></tr></thead><tbody>` +
       [...p.learn].sort((a, b) => a.learn_level - b.learn_level || a.recipe.localeCompare(b.recipe)).map(l => `<tr><td>${esc(l.recipe)}</td>
         <td>${l.how === "recipe" ? "AH: " + l.recipe_items.map(i => esc(i.name)).join(" / ") : "Trainer"}</td>
-        <td class="num">${l.learn_level}${l.learn_level_known ? "" : '<span class="src" title="Not in the game files; assumed to be the yellow level. Correct it in data/trainer.json."> est.</span>'}</td>
-        <td class="num">${l.cost_copper === null ? '<span class="src">fee unknown</span>' : money(l.cost_copper)}</td></tr>`).join("") + `</tbody></table></div>`;
-    if (unknown) h += `<div class="note">${unknown} trainer fee(s) unknown and counted as 0. The game files don't include trainer fees or the skill needed to train; enter what your trainer shows in <code>data/trainer.json</code>.</div>`;
+        <td class="num">${l.learn_level}${LEARN_NOTE[l.learn_from] || ""}</td>
+        <td class="num">${l.cost_copper === null ? '<span class="src">fee unknown</span>' : (l.fee_from === "classic" ? '<span class="src" title="Classic trainer fee, used as an estimate">~</span>' : "") + money(l.cost_copper)}</td></tr>`).join("") + `</tbody></table></div>`;
+    const est = p.learn.filter(l => l.fee_from === "classic" || l.learn_from === "classic").length;
+    const notes = [];
+    if (est) notes.push(`${est} trainer recipe(s) use Classic fees/levels as estimates (marked ~ and "Classic").`);
+    if (unknown) notes.push(`${unknown} trainer fee(s) unknown and counted as 0.`);
+    if (notes.length) h += `<div class="note">${notes.join(" ")} Enter what your trainer shows in <code>data/trainer.json</code> to replace them.</div>`;
   }
   if (p.no_sell_price.length) h += `<div class="warn" style="margin-top:14px">No ${p.sell_back === "vendor" ? "vendor sell" : "AH"} price for: ${p.no_sell_price.map(esc).join(", ")}. Counted as 0${p.sell_back === "vendor" ? " — add them to <code>data/vendor_sell.json</code>" : ""}.</div>`;
   if (p.unpriced.length) h += `<div class="error" style="margin-top:14px">No price found for: ${p.unpriced.map(esc).join(", ")}</div>`;
