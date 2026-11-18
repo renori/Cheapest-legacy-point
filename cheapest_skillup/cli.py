@@ -81,6 +81,11 @@ def render(plan: Plan, prices: PriceBook, vendor_names: dict[int, str]) -> str:
 def plan_to_dict(plan: Plan, prices: PriceBook, vendor_names: dict[int, str]) -> dict:
     return {
         "profession": plan.profession.key,
+        "name": plan.profession.name,
+        "data_note": plan.profession.note,
+        "tools": [{"item_id": i, "name": n, "cost_copper": None if c == float("inf") else round(c)} for i, (n, c) in plan.tool_costs.items()],
+        "recipes_to_get": [{"name": r.name, "source": r.source, "cost_copper": r.learn_cost} for r in plan.learn if r.source != "trainer"],
+        "unpriced": [item_name(i, prices, vendor_names) for i in plan.unpriced],
         "start": plan.start,
         "target": plan.target,
         "reached": plan.reached,

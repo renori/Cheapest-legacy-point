@@ -5,6 +5,20 @@ Finds the cheapest way to level a WoW Forever crafting profession (default 1 →
 
 No API key and no dependencies, just Python 3.10+.
 
+## GUI
+
+```sh
+python -m cheapest_skillup.gui            # opens http://127.0.0.1:8765/ in your browser
+python -m cheapest_skillup.gui --port 9000 --no-browser
+```
+
+Pick professions, your auction house (region + Normal/PvP + faction), the price column and the skill
+range, then press **Find cheapest route**. You get a cost comparison of all selected professions, and
+for each one the route, a step table, a shopping list, intermediates to craft, tools and recipes to
+buy. The server listens only on `127.0.0.1`, so only your computer can reach it. Stop it with Ctrl+C.
+
+## Command line
+
 ```sh
 python -m cheapest_skillup tailoring                       # one profession
 python -m cheapest_skillup                                 # all of them, plus a summary

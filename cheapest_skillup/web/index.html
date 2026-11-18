@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cheapest Skill-up</title>
+<style>
+:root {
+  --bg: #f6f3ec; --panel: #fffdf8; --ink: #2a2620; --muted: #756c5e; --line: #e4ddcf;
+  --accent: #8a5a12; --accent-ink: #fff; --chip: #efe8da; --chip-on: #8a5a12;
+  --gold: #c99a1c; --silver: #8e9399; --copper: #b06a3b; --bad: #b3261e; --warn-bg: #fff4d6; --warn-line: #e9cf86;
+  --s1: #8a5a12; --s2: #2f6f8f; --s3: #6b8f2f; --s4: #8f2f5c; --s5: #5c4a9e; --s6: #2f8f7a; --s7: #a3542a; --s8: #5e6b75;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #17150f; --panel: #211e17; --ink: #ece6d8; --muted: #a99f8c; --line: #383226;
+    --accent: #e0a440; --accent-ink: #1b1710; --chip: #2c271d; --chip-on: #e0a440;
+    --gold: #f0c040; --silver: #c4c9cf; --copper: #d88a55; --bad: #ff8a80; --warn-bg: #2e2714; --warn-line: #6b5a24;
+    --s1: #e0a440; --s2: #5fb2d9; --s3: #a6cf5f; --s4: #e07aa8; --s5: #a796f0; --s6: #5fd1b8; --s7: #ec8f5e; --s8: #a3b0ba;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+header { padding: 18px 24px 12px; border-bottom: 1px solid var(--line); display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+header h1 { margin: 0; font-size: 21px; letter-spacing: .2px; }
+header .sub { color: var(--muted); font-size: 13px; }
+.layout { display: grid; grid-template-columns: 300px 1fr; gap: 20px; padding: 20px 24px 40px; max-width: 1280px; margin: 0 auto; }
+@media (max-width: 860px) { .layout { grid-template-columns: 1fr; padding: 16px; } header { padding: 14px 16px 10px; } }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px; }
+aside.panel { align-self: start; position: sticky; top: 16px; }
+@media (max-width: 860px) { aside.panel { position: static; } }
+label.f { display: block; font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; margin: 14px 0 6px; }
+label.f:first-child { margin-top: 0; }
+select, input[type=number], input[type=text] { width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 7px; background: var(--bg); color: var(--ink); font: inherit; }
+.row { display: flex; gap: 8px; }
+.row > * { flex: 1; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { border: 1px solid var(--line); background: var(--chip); color: var(--ink); border-radius: 999px; padding: 5px 11px; font: inherit; font-size: 13px; cursor: pointer; }
+.chip[aria-pressed=true] { background: var(--chip-on); border-color: var(--chip-on); color: var(--accent-ink); }
+.linkbtns { display: flex; gap: 12px; margin-top: 6px; font-size: 12px; }
+.linkbtns button { background: none; border: 0; padding: 0; color: var(--accent); cursor: pointer; font: inherit; text-decoration: underline; }
+.check { display: flex; gap: 8px; align-items: center; margin-top: 12px; font-size: 14px; }
+.hint { color: var(--muted); font-size: 12px; margin-top: 4px; }
+button.go { width: 100%; margin-top: 18px; padding: 11px; border: 0; border-radius: 8px; background: var(--accent); color: var(--accent-ink); font: inherit; font-weight: 700; font-size: 15px; cursor: pointer; }
+button.go:disabled { opacity: .6; cursor: progress; }
+.meta { color: var(--muted); font-size: 13px; margin-bottom: 12px; }
+.error { border: 1px solid var(--bad); color: var(--bad); border-radius: 8px; padding: 10px 12px; margin-bottom: 14px; }
+.warn { background: var(--warn-bg); border: 1px solid var(--warn-line); border-radius: 8px; padding: 10px 12px; font-size: 13px; margin-bottom: 14px; }
+h2 { font-size: 16px; margin: 0 0 12px; }
+h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); margin: 20px 0 8px; }
+.summary { margin-bottom: 18px; }
+.bar-row { display: grid; grid-template-columns: 130px 1fr 120px; gap: 10px; align-items: center; padding: 5px 0; cursor: pointer; border-radius: 6px; }
+.bar-row:hover .name { color: var(--accent); }
+.bar-row .track { height: 12px; background: var(--chip); border-radius: 6px; overflow: hidden; }
+.bar-row .fill { height: 100%; background: var(--accent); border-radius: 6px; }
+.bar-row .amt { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+@media (max-width: 520px) { .bar-row { grid-template-columns: 96px 1fr 96px; font-size: 13px; } }
+.tabs { display: flex; gap: 4px; flex-wrap: wrap; border-bottom: 1px solid var(--line); margin-bottom: 16px; }
+.tab { background: none; border: 0; border-bottom: 2px solid transparent; padding: 8px 12px; font: inherit; color: var(--muted); cursor: pointer; }
+.tab[aria-selected=true] { color: var(--ink); border-color: var(--accent); font-weight: 600; }
+.total { display: flex; gap: 22px; flex-wrap: wrap; margin-bottom: 4px; }
+.total .big { font-size: 24px; font-weight: 700; }
+.total .lbl { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .5px; }
+.route { display: flex; height: 26px; border-radius: 6px; overflow: hidden; margin: 6px 0 2px; border: 1px solid var(--line); }
+.route div { height: 100%; min-width: 2px; border-right: 1px solid var(--panel); }
+.route div:last-child { border-right: 0; }
+.route-scale { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); }
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 12px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .4px; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.sw { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 7px; vertical-align: baseline; }
+.src { font-size: 11px; color: var(--muted); }
+.money { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.coin { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin: 0 4px 0 1px; vertical-align: 0; }
+.cg { background: var(--gold); } .cs { background: var(--silver); } .cc { background: var(--copper); }
+ul.plain { margin: 0; padding-left: 18px; }
+.empty { color: var(--muted); padding: 30px 0; text-align: center; }
+.spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: spin .8s linear infinite; vertical-align: -2px; margin-right: 6px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.note { color: var(--muted); font-size: 12px; margin-top: 14px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Cheapest Skill-up</h1>
+  <span class="sub">Cheapest route to level WoW Forever professions, priced from TradeSkillMaster's public data</span>
+</header>
+
+<div class="layout">
+  <aside class="panel">
+    <form id="form">
+      <label class="f">Professions</label>
+      <div class="chips" id="profs"></div>
+      <div class="linkbtns"><button type="button" id="all">Select all</button><button type="button" id="none">Clear</button></div>
+
+      <label class="f" for="region">Auction house</label>
+      <div class="row">
+        <select id="region" aria-label="Region" style="flex:0 0 76px"></select>
+        <select id="realm" aria-label="Auction house"></select>
+      </div>
+
+      <label class="f" for="price">Buy at</label>
+      <select id="price"></select>
+
+      <label class="f">Skill</label>
+      <div class="row">
+        <input id="from" type="number" min="1" max="449" aria-label="From skill">
+        <input id="to" type="number" min="2" max="450" aria-label="To skill">
+      </div>
+
+      <label class="f">Recipe sources allowed</label>
+      <div class="chips" id="sources"></div>
+
+      <label class="check"><input type="checkbox" id="sellback"> Sell crafted items back</label>
+      <div class="hint">Subtracts each item's AH value after the 5% cut.</div>
+
+      <label class="f" for="overrides">Price overrides</label>
+      <input id="overrides" type="text" placeholder="e.g. 2589=0, 2592=100">
+      <div class="hint">itemId=copper. Use 0 for mats you already have.</div>
+
+      <label class="check"><input type="checkbox" id="refresh"> Re-download prices now</label>
+
+      <button class="go" id="go" type="submit">Find cheapest route</button>
+    </form>
+  </aside>
+
+  <main>
+    <div id="out" class="panel"><div class="empty">Choose professions and press <b>Find cheapest route</b>.</div></div>
+  </main>
+</div>
+
+<script>
+const $ = (s, el = document) => el.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const SWATCH = ["--s1","--s2","--s3","--s4","--s5","--s6","--s7","--s8"].map(v => `var(${v})`);
+const PRICE_LABEL = {minBuyout: "Min buyout", marketValue: "Market value", recent: "Recent value", historical: "Historical price"};
+const store = {
+  get(k) { try { return JSON.parse(localStorage.getItem("csu:" + k)); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem("csu:" + k, JSON.stringify(v)); } catch {} },
+};
+
+function money(c) {
+  if (c === null || c === undefined) return '<span class="money">n/a</span>';
+  c = Math.round(c);
+  const neg = c < 0; c = Math.abs(c);
+  const g = Math.floor(c / 10000), s = Math.floor(c / 100) % 100, cp = c % 100;
+  let h = "";
+  if (g) h += `${g.toLocaleString()}<i class="coin cg" title="gold"></i>`;
+  if (g || s) h += `${s}<i class="coin cs" title="silver"></i>`;
+  h += `${cp}<i class="coin cc" title="copper"></i>`;
+  return `<span class="money">${neg ? "−" : ""}${h}</span>`;
+}
+const ceil = x => Math.ceil(x - 1e-9);
+
+let OPTIONS, LAST, ACTIVE;
+
+function chip(container, value, label, on) {
+  const b = document.createElement("button");
+  b.type = "button"; b.className = "chip"; b.dataset.value = value; b.textContent = label;
+  b.setAttribute("aria-pressed", on ? "true" : "false");
+  b.onclick = () => b.setAttribute("aria-pressed", b.getAttribute("aria-pressed") === "true" ? "false" : "true");
+  container.appendChild(b);
+}
+const pressed = el => [...el.querySelectorAll(".chip[aria-pressed=true]")].map(b => b.dataset.value);
+function fillSelect(sel, values, current, labels = {}) {
+  sel.innerHTML = values.map(v => `<option value="${esc(v)}">${esc(labels[v] || v)}</option>`).join("");
+  sel.value = current;
+}
+
+async function init() {
+  OPTIONS = await (await fetch("/api/options")).json();
+  const d = Object.assign({}, OPTIONS.defaults, store.get("form") || {});
+  const profSel = d.professions || OPTIONS.professions.map(p => p.key);
+  OPTIONS.professions.forEach(p => chip($("#profs"), p.key, p.name, profSel.includes(p.key)));
+  OPTIONS.sources.forEach(s => chip($("#sources"), s, s, d.sources.includes(s)));
+  fillSelect($("#region"), OPTIONS.regions, d.region, {us: "US", eu: "EU"});
+  fillSelect($("#realm"), OPTIONS.realms, d.realm, {"normal-alliance": "Normal · Alliance", "normal-horde": "Normal · Horde", "pvp-alliance": "PvP · Alliance", "pvp-horde": "PvP · Horde"});
+  fillSelect($("#price"), OPTIONS.price_fields, d.price, PRICE_LABEL);
+  $("#from").value = d.from; $("#to").value = d.to;
+  $("#sellback").checked = !!d.sell_back;
+  $("#overrides").value = d.overrides || "";
+  $("#all").onclick = () => document.querySelectorAll("#profs .chip").forEach(b => b.setAttribute("aria-pressed", "true"));
+  $("#none").onclick = () => document.querySelectorAll("#profs .chip").forEach(b => b.setAttribute("aria-pressed", "false"));
+  $("#form").onsubmit = e => { e.preventDefault(); run(); };
+}
+
+async function run() {
+  const form = {
+    professions: pressed($("#profs")), sources: pressed($("#sources")),
+    region: $("#region").value, realm: $("#realm").value, price: $("#price").value,
+    from: +$("#from").value, to: +$("#to").value, sell_back: $("#sellback").checked,
+    overrides: $("#overrides").value.replace(/\s+/g, ""),
+  };
+  if (!form.professions.length) return showError("Pick at least one profession.");
+  if (!form.sources.length) return showError("Allow at least one recipe source.");
+  store.set("form", form);
+  const q = new URLSearchParams({
+    professions: form.professions.join(","), sources: form.sources.join(","),
+    region: form.region, realm: form.realm, price: form.price, from: form.from, to: form.to,
+    sell_back: form.sell_back ? "1" : "0", overrides: form.overrides, refresh: $("#refresh").checked ? "1" : "0",
+  });
+  const go = $("#go");
+  go.disabled = true; go.innerHTML = '<span class="spinner"></span>Pricing…';
+  try {
+    const r = await fetch("/api/plan?" + q);
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error || r.statusText);
+    LAST = data;
+    $("#refresh").checked = false;
+    if (!data.plans.some(p => p.profession === ACTIVE)) ACTIVE = data.plans[0]?.profession;
+    render();
+  } catch (e) {
+    showError(e.message);
+  } finally {
+    go.disabled = false; go.textContent = "Find cheapest route";
+  }
+}
+
+function showError(msg) {
+  const out = $("#out");
+  const old = out.querySelector(".error"); if (old) old.remove();
+  out.insertAdjacentHTML("afterbegin", `<div class="error">${esc(msg)}</div>`);
+  out.querySelector(".empty")?.remove();
+}
+
+const fullCost = p => p.total_cost_copper + p.tools_cost_copper;
+
+function render() {
+  const d = LAST, out = $("#out");
+  const scanned = new Date(d.prices_updated);
+  const when = isNaN(scanned) ? d.prices_updated : scanned.toLocaleString();
+  let h = `<div class="meta">${esc(PRICE_LABEL[d.price_field] || d.price_field)} from TSM <b>${esc(d.auction_house)}</b> · scanned ${esc(when)}</div>`;
+  h += `<div class="warn">Recipe data is a Classic Era baseline. WoW Forever has renamed and added recipes, so verify routes in game and update <code>data/recipes/*.json</code>.</div>`;
+
+  if (d.plans.length > 1) {
+    const sorted = [...d.plans].sort((a, b) => fullCost(a) - fullCost(b));
+    const max = Math.max(...sorted.map(fullCost), 1);
+    h += `<section class="summary"><h2>Cost to ${d.plans[0].target}, cheapest first</h2>`;
+    for (const p of sorted) {
+      h += `<div class="bar-row" data-prof="${esc(p.profession)}" role="button" tabindex="0">
+        <span class="name">${esc(p.name)}</span>
+        <span class="track"><span class="fill" style="display:block;width:${(fullCost(p) / max * 100).toFixed(1)}%"></span></span>
+        <span class="amt">${money(fullCost(p))}</span></div>`;
+    }
+    h += `</section>`;
+  }
+
+  h += `<div class="tabs" role="tablist">` + d.plans.map(p =>
+    `<button class="tab" role="tab" data-prof="${esc(p.profession)}" aria-selected="${p.profession === ACTIVE}">${esc(p.name)}</button>`).join("") + `</div>`;
+  h += `<div id="detail"></div>`;
+  out.innerHTML = h;
+  out.querySelectorAll("[data-prof]").forEach(el => {
+    const pick = () => { ACTIVE = el.dataset.prof; render(); $("#detail").scrollIntoView({block: "nearest", behavior: "smooth"}); };
+    el.onclick = pick;
+    el.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(); } };
+  });
+  renderDetail(d.plans.find(p => p.profession === ACTIVE));
+}
+
+function renderDetail(p) {
+  const colors = {};
+  [...new Set(p.steps.map(s => s.recipe))].forEach((r, i) => colors[r] = SWATCH[i % SWATCH.length]);
+  const span = p.target - p.start;
+  let h = `<div class="total">
+    <div><div class="lbl">Total</div><div class="big">${money(fullCost(p))}</div></div>
+    <div><div class="lbl">Materials</div><div>${money(p.total_cost_copper)}</div></div>
+    ${p.tools_cost_copper ? `<div><div class="lbl">Tools</div><div>${money(p.tools_cost_copper)}</div></div>` : ""}
+    <div><div class="lbl">Crafts</div><div>${p.steps.reduce((a, s) => a + ceil(s.expected_crafts), 0).toLocaleString()}</div></div>
+  </div>`;
+  if (p.reached < p.target) h += `<div class="error" style="margin-top:12px">Stuck at ${p.reached}: no allowed recipe skills up past this with known prices. Try allowing more recipe sources.</div>`;
+
+  h += `<h3>Route</h3><div class="route">` + p.steps.map(s =>
+    `<div style="width:${((s.to - s.from) / span * 100).toFixed(2)}%;background:${colors[s.recipe]}" title="${esc(s.recipe)}: ${s.from}–${s.to}"></div>`).join("") + `</div>
+    <div class="route-scale"><span>${p.start}</span><span>${p.target}</span></div>`;
+
+  h += `<div class="table-wrap"><table><thead><tr><th>Skill</th><th>Recipe</th><th class="num">Crafts</th><th class="num">Cost</th></tr></thead><tbody>` +
+    p.steps.map(s => `<tr><td class="money">${s.from}–${s.to}</td><td><span class="sw" style="background:${colors[s.recipe]}"></span>${esc(s.recipe)}</td>
+      <td class="num">${ceil(s.expected_crafts)}</td><td class="num">${money(s.cost_copper)}</td></tr>`).join("") + `</tbody></table></div>`;
+
+  const buy = [...p.buy].map(b => ({...b, total: b.unit_price_copper == null ? Infinity : b.unit_price_copper * b.quantity})).sort((a, b) => b.total - a.total);
+  h += `<h3>Shopping list</h3><div class="table-wrap"><table><thead><tr><th class="num">Qty</th><th>Item</th><th class="num">Each</th><th class="num">Total</th></tr></thead><tbody>` +
+    buy.map(b => `<tr><td class="num">${ceil(b.quantity)}</td><td>${esc(b.name)} <span class="src">${esc(b.price_source)}</span></td>
+      <td class="num">${money(b.unit_price_copper)}</td><td class="num">${b.total === Infinity ? "n/a" : money(b.total)}</td></tr>`).join("") + `</tbody></table></div>`;
+
+  const cf = Object.entries(p.craft_first);
+  if (cf.length) h += `<h3>Craft these first (cheaper than buying)</h3><ul class="plain">` + cf.map(([n, q]) => `<li>${ceil(q)} × ${esc(n)}</li>`).join("") + `</ul>`;
+  if (p.tools.length) h += `<h3>Tools needed once</h3><ul class="plain">` + p.tools.map(t => `<li>${esc(t.name)}: ${money(t.cost_copper)}</li>`).join("") + `</ul>`;
+  if (p.recipes_to_get.length) h += `<h3>Recipes to buy or find</h3><ul class="plain">` + p.recipes_to_get.map(r => `<li>${esc(r.name)} <span class="src">${esc(r.source)}</span></li>`).join("") + `</ul>`;
+  if (p.unpriced.length) h += `<div class="error" style="margin-top:14px">No price found for: ${p.unpriced.map(esc).join(", ")}</div>`;
+  h += `<div class="note">Quantities are expected values; buy a little extra. Min buyout is the cheapest single listing, so large orders will cost more.</div>`;
+  $("#detail").innerHTML = h;
+}
+
+init().catch(e => showError("Could not load options: " + e.message));
+</script>
+</body>
+</html>
