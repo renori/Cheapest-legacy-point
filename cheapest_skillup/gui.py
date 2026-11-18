@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse
 import json
 import threading
+import time
 import traceback
 import urllib.error
 import webbrowser
@@ -16,72 +17,124 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
-from .cli import PRICE_FIELDS, plan_to_dict
+from .cli import PRICE_FIELDS, plan_to_dict, side_of
 from .optimizer import cheapest_plan
-from .prices import load_pricebook
+from .prices import CACHE_TTL_SECONDS, load_pricebook
 from .recipes import (available_professions, load_foreverdb, load_item_names, load_profession, load_vendor_names, load_vendor_prices,
                       load_vendor_sell)
 
 PAGE = Path(__file__).resolve().parent / "web" / "index.html"
 REALMS = ["normal-alliance", "normal-horde", "pvp-alliance", "pvp-horde"]
 REGIONS = ["us", "eu"]
-_lock = threading.Lock()  # one plan at a time keeps the download cache simple
+MILESTONES = [75, 150, 225, 300]
+MAX_SKILL = 300
+_lock = threading.Lock()  # one price download at a time
+_books: dict[tuple, tuple] = {}  # settings -> (PriceBook, updated, loaded at)
+_plans: dict[tuple, dict] = {}  # (settings, profession, from, to) -> plan dict
+PLAN_CACHE = 256
 
 
 def options() -> dict:
-    profs = []
-    for key in available_professions():
-        p = load_profession(key)
-        profs.append({"key": key, "name": p.name})
+    profs = [{"key": k, "name": load_profession(k).name} for k in available_professions()]
     return {
         "professions": profs,
         "regions": REGIONS,
         "realms": REALMS,
         "price_fields": list(PRICE_FIELDS),
         "sources": ["trainer", "recipe"],
+        "milestones": MILESTONES,
+        "max_skill": MAX_SKILL,
         "defaults": {"game": "forever", "region": "us", "realm": "pvp-horde", "price": "minBuyout",
-                     "from": 1, "to": 150, "sources": ["trainer", "recipe"], "sell_back": "none"},
+                     "sources": ["trainer", "recipe"], "sell_back": "none", "target": 150},
     }
 
 
-def make_plan(q: dict[str, list[str]]) -> dict:
+def _settings(q: dict[str, list[str]]) -> tuple:
     get = lambda k, d: (q.get(k) or [d])[0]  # noqa: E731
-    profs = [p for p in get("professions", "").split(",") if p] or available_professions()
-    known = set(available_professions())
-    bad = [p for p in profs if p not in known]
-    if bad:
-        raise ValueError(f"Unknown profession: {', '.join(bad)}")
     price = get("price", "minBuyout")
     if price not in PRICE_FIELDS:
         raise ValueError(f"Unknown price field: {price}")
-    start, target = int(get("from", "1")), int(get("to", "150"))
-    if not (1 <= start < target <= 450):
-        raise ValueError("Skill range must satisfy 1 <= from < to.")
-    game, region, realm = get("game", "forever"), get("region", "us"), get("realm", "pvp-horde")
-    sources = {s for s in get("sources", "trainer,recipe").split(",") if s}
     sell_back = get("sell_back", "none")
     if sell_back not in ("none", "vendor", "ah"):
         raise ValueError(f"Unknown sell-back mode: {sell_back}")
-    sell_back = None if sell_back == "none" else sell_back
-    overrides = {}
+    overrides = []
     for pair in get("overrides", "").split(","):
         if "=" in pair:
             k, v = pair.split("=", 1)
-            overrides[int(k)] = int(v)
+            overrides.append((int(k), int(v)))
+    sources = tuple(sorted(s for s in get("sources", "trainer,recipe").split(",") if s))
+    return (get("game", "forever"), get("region", "us"), get("realm", "pvp-horde"), price, sources,
+            None if sell_back == "none" else sell_back, tuple(sorted(overrides)))
 
-    vendor_names = {**load_item_names(), **load_vendor_names()}
+
+def _pricebook(settings: tuple, refresh: bool):
+    game, region, realm, price, _, _, overrides = settings
+    key = (game, region, realm, price, overrides)
     with _lock:
-        prices, updated = load_pricebook(game, region, realm, load_vendor_prices(), price,
-                                         refresh=get("refresh", "0") == "1", overrides=overrides,
-                                         vendor_sell=load_vendor_sell(), names=load_item_names())
-    plans = [cheapest_plan(load_profession(k), prices, start, target, sources, sell_back) for k in profs]
-    return {
-        "prices_updated": updated,
-        "auction_house": f"{game}/{region}/{realm}",
-        "price_field": price,
-        "plans": [plan_to_dict(p, prices, vendor_names) for p in plans],
-        "foreverdb": bool(load_foreverdb()),
-    }
+        hit = _books.get(key)
+        if refresh or not hit or time.time() - hit[2] > CACHE_TTL_SECONDS:
+            prices, updated = load_pricebook(game, region, realm, load_vendor_prices(), price, refresh=refresh,
+                                             overrides=dict(overrides), vendor_sell=load_vendor_sell(),
+                                             names=load_item_names())
+            hit = (prices, updated, time.time())
+            _books[key] = hit
+            for k in [k for k in _plans if k[0][:4] + (k[0][6],) == key]:
+                del _plans[k]  # new prices: re-plan
+        return hit[0], hit[1]
+
+
+def _profession(q: dict[str, list[str]]) -> str:
+    prof = (q.get("prof") or [""])[0]
+    if prof not in available_professions():
+        raise ValueError(f"Unknown profession: {prof}")
+    return prof
+
+
+def _skill(q: dict[str, list[str]], name: str, default: int) -> int:
+    try:
+        v = int((q.get(name) or [default])[0])
+    except ValueError:
+        raise ValueError(f"{name} must be a number") from None
+    if not 1 <= v <= MAX_SKILL:
+        raise ValueError(f"{name} must be between 1 and {MAX_SKILL}")
+    return v
+
+
+def _plan(settings: tuple, prof: str, start: int, target: int, prices, updated) -> dict:
+    key = (settings, prof, start, target)
+    if key not in _plans:
+        _, _, realm, _, sources, sell_back, _ = settings
+        plan = cheapest_plan(load_profession(prof), prices, start, target, set(sources), sell_back)
+        vendor_names = {**load_item_names(), **load_vendor_names()}
+        if len(_plans) >= PLAN_CACHE:
+            _plans.pop(next(iter(_plans)))
+        _plans[key] = plan_to_dict(plan, prices, vendor_names, side_of(realm))
+    return _plans[key]
+
+
+def make_overview(q: dict[str, list[str]]) -> dict:
+    """Cost from your skill to each milestone (and your target) for one profession."""
+    settings, prof = _settings(q), _profession(q)
+    start, target = _skill(q, "from", 1), _skill(q, "to", 150)
+    prices, updated = _pricebook(settings, (q.get("refresh") or ["0"])[0] == "1")
+    goals = sorted({m for m in MILESTONES if m > start} | ({target} if target > start else set()))
+    rows = []
+    for goal in goals:
+        p = _plan(settings, prof, start, goal, prices, updated)
+        rows.append({"to": goal, "total_copper": p["grand_total_copper"], "reached": p["reached"]})
+    return {"prof": prof, "from": start, "to": target, "milestones": rows, "prices_updated": updated,
+            "auction_house": "/".join(settings[:3])}
+
+
+def make_plan(q: dict[str, list[str]]) -> dict:
+    """The full route for one profession."""
+    settings, prof = _settings(q), _profession(q)
+    start, target = _skill(q, "from", 1), _skill(q, "to", 150)
+    if start >= target:
+        raise ValueError("Target must be above your current skill.")
+    prices, updated = _pricebook(settings, (q.get("refresh") or ["0"])[0] == "1")
+    return {"prices_updated": updated, "auction_house": "/".join(settings[:3]), "price_field": settings[3],
+            "plan": _plan(settings, prof, start, target, prices, updated), "foreverdb": bool(load_foreverdb())}
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -103,6 +156,8 @@ class Handler(BaseHTTPRequestHandler):
                 self._send(200, PAGE.read_bytes(), "text/html; charset=utf-8")
             elif url.path == "/api/options":
                 self._json(200, options())
+            elif url.path == "/api/overview":
+                self._json(200, make_overview(parse_qs(url.query)))
             elif url.path == "/api/plan":
                 self._json(200, make_plan(parse_qs(url.query)))
             else:

@@ -72,6 +72,14 @@
     "6260": {
       "name": "Blue Dye",
       "price": 50
+    },
+    "16072": {
+      "name": "Expert Cookbook",
+      "price": 10000
+    },
+    "16084": {
+      "name": "Expert First Aid - Under Wraps",
+      "price": 10000
     }
   }
 }

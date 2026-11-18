@@ -22,9 +22,16 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 
 from .prices import PriceBook
-from .recipes import Profession, Recipe
+from .recipes import Profession, Rank, Recipe
 
 INF = float("inf")
+LOW_CHANCE_CRAFTS = 3  # more expected crafts per point than this: flag the step
+# Smoothing: a run of fewer than SMOOTH_MIN points between other recipes is folded into a
+# neighbour's recipe when that costs at most max(SMOOTH_COPPER, SMOOTH_PCT of materials) more.
+SMOOTH_MIN = 3
+SMOOTH_COPPER = 100
+SMOOTH_PCT = 0.005
+SMOOTH_PASSES = 4
 
 
 @dataclass
@@ -35,6 +42,14 @@ class Step:
     expected_crafts: float
     cost: float  # copper, expected, after any sell-back credit
     credit: float = 0.0  # copper recovered by selling what this step crafts
+
+    @property
+    def crafts_per_point(self) -> float:
+        return self.expected_crafts / max(1, self.end - self.start)
+
+    @property
+    def low_chance(self) -> bool:
+        return self.crafts_per_point > LOW_CHANCE_CRAFTS
 
 
 @dataclass
@@ -54,14 +69,19 @@ class Plan:
     sell_back: str | None = None  # None, "vendor" or "ah"
     no_sell_price: set[int] = field(default_factory=set)  # crafted items with no sell price known
     learn_costs: list[tuple[Recipe, int | None]] = field(default_factory=list)  # (recipe, copper or None=unknown)
+    ranks: list[tuple[Rank, int | None]] = field(default_factory=list)  # ranks to get on the way, with their cost
 
     @property
     def learn_total(self) -> float:
         return sum(c for _, c in self.learn_costs if c)
 
     @property
+    def ranks_total(self) -> float:
+        return sum(c for _, c in self.ranks if c)
+
+    @property
     def grand_total(self) -> float:
-        return self.total_cost + self.tools_cost + self.learn_total
+        return self.total_cost + self.tools_cost + self.learn_total + self.ranks_total
 
     @property
     def sell_credit(self) -> float:
@@ -108,32 +128,46 @@ class Optimizer:
             if r.makes:
                 self._makers[r.makes].append(r)
         self._unit_memo: dict[tuple[int, int], tuple[float, Recipe | None]] = {}
+        self._reagent_memo: dict[tuple[int, int], float] = {}
+        self._busy: set[tuple[int, int]] = set()
 
     # -- costs ---------------------------------------------------------------
 
-    def unit_cost(self, item: int, skill: int, _stack: frozenset = frozenset()) -> tuple[float, Recipe | None]:
+    def unit_cost(self, item: int, skill: int) -> tuple[float, Recipe | None]:
         """Cheapest cost of one `item` at `skill`, and the recipe to craft it (None = buy)."""
         key = (item, skill)
         if key in self._unit_memo:
             return self._unit_memo[key]
         q = self.prices.quote(item)
         best: tuple[float, Recipe | None] = (q.price if q.price is not None else INF, None)
+        if key in self._busy:
+            return best  # crafting loop (A from B from A): just buy
+        self._busy.add(key)
         for r in self._makers.get(item, []):
-            if r.orange > skill or r.name in _stack:
+            if r.orange > skill:
                 continue
-            c = self.reagent_cost(r, skill, _stack | {r.name}) / r.makes_qty
+            c = self.reagent_cost(r, skill) / r.makes_qty
             if c < best[0]:
                 best = (c, r)
-        if not _stack:
-            self._unit_memo[key] = best
+        self._busy.discard(key)
+        self._unit_memo[key] = best
         return best
 
-    def reagent_cost(self, r: Recipe, skill: int, _stack: frozenset = frozenset()) -> float:
-        return sum(qty * self.unit_cost(item, skill, _stack)[0] for item, qty in r.reagents.items())
+    def reagent_cost(self, r: Recipe, skill: int) -> float:
+        key = (id(r), skill)
+        if key not in self._reagent_memo:
+            self._reagent_memo[key] = sum(qty * self.unit_cost(item, skill)[0] for item, qty in r.reagents.items())
+        return self._reagent_memo[key]
 
     def learn_cost(self, r: Recipe) -> int | None:
         """Copper to learn `r`: 0 for auto, trainer fee (None if unknown), AH price of its recipe item."""
         return self._learn.get(id(r), 0)
+
+    def rank_cost(self, rank: Rank) -> int | None:
+        """Copper to get a profession rank: its trainer fee, or the skill book's vendor/AH price."""
+        if rank.how == "book" and rank.item and rank.cost_from != "you":
+            return self.prices.quote(rank.item).price
+        return rank.cost
 
     def credit(self, r: Recipe) -> float:
         """Copper recovered per craft by selling what it makes."""
@@ -142,7 +176,7 @@ class Optimizer:
         return self.prices.sell_value(r.makes, self.sell_back) * r.makes_qty
 
     def craft_cost(self, r: Recipe, skill: int) -> float:
-        return self.reagent_cost(r, skill, frozenset({r.name})) - self.credit(r)
+        return self.reagent_cost(r, skill) - self.credit(r)
 
     def point_cost(self, r: Recipe, skill: int) -> float:
         p = r.skillup_chance(skill)
@@ -150,14 +184,59 @@ class Optimizer:
 
     # -- planning ------------------------------------------------------------
 
-    def plan(self, start: int, target: int) -> Plan:
-        steps: list[Step] = []
-        skill = start
-        while skill < target:
-            options = [(self.point_cost(r, skill), r) for r in self.recipes]
+    def choose(self, start: int, target: int) -> list[Recipe]:
+        """Cheapest recipe for each point from `start` (stops early if nothing can skill up)."""
+        chosen: list[Recipe] = []
+        for skill in range(start, target):
+            options = [(self.point_cost(r, skill), r) for r in self.recipes if r.orange <= skill < r.grey]
             cost, best = min(options, key=lambda o: o[0], default=(INF, None))
             if best is None or cost == INF:
                 break
+            chosen.append(best)
+        return chosen
+
+    def smooth(self, start: int, chosen: list[Recipe]) -> list[Recipe]:
+        """Fold short runs (A A B A A) into a neighbouring recipe when that costs next to nothing more."""
+        chosen = list(chosen)
+        materials = sum(self.point_cost(r, start + i) for i, r in enumerate(chosen))
+        tolerance = max(SMOOTH_COPPER, SMOOTH_PCT * materials)
+        for _ in range(SMOOTH_PASSES):
+            runs, i = [], 0
+            while i < len(chosen):
+                j = i
+                while j < len(chosen) and chosen[j] is chosen[i]:
+                    j += 1
+                runs.append((i, j))
+                i = j
+            changed = False
+            for k, (i, j) in enumerate(runs):
+                if j - i >= SMOOTH_MIN or len(runs) == 1:
+                    continue
+                current = sum(self.point_cost(chosen[x], start + x) for x in range(i, j))
+                best = None
+                for n in (k - 1, k + 1):
+                    if not 0 <= n < len(runs):
+                        continue
+                    alt = chosen[runs[n][0]]
+                    extra = sum(self.point_cost(alt, start + x) for x in range(i, j)) - current
+                    if extra <= tolerance and (best is None or extra < best[0]):
+                        best = (extra, alt)
+                if best:
+                    for x in range(i, j):
+                        chosen[x] = best[1]
+                    tolerance -= best[0]
+                    changed = True
+                    break
+            if not changed:
+                break
+        return chosen
+
+    def plan(self, start: int, target: int) -> Plan:
+        steps: list[Step] = []
+        chosen = self.smooth(start, self.choose(start, target))
+        for i, best in enumerate(chosen):
+            skill = start + i
+            cost = self.point_cost(best, skill)
             p = best.skillup_chance(skill)
             credit = self.credit(best) / p
             if steps and steps[-1].recipe is best:
@@ -166,7 +245,7 @@ class Optimizer:
                 s.credit += credit
             else:
                 steps.append(Step(best, skill, skill + 1, 1 / p, cost, credit))
-            skill += 1
+        skill = start + len(chosen)
 
         buy: dict[int, float] = defaultdict(float)
         craft_first: dict[str, float] = defaultdict(float)
@@ -215,6 +294,7 @@ class Optimizer:
             unpriced=unpriced,
             tool_costs=tool_costs,
             learn_costs=[(r, self.learn_cost(r)) for r in learn.values()],
+            ranks=[(r, self.rank_cost(r)) for r in self.prof.ranks_needed(start, skill)],
             sell_back=self.sell_back,
             no_sell_price={s.recipe.makes for s in steps if self.sell_back and s.recipe.makes
                            and not self.prices.sell_value(s.recipe.makes, self.sell_back)},
@@ -231,28 +311,45 @@ def cheapest_plan(
 ) -> Plan:
     """Plan including what it costs to learn the recipes.
 
-    The per-point planner ignores one-off learning costs, so afterwards try
-    leaving out each paid recipe it used (most expensive first) and keep the
-    change whenever the grand total drops.
+    The per-point planner ignores one-off learning costs. Afterwards, for each
+    paid recipe the plan uses, estimate what doing its points with the next-best
+    recipe would cost; if that is less than the recipe's price, re-plan without
+    it and keep the change when the grand total really drops.
     """
     exclude: set[int] = set()
+    kept: set[int] = set()
 
-    def run() -> Plan:
-        return Optimizer(profession, prices, allowed_sources, sell_back, frozenset(exclude)).plan(start, target)
+    def run() -> tuple[Plan, Optimizer]:
+        opt = Optimizer(profession, prices, allowed_sources, sell_back, frozenset(exclude))
+        return opt.plan(start, target), opt
 
-    best = run()
-    improved = True
-    while improved:
-        improved = False
-        paid = sorted(((r, c) for r, c in best.learn_costs if c), key=lambda rc: -rc[1])
-        for r, _ in paid:
-            exclude.add(id(r))
-            trial = run()
-            if trial.reached >= best.reached and trial.grand_total < best.grand_total:
-                best, improved = trial, True
-                break
+    best, opt = run()
+    while True:
+        used_points: dict[int, list[int]] = {}
+        for s in best.steps:
+            used_points.setdefault(id(s.recipe), []).extend(range(s.start, s.end))
+        candidates = []
+        for r, fee in best.learn_costs:
+            if not fee or id(r) in kept:
+                continue
+            points = used_points.get(id(r), [])
+            # Extra cost of doing r's points with the best other recipe (intermediate-only recipes: unknown, test them).
+            extra = 0.0
+            for sk in points:
+                alts = [opt.point_cost(a, sk) for a in opt.recipes if a is not r and a.orange <= sk < a.grey]
+                extra += min(alts, default=INF) - opt.point_cost(r, sk)
+            if extra < fee:
+                candidates.append((fee - extra, r))
+        if not candidates:
+            return best
+        _, r = max(candidates, key=lambda c: c[0])
+        exclude.add(id(r))
+        trial, trial_opt = run()
+        if trial.reached >= best.reached and trial.grand_total < best.grand_total:
+            best, opt = trial, trial_opt
+        else:
             exclude.discard(id(r))
-    return best
+            kept.add(id(r))
 
 
 def ceil(x: float) -> int:

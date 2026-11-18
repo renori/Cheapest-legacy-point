@@ -10,7 +10,9 @@ and writes data/foreverdb.json. The planner uses it to:
   servers, which the game files can't link by name);
 * leave out recipes with no known way to learn them, and recipes ForeverDB
   marks as probably not in the live game (Season of Discovery leftovers...);
-* use trainer fees players saw at Forever trainers.
+* use trainer fees players saw at Forever trainers;
+* charge each profession rank (Journeyman, Expert, Artisan) at ForeverDB's
+  fee, from the ForeverDB Helper addon's Data/Professions.lua.
 
 Data from ForeverDB.net (https://foreverdb.net), GPL-3.0 with an attribution
 term: credit "Data from ForeverDB.net (https://foreverdb.net)".
@@ -18,12 +20,13 @@ term: credit "Data from ForeverDB.net (https://foreverdb.net)".
 
 from __future__ import annotations
 
+import io
 import json
 import re
 import sys
-from pathlib import Path
+import zipfile
 
-from .gamedata import _get
+from .gamedata import _get, load_table
 from .recipes import DATA_DIR
 
 SITE = "https://foreverdb.net"
@@ -69,6 +72,75 @@ def parse_recipes_lua(text: str) -> tuple[str, dict[int, dict]]:
     return build, out
 
 
+RANK_FILE = "ForeverDB_Helper/Data/Professions.lua"
+_NPC = re.compile(r'\[(\d+)\]=\{"((?:[^"\\]|\\.)*)","((?:[^"\\]|\\.)*)","([ah])",(\d+),([-\d.]+),([-\d.]+),(\d)\}')
+PROFESSION_KEYS = {"first-aid": "first_aid"}
+
+
+def _ids(s: str) -> list[int]:
+    return [int(x) for x in re.findall(r"\d+", s)]
+
+
+def _faction_lists(s: str) -> dict[str, list[int]]:
+    """'a={1,2},h={3}' -> {"a": [1, 2], "h": [3]}."""
+    return {side: _ids(ids) for side, ids in re.findall(r"\b([ah])=\{([\d,]*)\}", s)}
+
+
+def parse_trainers_lua(text: str) -> tuple[dict[str, dict[str, list[int]]], dict[int, dict], dict[int, dict]]:
+    """From ForeverDB Helper's Data/Professions.lua:
+    rank trainers {profession: {cap: {"a": [npc], "h": [npc]}}},
+    recipe trainers {spell: {"a": [npc], "h": [npc]}} for the recipes on ForeverDB's routes,
+    trainers {npc: {name, title, side, map, x, y, seen}}."""
+    rank_tr: dict[str, dict[str, list[int]]] = {}
+    recipe_tr: dict[int, dict[str, list[int]]] = {}
+    for m in re.finditer(r'\["([\w-]+)"\]=\[=\[(.*?)\]=\]', text, re.S):
+        key = PROFESSION_KEYS.get(m.group(1), m.group(1))
+        body = m.group(2)
+        i = body.find("ranks={")
+        if i >= 0 and key not in rank_tr:
+            j = body.find("steps", i)
+            part = body[i:j if j > 0 else None]
+            caps = {}
+            for cap, tr in re.findall(r'max=(\d+),sk=\d+,lv=\d+,cost=\d+,tr=\{((?:[ah]=\{[\d,]*\},?)*)\}', part):
+                caps[cap] = _faction_lists(tr)
+            rank_tr[key] = caps
+        for side_m in re.finditer(r'\b([ah])=\{steps=', body):
+            side = side_m.group(1)
+            end = body.find("},h={steps=", side_m.end()) if side == "a" else len(body)
+            part = body[side_m.end():end]
+            starts = [(s.start(), int(s.group(1))) for s in re.finditer(r'\{s=(\d+),', part)]
+            for n, (pos, spell) in enumerate(starts):
+                step = part[pos:starts[n + 1][0] if n + 1 < len(starts) else len(part)]
+                learn = re.search(r'L=\{how="([a-z]*)"[^{}]*?tr=\{([\d,]*)\}', step)
+                if learn and "t" in learn.group(1):
+                    recipe_tr.setdefault(spell, {})[side] = _ids(learn.group(2))
+    npcs: dict[int, dict] = {}
+    k = text.find("ns.profNpcSrc")
+    if k >= 0:
+        for m in _NPC.finditer(text[k:]):
+            npcs[int(m.group(1))] = {"name": m.group(2), "title": m.group(3), "side": m.group(4), "map": int(m.group(5)),
+                                     "x": float(m.group(6)), "y": float(m.group(7)), "seen": m.group(8) == "1"}
+    return rank_tr, recipe_tr, npcs
+
+
+def parse_ranks_lua(text: str) -> dict[str, list[dict]]:
+    """{profession: [{name, cap, skill, level, cost}]} from ForeverDB Helper's Data/Professions.lua."""
+    out: dict[str, list[dict]] = {}
+    for m in re.finditer(r'\["([\w-]+)"\]=\[=\[(.*?)\]=\]', text, re.S):
+        body = m.group(2)
+        i = body.find("ranks={")
+        if i < 0:
+            continue
+        j = body.find("steps", i)
+        ranks = [{"name": r, "cap": int(cap), "skill": int(sk), "level": int(lv), "cost": int(cost)}
+                 for r, cap, sk, lv, cost in re.findall(
+                     r'\{r="(\w+)",max=(\d+),sk=(\d+),lv=(\d+),cost=(\d+)', body[i:j if j > 0 else None])]
+        key = PROFESSION_KEYS.get(m.group(1), m.group(1))
+        if ranks and key not in out:
+            out[key] = ranks
+    return out
+
+
 def main(argv: list[str] | None = None) -> int:
     manifest = json.loads(_get(f"{SITE}/downloads/addon-manifest.json"))
     files = {f["path"]: f["url"] for f in manifest["data"]["files"]}
@@ -77,10 +149,35 @@ def main(argv: list[str] | None = None) -> int:
         return 1
     text = _get(f"{SITE}/{files['Data/Recipes.lua']}").decode("utf-8")
     build, spells = parse_recipes_lua(text)
+    ranks: dict[str, list[dict]] = {}
+    rank_tr: dict = {}
+    recipe_tr: dict = {}
+    npcs: dict = {}
+    try:
+        with zipfile.ZipFile(io.BytesIO(_get(f"{SITE}/{manifest['addon']['url']}"))) as z:
+            helper = z.read(RANK_FILE).decode("utf-8")
+        ranks = parse_ranks_lua(helper)
+        rank_tr, recipe_tr, npcs = parse_trainers_lua(helper)
+    except (KeyError, zipfile.BadZipFile) as e:
+        print(f"No rank data in the ForeverDB addon ({e}); rank fees fall back to Classic.", file=sys.stderr)
+    for key, rs in ranks.items():
+        for r in rs:
+            r["trainers"] = rank_tr.get(key, {}).get(str(r["cap"]), {})
+    # Zone names for the trainers' maps, from the game's UiMap table.
+    zones = {}
+    try:
+        zones = {int(r["ID"]): r["Name_lang"] for r in load_table("UiMap", build)}
+    except Exception as e:  # noqa: BLE001 - names are a nicety
+        print(f"Could not load zone names ({e}).", file=sys.stderr)
+    for n in npcs.values():
+        n["zone"] = zones.get(n["map"], f"map {n['map']}")
     data = {
         "credit": CREDIT,
         "license": "GPL-3.0 with an attribution term (see https://foreverdb.net and the ForeverDB addon's NOTICE.txt)",
         "source": f"ForeverDB addon data {manifest['data'].get('version', '')}, Data/Recipes.lua, WoW Forever build {build}",
+        "ranks": ranks,
+        "trainers": {str(k): v for k, v in sorted(npcs.items())},
+        "recipe_trainers": {str(k): v for k, v in sorted(recipe_tr.items())},
         "spells": {str(k): v for k, v in sorted(spells.items())},
     }
     OUT.write_text("{\n" + "".join(f'  {json.dumps(k)}: {json.dumps(v)},\n' for k, v in data.items() if k != "spells")

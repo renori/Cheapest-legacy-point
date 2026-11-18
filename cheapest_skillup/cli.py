@@ -36,14 +36,64 @@ def item_name(item: int, prices: PriceBook, vendor_names: dict[int, str]) -> str
     return prices.name(item) or vendor_names.get(item) or f"item {item}"
 
 
-def render(plan: Plan, prices: PriceBook, vendor_names: dict[int, str]) -> str:
+def prev_cap(plan: Plan, rank) -> int:
+    caps = [r.cap for r in plan.profession.ranks if r.cap < rank.cap]
+    return max(caps, default=0)
+
+
+def rank_text(rank, cost) -> str:
+    if rank.how == "quest":
+        return "quest"
+    if cost is None:
+        return "fee unknown"
+    return ("~" if rank.cost_from == "classic" else "") + money(cost) + (" (skill book)" if rank.how == "book" else "")
+
+
+def side_of(realm: str) -> str | None:
+    """'pvp-horde' -> 'h', 'normal-alliance' -> 'a'."""
+    return "h" if realm.endswith("horde") else "a" if realm.endswith("alliance") else None
+
+
+def where_at(trainers: list[dict], n: int = 3) -> str:
+    if not trainers:
+        return "trainer locations unknown"
+    shown = [f"{t['name']} ({t['zone']} {t['x']:.0f},{t['y']:.0f})" for t in trainers[:n]]
+    return "at " + ", ".join(shown) + (f" +{len(trainers) - n} more" if len(trainers) > n else "")
+
+
+def trainer_json(trainers: list[dict]) -> list[dict]:
+    return [{"name": t["name"], "title": t["title"], "zone": t["zone"], "x": t["x"], "y": t["y"], "seen": t["seen"]}
+            for t in trainers]
+
+
+def rank_line(rank, cost) -> str:
+    need = [f"skill {rank.skill}+"] if rank.skill else []
+    if rank.level:
+        need.append(f"character level {rank.level}")
+    how = {"book": "Learn", "quest": "Quest for"}.get(rank.how, "Train")
+    label = f"** {how} {rank.name} (cap {rank.cap})" + (f", needs {', '.join(need)}" if need else "")
+    return f"{'':<10} {label:<55} {rank_text(rank, cost):>16}"
+
+
+def render(plan: Plan, prices: PriceBook, vendor_names: dict[int, str], side: str | None = None) -> str:
     out: list[str] = []
     title = f"{plan.profession.name}: {plan.start} -> {plan.target}"
     out += [title, "=" * len(title)]
     out.append(f"{'Skill':<10} {'Recipe':<38} {'Learn':<10} {'Crafts':>6} {'Cost':>14}")
+    pending = list(plan.ranks)
     for s in plan.steps:
+        while pending and (s.end > prev_cap(plan, pending[0][0]) or pending[0][0].cap <= 75):
+            rank, cost = pending.pop(0)
+            out.append(rank_line(rank, cost))
+            if rank.how == "trainer":
+                out.append(f"{'':<14}{where_at(plan.profession.trainers_for(rank, side))}")
+        flag = "  (low chance: ~%.1f crafts per point)" % s.crafts_per_point if s.low_chance else ""
         out.append(f"{s.start:>3}-{s.end:<6} {s.recipe.name:<38} {SOURCE_LABEL.get(s.recipe.source, s.recipe.source):<10} "
-                   f"{ceil(s.expected_crafts):>6} {money(s.cost):>14}")
+                   f"{ceil(s.expected_crafts):>6} {money(s.cost):>14}{flag}")
+    for rank, cost in pending:
+        out.append(rank_line(rank, cost))
+        if rank.how == "trainer":
+            out.append(f"{'':<14}{where_at(plan.profession.trainers_for(rank, side))}")
     if plan.reached < plan.target:
         out.append(f"!! Stuck at {plan.reached}: no allowed recipe can skill up from here with known prices.")
 
@@ -81,6 +131,8 @@ def render(plan: Plan, prices: PriceBook, vendor_names: dict[int, str]) -> str:
                 where = f"trainer, {level}{fee_note}"
             fee = "fee unknown" if c is None else ("~" if r.fee_from == "classic" else "") + money(c)
             out.append(f"  {r.name:<38} {fee:>14}  ({where})")
+            if r.source == "trainer":
+                out.append(f"  {'':<38} {'':>14}  {where_at(plan.profession.trainers_for(r, side))}")
 
     if plan.sell_back:
         how = "to a vendor" if plan.sell_back == "vendor" else "on the AH"
@@ -94,6 +146,8 @@ def render(plan: Plan, prices: PriceBook, vendor_names: dict[int, str]) -> str:
         out.append(f"Tools: {money(plan.tools_cost)}")
     if plan.learn_total:
         out.append(f"Learning recipes: {money(plan.learn_total)}")
+    if plan.ranks_total:
+        out.append(f"Profession ranks: {money(plan.ranks_total)}")
     unknown = sum(1 for r, c in plan.learn_costs if c is None)
     estimated = sum(1 for r, c in plan.learn_costs if c is not None and r.fee_from == "classic")
     notes = ([f"{estimated} trainer fee(s) are Classic estimates"] if estimated else []) + \
@@ -104,7 +158,7 @@ def render(plan: Plan, prices: PriceBook, vendor_names: dict[int, str]) -> str:
     return "\n".join(out)
 
 
-def plan_to_dict(plan: Plan, prices: PriceBook, vendor_names: dict[int, str]) -> dict:
+def plan_to_dict(plan: Plan, prices: PriceBook, vendor_names: dict[int, str], side: str | None = None) -> dict:
     return {
         "profession": plan.profession.key,
         "name": plan.profession.name,
@@ -117,17 +171,24 @@ def plan_to_dict(plan: Plan, prices: PriceBook, vendor_names: dict[int, str]) ->
         "total_cost_copper": round(plan.total_cost),
         "tools_cost_copper": round(plan.tools_cost),
         "learn_cost_copper": round(plan.learn_total),
+        "ranks_cost_copper": round(plan.ranks_total),
+        "ranks": [{"name": r.name, "cap": r.cap, "skill": r.skill, "level": r.level, "how": r.how, "cost_copper": c,
+                   "cost_from": r.cost_from, "before": prev_cap(plan, r),
+                   "trainers": trainer_json(plan.profession.trainers_for(r, side)) if r.how == "trainer" else []}
+                  for r, c in plan.ranks],
         "grand_total_copper": round(plan.grand_total),
         "learn": [
             {"recipe": r.name, "spell": r.spell, "how": r.source, "cost_copper": c, "learn_level": r.orange,
-             "learn_level_known": r.learn_known, "learn_from": r.learn_from, "fee_from": r.fee_from, "recipe_items": [{"item_id": i, "name": item_name(i, prices, vendor_names)} for i in r.recipe_items]}
+             "learn_level_known": r.learn_known, "learn_from": r.learn_from, "fee_from": r.fee_from,
+             "trainers": trainer_json(plan.profession.trainers_for(r, side)) if r.source == "trainer" else [], "recipe_items": [{"item_id": i, "name": item_name(i, prices, vendor_names)} for i in r.recipe_items]}
             for r, c in plan.learn_costs if r.source != "auto"
         ],
         "sell_back": plan.sell_back,
         "sell_credit_copper": round(plan.sell_credit),
         "no_sell_price": [item_name(i, prices, vendor_names) for i in sorted(plan.no_sell_price)],
         "steps": [
-            {"recipe": s.recipe.name, "how": s.recipe.source, "from": s.start, "to": s.end, "expected_crafts": round(s.expected_crafts, 2), "cost_copper": round(s.cost), "credit_copper": round(s.credit)}
+            {"recipe": s.recipe.name, "how": s.recipe.source, "crafts_per_point": round(s.crafts_per_point, 2),
+             "low_chance": s.low_chance, "from": s.start, "to": s.end, "expected_crafts": round(s.expected_crafts, 2), "cost_copper": round(s.cost), "credit_copper": round(s.credit)}
             for s in plan.steps
         ],
         "craft_first": {k: round(v, 2) for k, v in plan.craft_first.items()},
@@ -189,10 +250,10 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.json:
         print(json.dumps({"prices_updated": updated, "auction_house": f"{args.game}/{args.region}/{args.realm}", "price_field": args.price,
-                          "plans": [plan_to_dict(p, prices, vendor_names) for p in results]}, indent=2))
+                          "plans": [plan_to_dict(p, prices, vendor_names, side_of(args.realm)) for p in results]}, indent=2))
     else:
         print(f"Prices: TSM {args.price} for {args.game}/{args.region}/{args.realm}, scanned {updated}\n")
-        print("\n\n".join(render(p, prices, vendor_names) for p in results))
+        print("\n\n".join(render(p, prices, vendor_names, side_of(args.realm)) for p in results))
         if load_foreverdb():
             print(f"\nRecipe sources and trainer fees: {FOREVERDB_CREDIT}")
         if len(results) > 1:

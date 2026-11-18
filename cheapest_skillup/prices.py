@@ -17,6 +17,10 @@ from pathlib import Path
 
 BASE_URL = "https://public-data.tradeskillmaster.com"
 CACHE_TTL_SECONDS = 3 * 60 * 60  # realm files refresh roughly every 3 hours
+VENDOR_EDGE = 0.9  # buy a vendor-sold item on the AH only if it is at least 10% cheaper there
+AH_CUT = 0.05
+DEPOSIT_RATE = 0.05  # of the vendor sell price, per 2 hours of auction (lost if it doesn't sell)
+AUCTION_HOURS = 24
 
 
 def realm_url(game: str, region: str, realm: str) -> str:
@@ -108,6 +112,12 @@ class PriceBook:
         return self.names.get(item_id)
 
     def quote(self, item_id: int) -> Quote:
+        cache = self.__dict__.setdefault("_quotes", {})
+        if item_id not in cache:
+            cache[item_id] = self._quote(item_id)
+        return cache[item_id]
+
+    def _quote(self, item_id: int) -> Quote:
         if item_id in self.overrides:
             return Quote(item_id, self.overrides[item_id], "override")
         candidates: list[Quote] = []
@@ -121,7 +131,10 @@ class PriceBook:
             if mv is not None:
                 candidates.append(Quote(item_id, mv, "region marketValue"))
         if item_id in self.vendor_prices:
-            candidates.append(Quote(item_id, self.vendor_prices[item_id], "vendor"))
+            vendor = self.vendor_prices[item_id]
+            # Not worth a trip to the AH for a copper or two: prefer the vendor unless the AH is 10% cheaper.
+            candidates = [q for q in candidates if q.price <= vendor * VENDOR_EDGE]
+            candidates.append(Quote(item_id, vendor, "vendor"))
         if not candidates:
             return Quote(item_id, None, "unavailable")
         return min(candidates, key=lambda q: q.price)
@@ -136,13 +149,17 @@ class PriceBook:
     def sell_value(self, item_id: int, mode: str = "vendor") -> int:
         """What one crafted item is worth when sold back.
 
-        mode "vendor": the vendor sell price from data/vendor_sell.json. mode "ah": the AH price after the 5% cut.
+        mode "vendor": the vendor sell price from data/vendor_sell.json. mode "ah": the AH price after
+        the 5% cut and the 24-hour deposit (counted as lost, as if it doesn't sell the first time).
         """
         if mode == "vendor":
             return self.vendor_sell.get(item_id, 0)
         realm = self.realm_rows.get(item_id)
         ah = _int(realm.get(self.price_field)) if realm else None
-        return int(ah * 0.95) if ah else 0
+        if not ah:
+            return 0
+        deposit = self.vendor_sell.get(item_id, 0) * DEPOSIT_RATE * AUCTION_HOURS / 2
+        return max(0, int(ah * (1 - AH_CUT) - deposit))
 
 
 def load_pricebook(
