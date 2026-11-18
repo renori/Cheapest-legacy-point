@@ -1,34 +1,69 @@
 # Cheapest Skill-up
 
-Finds the cheapest way to level a WoW Forever crafting profession (default 1 → 150), priced with
-[TradeSkillMaster's public pricing data](https://tradeskillmaster.com/public-data).
+The cheapest way to level a WoW Forever crafting profession to 150, 225, 300 or any skill you choose.
+It is priced with [TradeSkillMaster's public pricing data](https://tradeskillmaster.com/public-data)
+and includes materials, recipes, trainer fees and profession ranks. It also shows where each trainer
+is.
 
 No API key and no dependencies, just Python 3.10+.
 
-## GUI
+![Overview: cost from your skill to each milestone, per profession](docs/images/overview.png)
 
-On Windows, double-click **`start_gui.bat`** in this folder. Or open a terminal **in this folder**
-(the one that contains `cheapest_skillup`) and run:
+| Route with ranks and trainer locations | Recipes, ranks and their sources |
+|---|---|
+| ![Route](docs/images/route.png) | ![Recipes and ranks](docs/images/recipes.png) |
 
-```sh
-python -m cheapest_skillup.gui            # opens http://127.0.0.1:8765/ in your browser
-python -m cheapest_skillup.gui --port 9000 --no-browser
+| Dark mode | Phone |
+|---|---|
+| ![Dark mode overview](docs/images/overview-dark.png) | ![Phone](docs/images/phone.png) |
+
+## Quick start (Windows PowerShell)
+
+```powershell
+git clone -b ccr-8d972126-1vg3tt https://github.com/renori/cheapest-legacy-point.git
+cd cheapest-legacy-point
+python -m cheapest_skillup.gui
 ```
 
-Pick professions, your auction house (region + Normal/PvP + faction), the price column and the skill
-range, then press **Find cheapest route**. You get a cost comparison of all selected professions, and
-for each one the route, a step table (with how each recipe is learned), a shopping list, intermediates
-to craft, tools, and the recipes to learn with their cost. The server listens only on `127.0.0.1`, so only your computer can reach it. Stop it with Ctrl+C.
+This opens http://127.0.0.1:8765/ in your browser. Next time, just double-click `start_gui.bat`.
+Always run the commands from inside the folder that contains `cheapest_skillup`.
+
+## The app
+
+**Overview.** There is one card per profession. Enter your current skill and pick a target: 150, 225,
+300, or any other number. The card shows the cost from your skill to each milestone, with your target
+highlighted. Star your own professions to keep them at the top. Your entries are saved in your browser.
+
+**Profession page.** It opens with a cost summary: materials, anything you recover by selling, recipes
+and trainer fees, profession ranks and tools. Below it are three views:
+
+* **Route:** the recipe to craft for each stretch of skill, with how many crafts and what they cost.
+  * Rank rows (*Train Journeyman*, *Learn Expert*, *Quest for Artisan*) appear where you hit each cap,
+    with the skill and character level they need.
+  * Every trainer step has a **Where to train** list for your auction house's faction: trainer name,
+    title, zone and map coordinates, with trainers players have seen in Forever listed first.
+  * Steps that need more than 3 crafts per skill point are marked *low chance*.
+* **Materials:** the shopping list, intermediates to craft yourself, and tools.
+* **Recipes & ranks:** every recipe and rank to learn, where it comes from, its learn level and its
+  cost.
+
+**Sidebar.** Here you choose your auction house (region, Normal or PvP, faction), which TSM price to buy
+at, whether to buy recipe items on the AH, what to do with crafted items (keep, sell to a vendor, or
+sell on the AH after the 5% cut and deposit), and per-item price overrides (`2589=0` for mats you
+already have).
+
+The server listens only on `127.0.0.1`, so only your computer can reach it. Stop it with Ctrl+C.
 
 ## Command line
 
 ```sh
-python -m cheapest_skillup tailoring                       # one profession
-python -m cheapest_skillup                                 # all of them, plus a summary
-python -m cheapest_skillup alchemy --realm pvp-horde --region eu
-python -m cheapest_skillup leatherworking --from 75 --to 150
-python -m cheapest_skillup cooking --sources trainer           # don't buy recipe items
-python -m cheapest_skillup tailoring --sell-back           # subtract vendor value of what you craft
+python -m cheapest_skillup tailoring                       # one profession, 1 -> 150
+python -m cheapest_skillup tailoring --to 300              # to Artisan
+python -m cheapest_skillup leatherworking --from 120 --to 225
+python -m cheapest_skillup                                 # all professions, plus a summary
+python -m cheapest_skillup alchemy --region eu --realm normal-alliance
+python -m cheapest_skillup cooking --sources trainer       # don't buy recipe items
+python -m cheapest_skillup tailoring --sell-back           # credit the vendor value of what you craft
 python -m cheapest_skillup tailoring --sell-back ah        # ...or its AH value (optimistic)
 python -m cheapest_skillup tailoring --price marketValue   # if min buyouts are thin
 python -m cheapest_skillup tailoring --json
@@ -39,125 +74,87 @@ Professions: `alchemy`, `blacksmithing`, `cooking`, `enchanting`, `engineering`,
 
 ## Prices
 
-Downloaded from `https://public-data.tradeskillmaster.com` and cached for 3 hours in
-`~/.cache/cheapest-skillup` (`--refresh` ignores the cache).
+Prices are downloaded from `https://public-data.tradeskillmaster.com` and cached for 3 hours in
+`~/.cache/cheapest-skillup` (*Re-download prices* in the app, `--refresh` on the command line).
 
-| Option     | Default           | Meaning                                                             |
-|------------|-------------------|---------------------------------------------------------------------|
-| `--game`   | `forever`         | TSM game type                                                       |
-| `--region` | `us`              | `us`, `eu`, ...                                                     |
-| `--realm`  | `pvp-horde`       | Forever auction house: `normal-alliance`, `normal-horde`, `pvp-alliance`, `pvp-horde` |
-| `--price`  | `minBuyout`       | TSM column used for buying: `minBuyout`, `marketValue`, `recent`, `historical` |
+| Option     | Default     | Meaning |
+|------------|-------------|---------|
+| `--region` | `us`        | `us` or `eu` |
+| `--realm`  | `pvp-horde` | Forever auction house: `normal-alliance`, `normal-horde`, `pvp-alliance`, `pvp-horde` |
+| `--price`  | `minBuyout` | TSM column to buy at: `minBuyout`, `marketValue`, `recent`, `historical` |
 
-For each reagent the tool uses the cheapest of:
+For each reagent, the tool uses the cheapest of these:
 
-1. the auction-house price (`--price` column) or, if nothing is listed, the region market value;
-2. the vendor price from `data/vendor_items.json`;
-3. crafting it yourself with a recipe from the same profession (for example, Bolt of Linen Cloth from
-   Linen Cloth).
+1. The auction-house price, or the region market value if nothing is listed.
+2. The vendor price from `data/vendor_items.json`. A vendor-sold item is bought on the AH only if it's
+   at least 10% cheaper there.
+3. Crafting it yourself with a recipe from the same profession (for example, Bolt of Linen Cloth).
 
-`--price-override 2589=20` forces a price in copper, for example for mats you already own (`=0`).
+## How the route is chosen
 
-## Selling crafted items back
+At skill `s`, a recipe skills up with probability 1 below its yellow level,
+`(grey − s) / (grey − yellow)` from yellow to grey, and 0 from grey on. The expected cost of one point
+is `craft cost / probability`, and the cheapest recipe is picked for every point.
 
-With `--sell-back` (GUI: *Crafted items → Sell to a vendor*), each craft is credited with the vendor
-sell price of what it makes (from the game data, `data/vendor_sell.json`), and the route is
-re-optimised with that credit.
+The raw choice is then refined:
 
-`--sell-back ah` uses the AH min buyout minus the 5% cut instead. That assumes everything sells at the
-lowest listing, so treat it as a best case.
+* **No zigzag.** A run of 1–2 points with a different recipe is folded into its neighbour's recipe
+  when that costs at most 1s (or 0.5% of materials) more.
+* **Paid recipes must pay off.** For each recipe that costs something (a trainer fee or an AH recipe
+  item), the tool estimates the cost of doing its points with the next-best recipe. If that is
+  cheaper than learning the recipe, the route is re-planned without it, and the change is kept only if
+  the total really drops.
+* **Ranks.** The fee of every profession rank on the way is added (Journeyman 4s 50c, Expert 45s,
+  Artisan 4g 50s or 5g, depending on the profession). First Aid and Cooking Expert are skill books,
+  priced at the cheaper of vendor and AH. First Aid and Cooking Artisan come from quests.
 
-## How the plan is chosen
+Quantities are expected values, so buy a little extra. Min buyout is the cheapest single listing, so
+large orders cost more; compare against `--price marketValue`. Not modelled: skill-ups from crafting
+intermediates (so the estimate errs high), the items you enchant, and the AH order book.
 
-At skill `s`, a recipe with colours `[orange, yellow, green, grey]` skills up with probability 1
-below yellow, `(grey − s) / (grey − yellow)` from yellow to grey, and 0 at grey. The expected cost of
-one point is `craft cost / probability`. Each point is independent, so picking the cheapest recipe
-for every point gives the cheapest total. Quantities in the report are expected values, so buy a
-little extra.
+## Data
 
-Learning costs are included: after planning, each paid recipe the plan uses is tried without it, and
-dropped whenever that lowers the grand total.
+| File | What | Source | Refresh with |
+|------|------|--------|--------------|
+| `data/recipes/*.json` | Every craft: reagents, product, skill colours, tools | WoW Forever client tables via [wago.tools](https://wago.tools) | `python -m cheapest_skillup.gamedata` |
+| `data/vendor_sell.json`, `data/item_names.json` | Vendor sell prices, item names | same | same |
+| `data/foreverdb.json` | How each recipe is learned, trainer fees seen in Forever, rank fees, trainer locations | [ForeverDB.net](https://foreverdb.net) addon data | `python -m cheapest_skillup.foreverdb` |
+| `data/trainer_classic.json` | Classic trainer fees and learn levels, used where nothing better is known | [CMaNGOS classic-db](https://github.com/cmangos/classic-db) | `python -m cheapest_skillup.classic_trainers <dump>` |
+| `data/trainer.json` | **Your own** trainer fees, learn levels and exclusions | you | |
 
-Not modelled: skill-ups from crafting intermediates (so the estimate errs high), the items you need to
-enchant, and the AH order book. Min buyout is the price of the *cheapest*
-listing, so large purchases will cost more; compare against `--price marketValue`.
-
-## Recipes
-
-`data/recipes/*.json` are generated from WoW Forever's own game data: every craft, its reagents and
-product, and its skill-up colours (yellow and grey from the game; green halfway between). To update
-after a game patch:
-
-```sh
-python -m cheapest_skillup.gamedata                         # latest Forever build on wago.tools
-python -m cheapest_skillup.gamedata --build 1.60.1.70959    # a specific build
-```
-
-This downloads the client tables from [wago.tools](https://wago.tools) and also refreshes
-`data/vendor_sell.json`, `data/item_names.json` and the vendor buy prices in `data/vendor_items.json`.
-
-How each recipe is learned (the *Learn* column):
+### How recipes are learned
 
 | Learn       | Meaning | Cost counted |
 |-------------|---------|--------------|
-| `known`     | Learned with the profession | free |
-| `trainer`   | Taught by a profession trainer | fee from `data/trainer.json` |
+| `Known`     | Learned with the profession | free |
+| `Trainer`   | Taught by a profession trainer | its fee |
 | `AH recipe` | Taught by a recipe item (Pattern:, Recipe:, Plans:...) | that item's price on your AH |
 
-* Recipe items are used **only when listed on your auction house** at the time of the price scan.
-* Recipes taught only by bind-on-pickup items (quest rewards, BoP drops) are left out entirely, since
-  they can never be bought.
-* `--sources trainer` (GUI: untick *AH recipe items*) plans without buying any recipe items.
+* A recipe item is used only if it's listed on your auction house.
+* Recipes taught only by bind-on-pickup items (quest rewards, BoP drops) are left out. So are recipes
+  with no known source, and recipes ForeverDB marks as probably not in the live game.
+* For trainer fees and learn levels, priority goes: your `trainer.json`, then ForeverDB (fees seen at
+  Forever trainers, shown as *seen*), then Classic values (shown as `~` or *Classic*). Otherwise the fee
+  counts as 0 and the learn level is assumed to be the recipe's yellow level (*est.*).
 
-### How recipes are learned: ForeverDB.net
+### Your corrections: `data/trainer.json`
 
-`data/foreverdb.json` comes from [ForeverDB.net](https://foreverdb.net)'s free addon data
-(`Data/Recipes.lua`). It corrects what the game files can't tell:
+```json
+"2385": {"name": "Brown Linen Vest", "profession": "Tailoring", "cost": 50, "learn": 10},
+"12345": {"exclude": true},
+```
 
-* how each recipe is really learned, including recipe items whose names Blizzard keeps on its servers;
-* recipes with no known way to learn them, and recipes ForeverDB marks as probably not in the live
-  game (Season of Discovery leftovers and the like): both are left out;
-* trainer fees players saw at Forever trainers (shown as *seen*), and Classic fees for the rest.
-
-Refresh it with `python -m cheapest_skillup.foreverdb`.
-
-**Data from ForeverDB.net (https://foreverdb.net).** Used under GPL-3.0 with ForeverDB's attribution
-term. Keep this credit wherever the data is shown.
-
-### Trainer fees and learn levels
-
-The game files don't contain trainer fees or the skill a trainer requires; the server sends those.
-They're filled in from these places, highest priority first:
-
-1. **`data/trainer.json`: your values.** It lists every trainer recipe with `"cost": null,
-   "learn": null`. Fill in what your trainer shows (`cost` in copper, 1s 25c = `125`; `learn` = skill
-   needed). Re-running the importer keeps what you entered.
-2. **`data/foreverdb.json`: ForeverDB.net.** Fees seen at Forever trainers, otherwise Classic fees.
-3. **`data/trainer_classic.json`: Classic estimates.** Classic (1.12) trainer fees and learn levels for
-   the ~400 trainer recipes Forever kept from Classic, from the open-source
-   [CMaNGOS classic-db](https://github.com/cmangos/classic-db) (GPL-3.0). Shown with `~` / *Classic*.
-   A Classic learn level above Forever's yellow level is capped at yellow, since Forever made that
-   recipe easier. To regenerate:
-
-   ```sh
-   git clone --depth 1 https://github.com/cmangos/classic-db
-   python -m cheapest_skillup.classic_trainers classic-db/Full_DB/ClassicDB_*.sql.gz
-   ```
-4. **Otherwise:** the fee counts as 0 (the report says how many) and the recipe is assumed learnable at
-   its yellow level (*est.*), which never schedules it before you could train it. This applies mostly to
-   Forever-only trainer recipes.
-
-The route only goes through recipes the game data marks as craftable profession recipes. A few
-trainer recipes may not actually be offered by trainers (event or removed recipes); if the plan uses
-one you can't learn, add `"exclude": true` to its entry in `data/trainer.json`.
+`cost` is in copper (1s 25c = `125`), `learn` is the skill needed to train it, and `"exclude": true`
+removes a recipe you can't get. Rank fees can be overridden too, with
+`"ranks": {"tailoring": {"300": {"cost": 50000}}}`. Re-running the importers keeps what you entered.
 
 ## Credits
 
 * Prices: [TradeSkillMaster](https://tradeskillmaster.com/public-data) public pricing data.
 * Game data: WoW Forever client tables via [wago.tools](https://wago.tools). World of Warcraft is a
-  trademark of Blizzard Entertainment; this tool is not affiliated with Blizzard.
-* Recipe sources and trainer fees: **Data from ForeverDB.net (https://foreverdb.net)**, GPL-3.0 with
-  attribution.
+  trademark of Blizzard Entertainment. This tool is not affiliated with Blizzard.
+* Recipe sources, trainer fees, ranks and trainer locations: **Data from ForeverDB.net
+  (https://foreverdb.net)**, GPL-3.0 with attribution.
 * Classic trainer estimates: [CMaNGOS classic-db](https://github.com/cmangos/classic-db), GPL-3.0.
 
 ## Tests
