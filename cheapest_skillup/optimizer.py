@@ -70,6 +70,7 @@ class Plan:
     no_sell_price: set[int] = field(default_factory=set)  # crafted items with no sell price known
     learn_costs: list[tuple[Recipe, int | None]] = field(default_factory=list)  # (recipe, copper or None=unknown)
     ranks: list[tuple[Rank, int | None]] = field(default_factory=list)  # ranks to get on the way, with their cost
+    bought: dict[str, str] = field(default_factory=dict)  # recipe name -> "vendor" | "ah" (recipe items)
 
     @property
     def learn_total(self) -> float:
@@ -97,10 +98,13 @@ class Optimizer:
         self,
         profession: Profession,
         prices: PriceBook,
-        allowed_sources: set[str] = frozenset({"trainer", "recipe"}),
+        allowed_sources: set[str] = frozenset({"trainer", "vendor", "recipe"}),
         sell_back: str | None = None,  # None, "vendor" or "ah"
         exclude: frozenset[int] = frozenset(),  # id() of recipes to leave out
+        side: str | None = None,  # "a" or "h": your faction, for vendor recipes
     ):
+        self.side = side
+        self.bought: dict[int, str] = {}  # id(recipe) -> "vendor" | "ah" for recipe items
         if sell_back not in (None, "vendor", "ah"):
             raise ValueError(f"sell_back must be None, 'vendor' or 'ah', not {sell_back!r}")
         self.prof = profession
@@ -114,11 +118,17 @@ class Optimizer:
                 self._learn[id(r)] = 0
             elif r.source == "trainer" and "trainer" in allowed_sources:
                 self._learn[id(r)] = r.learn_cost
-            elif r.source == "recipe" and "recipe" in allowed_sources:
-                listed = [p for p in (prices.ah_price(i) for i in r.recipe_items) if p is not None]
-                if not listed:
-                    continue  # recipe item not on your AH (or bind-on-pickup): not available
-                self._learn[id(r)] = min(listed)
+            elif r.source == "recipe":
+                options = []
+                if "recipe" in allowed_sources:
+                    options += [(p, "ah") for p in (prices.ah_price(i) for i in r.recipe_items) if p is not None]
+                if "vendor" in allowed_sources:
+                    options += [(p, "vendor") for s, rows in r.vendors.items() if side in (None, s, "b") for _, p in rows]
+                if not options:
+                    continue  # no vendor on your side and not on your AH (or bind-on-pickup): not available
+                price, how = min(options)
+                self._learn[id(r)] = price
+                self.bought[id(r)] = how
             else:
                 continue
             self.recipes.append(r)
@@ -306,8 +316,9 @@ def cheapest_plan(
     prices: PriceBook,
     start: int,
     target: int,
-    allowed_sources: set[str] = frozenset({"trainer", "recipe"}),
+    allowed_sources: set[str] = frozenset({"trainer", "vendor", "recipe"}),
     sell_back: str | None = None,
+    side: str | None = None,
 ) -> Plan:
     """Plan including what it costs to learn the recipes.
 
@@ -320,8 +331,10 @@ def cheapest_plan(
     kept: set[int] = set()
 
     def run() -> tuple[Plan, Optimizer]:
-        opt = Optimizer(profession, prices, allowed_sources, sell_back, frozenset(exclude))
-        return opt.plan(start, target), opt
+        opt = Optimizer(profession, prices, allowed_sources, sell_back, frozenset(exclude), side)
+        plan = opt.plan(start, target)
+        plan.bought = {r.name: opt.bought[id(r)] for r, _ in plan.learn_costs if id(r) in opt.bought}
+        return plan, opt
 
     best, opt = run()
     while True:

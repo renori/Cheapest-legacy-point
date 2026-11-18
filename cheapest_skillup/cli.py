@@ -13,7 +13,12 @@ from .recipes import (available_professions, load_foreverdb, load_item_names, lo
 
 FOREVERDB_CREDIT = "Data from ForeverDB.net (https://foreverdb.net)"
 
-SOURCE_LABEL = {"auto": "known", "trainer": "trainer", "recipe": "AH recipe"}
+SOURCE_LABEL = {"auto": "known", "trainer": "trainer", "recipe": "AH recipe", "vendor": "vendor"}
+
+
+def how_of(plan: Plan, r) -> str:
+    """auto | trainer | recipe (bought on the AH) | vendor (bought from a vendor)."""
+    return "vendor" if r.source == "recipe" and plan.bought.get(r.name) == "vendor" else r.source
 
 PRICE_FIELDS = ("minBuyout", "marketValue", "recent", "historical")
 
@@ -54,10 +59,17 @@ def side_of(realm: str) -> str | None:
     return "h" if realm.endswith("horde") else "a" if realm.endswith("alliance") else None
 
 
+def place(n: dict) -> str:
+    """'Orgrimmar 63,50', or just the zone when the coordinates are unknown."""
+    if n.get("x") is None or n.get("y") is None:
+        return n.get("zone") or "unknown place"
+    return f"{n.get('zone') or '?'} {n['x']:.0f},{n['y']:.0f}"
+
+
 def where_at(trainers: list[dict], n: int = 3) -> str:
     if not trainers:
         return "trainer locations unknown"
-    shown = [f"{t['name']} ({t['zone']} {t['x']:.0f},{t['y']:.0f})" for t in trainers[:n]]
+    shown = [f"{t['name']} ({place(t)})" for t in trainers[:n]]
     return "at " + ", ".join(shown) + (f" +{len(trainers) - n} more" if len(trainers) > n else "")
 
 
@@ -88,7 +100,7 @@ def render(plan: Plan, prices: PriceBook, vendor_names: dict[int, str], side: st
             if rank.how == "trainer":
                 out.append(f"{'':<14}{where_at(plan.profession.trainers_for(rank, side))}")
         flag = "  (low chance: ~%.1f crafts per point)" % s.crafts_per_point if s.low_chance else ""
-        out.append(f"{s.start:>3}-{s.end:<6} {s.recipe.name:<38} {SOURCE_LABEL.get(s.recipe.source, s.recipe.source):<10} "
+        out.append(f"{s.start:>3}-{s.end:<6} {s.recipe.name:<38} {SOURCE_LABEL.get(how_of(plan, s.recipe), s.recipe.source):<10} "
                    f"{ceil(s.expected_crafts):>6} {money(s.cost):>14}{flag}")
     for rank, cost in pending:
         out.append(rank_line(rank, cost))
@@ -122,7 +134,10 @@ def render(plan: Plan, prices: PriceBook, vendor_names: dict[int, str], side: st
     if to_learn:
         out += ["", "Recipes to learn:"]
         for r, c in sorted(to_learn, key=lambda rc: (rc[0].orange, rc[0].name)):
-            if r.source == "recipe":
+            if r.source == "recipe" and plan.bought.get(r.name) == "vendor":
+                vs = plan.profession.vendors_for(r, side)
+                where = "buy from " + (", ".join(f"{v['name']} ({place(v)})" for v in vs[:3]) or "a vendor")
+            elif r.source == "recipe":
                 where = f"buy {' / '.join(item_name(i, prices, vendor_names) for i in r.recipe_items)} on the AH"
             else:
                 level = {"classic": f"learn at ~{r.orange} (Classic estimate)", "assumed": f"learn level unknown, assumed {r.orange}",
@@ -178,7 +193,10 @@ def plan_to_dict(plan: Plan, prices: PriceBook, vendor_names: dict[int, str], si
                   for r, c in plan.ranks],
         "grand_total_copper": round(plan.grand_total),
         "learn": [
-            {"recipe": r.name, "spell": r.spell, "how": r.source, "cost_copper": c, "learn_level": r.orange,
+            {"recipe": r.name, "spell": r.spell, "how": how_of(plan, r), "cost_copper": c,
+             "vendors": [{"name": v["name"], "title": v["title"], "zone": v["zone"], "x": v["x"], "y": v["y"],
+                          "seen": v["seen"], "price_copper": v["price"]} for v in plan.profession.vendors_for(r, side)]
+             if how_of(plan, r) == "vendor" else [], "learn_level": r.orange,
              "learn_level_known": r.learn_known, "learn_from": r.learn_from, "fee_from": r.fee_from,
              "trainers": trainer_json(plan.profession.trainers_for(r, side)) if r.source == "trainer" else [], "recipe_items": [{"item_id": i, "name": item_name(i, prices, vendor_names)} for i in r.recipe_items]}
             for r, c in plan.learn_costs if r.source != "auto"
@@ -187,7 +205,7 @@ def plan_to_dict(plan: Plan, prices: PriceBook, vendor_names: dict[int, str], si
         "sell_credit_copper": round(plan.sell_credit),
         "no_sell_price": [item_name(i, prices, vendor_names) for i in sorted(plan.no_sell_price)],
         "steps": [
-            {"recipe": s.recipe.name, "how": s.recipe.source, "crafts_per_point": round(s.crafts_per_point, 2),
+            {"recipe": s.recipe.name, "how": how_of(plan, s.recipe), "crafts_per_point": round(s.crafts_per_point, 2),
              "low_chance": s.low_chance, "from": s.start, "to": s.end, "expected_crafts": round(s.expected_crafts, 2), "cost_copper": round(s.cost), "credit_copper": round(s.credit)}
             for s in plan.steps
         ],
@@ -212,8 +230,9 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--price", choices=PRICE_FIELDS, default="minBuyout", help="TSM price column to buy at (default: minBuyout)")
     ap.add_argument("--from", dest="start", type=int, default=1, help="current skill (default: 1)")
     ap.add_argument("--to", dest="target", type=int, default=150, help="target skill (default: 150)")
-    ap.add_argument("--sources", default="trainer,recipe",
-                    help="how you're willing to learn recipes: trainer, recipe (recipe items on your AH, at their AH price)")
+    ap.add_argument("--sources", default="trainer,vendor,recipe",
+                    help="how you're willing to learn recipes: trainer, vendor (recipes sold by vendors on your side), "
+                         "recipe (recipe items on your AH, at their AH price)")
     ap.add_argument("--sell-back", nargs="?", const="vendor", choices=("vendor", "ah"), default=None,
                     help="subtract what you get for selling what you craft: 'vendor' (default) uses vendor sell "
                          "prices from data/vendor_sell.json, 'ah' uses the AH price after the 5%% cut")
@@ -245,7 +264,7 @@ def main(argv: list[str] | None = None) -> int:
     results = []
     for key in chosen:
         prof = load_profession(key)
-        plan = cheapest_plan(prof, prices, args.start, args.target, sources, args.sell_back)
+        plan = cheapest_plan(prof, prices, args.start, args.target, sources, args.sell_back, side_of(args.realm))
         results.append(plan)
 
     if args.json:

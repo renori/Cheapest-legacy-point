@@ -163,7 +163,7 @@ const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt
 const SWATCH = ["--s1","--s2","--s3","--s4","--s5","--s6","--s7","--s8"].map(v => `var(${v})`);
 const PRICE_LABEL = {minBuyout: "Min buyout", marketValue: "Market value", recent: "Recent value", historical: "Historical price"};
 const REALM_LABEL = {"normal-alliance": "Normal · Alliance", "normal-horde": "Normal · Horde", "pvp-alliance": "PvP · Alliance", "pvp-horde": "PvP · Horde"};
-const HOW = {auto: "Known", trainer: "Trainer", recipe: "AH recipe"};
+const HOW = {auto: "Known", trainer: "Trainer", recipe: "AH recipe", vendor: "Vendor recipe"};
 const store = {
   get(k) { try { return JSON.parse(localStorage.getItem("csu:" + k)); } catch { return null; } },
   set(k, v) { try { localStorage.setItem("csu:" + k, JSON.stringify(v)); } catch {} },
@@ -239,7 +239,7 @@ async function init() {
   fillSelect($("#region"), OPT.regions, d.region, {us: "US", eu: "EU"});
   fillSelect($("#realm"), OPT.realms, d.realm, REALM_LABEL);
   fillSelect($("#price"), OPT.price_fields, d.price, PRICE_LABEL);
-  const SRC = {trainer: "Trainer", recipe: "AH recipe items"};
+  const SRC = {trainer: "Trainer", vendor: "Vendor recipes", recipe: "AH recipe items"};
   const srcSel = (d.sources || []).filter(s => OPT.sources.includes(s));
   OPT.sources.forEach(s => chip($("#sources"), s, SRC[s] || s, (srcSel.length ? srcSel : OPT.defaults.sources).includes(s)));
   $("#sellback").value = ["none", "vendor", "ah"].includes(d.sell_back) ? d.sell_back : "none";
@@ -346,10 +346,19 @@ async function renderProfession(key) {
   }
 }
 
+const where = n => esc(n.zone || "") + (n.x == null || n.y == null ? "" : ` (${n.x.toFixed(1)}, ${n.y.toFixed(1)})`);
+
 function trainersHtml(list, label = "Where to train") {
   if (!list || !list.length) return "";
   return `<details class="where"><summary>${label} (${list.length})</summary><ul>` + list.map(t =>
-    `<li>${esc(t.name)} <span class="src">${esc(t.title)}</span> — ${esc(t.zone)} (${t.x.toFixed(1)}, ${t.y.toFixed(1)})${t.seen ? "" : ' <span class="unseen">not yet seen in Forever</span>'}</li>`
+    `<li>${esc(t.name)} <span class="src">${esc(t.title)}</span> — ${where(t)}${t.seen ? "" : ' <span class="unseen">not yet seen in Forever</span>'}</li>`
+  ).join("") + `</ul></details>`;
+}
+
+function vendorsHtml(list) {
+  if (!list || !list.length) return "";
+  return `<details class="where"><summary>Where to buy (${list.length})</summary><ul>` + list.map(v =>
+    `<li>${esc(v.name)} <span class="src">${esc(v.title || "")}</span> — ${where(v)} · ${money(v.price_copper)}${v.seen ? "" : ' <span class="unseen">not yet seen in Forever</span>'}</li>`
   ).join("") + `</ul></details>`;
 }
 
@@ -388,7 +397,7 @@ function drawDetail(d) {
   <div class="views" role="tablist">${["route", "materials", "recipes"].map(v =>
     `<button class="view" type="button" role="tab" data-v="${v}" aria-selected="${VIEW === v}">${{route: "Route", materials: "Materials", recipes: "Recipes & ranks"}[v]}</button>`).join("")}</div>
   <div id="view"></div>`;
-  if (d.foreverdb) h += `<div class="note">Recipe sources, trainer fees and trainer locations: <a href="https://foreverdb.net" target="_blank" rel="noopener">Data from ForeverDB.net</a>. Prices: TradeSkillMaster (${esc(d.auction_house)}, ${esc(PRICE_LABEL[d.price_field] || d.price_field)}).</div>`;
+  if (d.foreverdb) h += `<div class="note">Recipe sources, trainer fees, vendor prices and locations: <a href="https://foreverdb.net" target="_blank" rel="noopener">Data from ForeverDB.net</a>. Prices: TradeSkillMaster (${esc(d.auction_house)}, ${esc(PRICE_LABEL[d.price_field] || d.price_field)}).</div>`;
   h += `<div class="note">Quantities are expected values; buy a little extra. Min buyout is the cheapest single listing, so large orders will cost more.</div>`;
   $("#detail").innerHTML = h;
   $("#detail").querySelectorAll(".view").forEach(b => b.onclick = () => { VIEW = b.dataset.v; store.set("view", VIEW); drawDetail(d); });
@@ -414,6 +423,7 @@ function routeView(p, learnBy) {
     if (first && l) {
       learn += `<div class="src">${l.cost_copper === null ? "fee unknown" : (l.fee_from === "classic" ? "~" : "") + money(l.cost_copper)}</div>`;
       if (l.how === "trainer") extra = trainersHtml(l.trainers);
+      else if (l.how === "vendor") extra = vendorsHtml(l.vendors);
       else if (l.how === "recipe") extra = `<div class="src">Buy ${l.recipe_items.map(i => esc(i.name)).join(" / ")} on the AH</div>`;
     }
     const low = s.low_chance ? `<span class="badge" title="About ${s.crafts_per_point.toFixed(1)} crafts per skill point">low chance</span>` : "";
@@ -448,8 +458,8 @@ function recipesView(p) {
                 assumed: ' <span class="src" title="Unknown; assumed to be the recipe\'s yellow level">est.</span>'};
   if (p.learn.length) {
     h += `<h3${p.ranks.length ? "" : ' style="margin-top:0"'}>Recipes to learn</h3><div class="table-wrap"><table class="t"><thead><tr><th>Recipe</th><th>From</th><th class="num">Learn at</th><th class="num">Cost</th></tr></thead><tbody>` +
-      [...p.learn].sort((a, b) => a.learn_level - b.learn_level || a.recipe.localeCompare(b.recipe)).map(l => `<tr><td>${esc(l.recipe)}${l.how === "trainer" ? trainersHtml(l.trainers) : ""}</td>
-        <td>${l.how === "recipe" ? "AH: " + l.recipe_items.map(i => esc(i.name)).join(" / ") : "Trainer"}</td>
+      [...p.learn].sort((a, b) => a.learn_level - b.learn_level || a.recipe.localeCompare(b.recipe)).map(l => `<tr><td>${esc(l.recipe)}${l.how === "trainer" ? trainersHtml(l.trainers) : l.how === "vendor" ? vendorsHtml(l.vendors) : ""}</td>
+        <td>${l.how === "recipe" ? "AH: " + l.recipe_items.map(i => esc(i.name)).join(" / ") : l.how === "vendor" ? "Vendor" : "Trainer"}</td>
         <td class="num">${l.learn_level}${NOTE[l.learn_from] || ""}</td>
         <td class="num">${l.cost_copper === null ? '<span class="src">fee unknown</span>' : (l.fee_from === "classic" ? '<span class="src">~</span>' : "") + money(l.cost_copper)
           + (l.fee_from === "forever" ? ' <span class="src" title="Fee players saw at a Forever trainer">seen</span>' : "")}</td></tr>`).join("") + `</tbody></table></div>`;

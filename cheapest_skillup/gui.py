@@ -41,11 +41,11 @@ def options() -> dict:
         "regions": REGIONS,
         "realms": REALMS,
         "price_fields": list(PRICE_FIELDS),
-        "sources": ["trainer", "recipe"],
+        "sources": ["trainer", "vendor", "recipe"],
         "milestones": MILESTONES,
         "max_skill": MAX_SKILL,
         "defaults": {"game": "forever", "region": "us", "realm": "pvp-horde", "price": "minBuyout",
-                     "sources": ["trainer", "recipe"], "sell_back": "none", "target": 150},
+                     "sources": ["trainer", "vendor", "recipe"], "sell_back": "none", "target": 150},
     }
 
 
@@ -62,7 +62,7 @@ def _settings(q: dict[str, list[str]]) -> tuple:
         if "=" in pair:
             k, v = pair.split("=", 1)
             overrides.append((int(k), int(v)))
-    sources = tuple(sorted(s for s in get("sources", "trainer,recipe").split(",") if s))
+    sources = tuple(sorted(s for s in get("sources", "trainer,vendor,recipe").split(",") if s))
     return (get("game", "forever"), get("region", "us"), get("realm", "pvp-horde"), price, sources,
             None if sell_back == "none" else sell_back, tuple(sorted(overrides)))
 
@@ -104,7 +104,7 @@ def _plan(settings: tuple, prof: str, start: int, target: int, prices, updated) 
     key = (settings, prof, start, target)
     if key not in _plans:
         _, _, realm, _, sources, sell_back, _ = settings
-        plan = cheapest_plan(load_profession(prof), prices, start, target, set(sources), sell_back)
+        plan = cheapest_plan(load_profession(prof), prices, start, target, set(sources), sell_back, side_of(realm))
         vendor_names = {**load_item_names(), **load_vendor_names()}
         if len(_plans) >= PLAN_CACHE:
             _plans.pop(next(iter(_plans)))

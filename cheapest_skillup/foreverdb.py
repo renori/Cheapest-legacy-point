@@ -73,6 +73,7 @@ def parse_recipes_lua(text: str) -> tuple[str, dict[int, dict]]:
 
 
 RANK_FILE = "ForeverDB_Helper/Data/Professions.lua"
+NPC_FILE = "ForeverDB/Data/NPCs.lua"
 _NPC = re.compile(r'\[(\d+)\]=\{"((?:[^"\\]|\\.)*)","((?:[^"\\]|\\.)*)","([ah])",(\d+),([-\d.]+),([-\d.]+),(\d)\}')
 PROFESSION_KEYS = {"first-aid": "first_aid"}
 
@@ -153,11 +154,18 @@ def main(argv: list[str] | None = None) -> int:
     rank_tr: dict = {}
     recipe_tr: dict = {}
     npcs: dict = {}
+    npc_names: dict = {}
     try:
         with zipfile.ZipFile(io.BytesIO(_get(f"{SITE}/{manifest['addon']['url']}"))) as z:
             helper = z.read(RANK_FILE).decode("utf-8")
+            try:
+                npc_text = z.read(NPC_FILE).decode("utf-8")
+            except KeyError:
+                npc_text = ""
         ranks = parse_ranks_lua(helper)
         rank_tr, recipe_tr, npcs = parse_trainers_lua(helper)
+        npc_names = {int(m.group(1)): [m.group(2), m.group(3)] for m in re.finditer(
+            r'\[(\d+)\]=\{"((?:[^"\\]|\\.)*)","((?:[^"\\]|\\.)*)",\d+,', npc_text)}
     except (KeyError, zipfile.BadZipFile) as e:
         print(f"No rank data in the ForeverDB addon ({e}); rank fees fall back to Classic.", file=sys.stderr)
     for key, rs in ranks.items():
@@ -177,6 +185,7 @@ def main(argv: list[str] | None = None) -> int:
         "source": f"ForeverDB addon data {manifest['data'].get('version', '')}, Data/Recipes.lua, WoW Forever build {build}",
         "ranks": ranks,
         "trainers": {str(k): v for k, v in sorted(npcs.items())},
+        "npc_names": {str(k): v for k, v in sorted(npc_names.items())},
         "recipe_trainers": {str(k): v for k, v in sorted(recipe_tr.items())},
         "spells": {str(k): v for k, v in sorted(spells.items())},
     }

@@ -27,7 +27,8 @@ class Recipe:
     spell: int | None = None
     learn_known: bool = True  # False: learn level not in game data, assumed = yellow
     recipe_items: list[int] = field(default_factory=list)  # items that teach it (source "recipe")
-    trainers: dict[str, list[int]] = field(default_factory=dict)  # {"a"/"h": [npc id]} known to teach it
+    trainers: dict[str, list[int]] = field(default_factory=dict)  # {"a"/"h"/"b": [npc id]} known to teach it
+    vendors: dict[str, list[list[int]]] = field(default_factory=dict)  # {"a"/"h"/"b": [[npc id, copper]]} selling it
     fee_from: str | None = None  # trainer fee: "you" (trainer.json), "forever" (seen at a Forever trainer), "classic", None
     learn_from: str = "game"  # learn level origin: "game", "you", "classic", "assumed" (= yellow)
 
@@ -79,10 +80,16 @@ class Profession:
             covering = next((k for k in self.ranks if r.orange < k.cap), None)
             for s, ids in (covering.trainers if covering else {}).items():
                 lists.setdefault(s, ids)  # no named trainer on this side: any trainer of that rank
-        ids = [i for s, ids in lists.items() if side in (None, s) for i in ids]
-        npcs = load_trainer_npcs()
-        found = [dict(npcs[i], id=i) for i in dict.fromkeys(ids) if i in npcs]
-        return sorted(found, key=lambda n: (not n["seen"], n["zone"], n["name"]))
+        if isinstance(r, Rank) and not lists:
+            lists = rank_trainers_from_api(self.key, r.cap)
+        return npcs_at([i for s, ids in lists.items() if side in (None, s, "b") for i in ids])
+
+    def vendors_for(self, r: Recipe, side: str | None) -> list[dict]:
+        """Vendors on your side selling the recipe, cheapest first, with their price."""
+        rows = [(npc, price) for s, lst in r.vendors.items() if side in (None, s, "b") for npc, price in lst]
+        found = {n["id"]: n for n in npcs_at([npc for npc, _ in rows])}
+        out = [dict(found[npc], price=price) for npc, price in rows if npc in found]
+        return sorted(out, key=lambda n: (n["price"], not n["seen"], n["zone"] or "", n["name"]))
 
     def ranks_needed(self, start: int, reached: int) -> list[Rank]:
         """Ranks to train to go from `start` to `reached` (from 1: Apprentice too)."""
@@ -171,8 +178,75 @@ def load_foreverdb(data_dir: Path = DATA_DIR) -> dict[int, dict]:
 
 
 def load_trainer_npcs(data_dir: Path = DATA_DIR) -> dict[int, dict]:
-    """Trainers: {npc: {name, title, side, zone, x, y, seen}} (ForeverDB.net)."""
-    return {int(k): v for k, v in _foreverdb_file(data_dir / "foreverdb.json").get("trainers", {}).items()}
+    """Trainers and vendors: {npc: {name, title, side, zone, x, y, seen}} (ForeverDB.net).
+
+    Places come from the free helper data, then the API file; names only from the free files."""
+    free = _foreverdb_file(data_dir / "foreverdb.json")
+    names = {int(k): v for k, v in free.get("npc_names", {}).items()}
+    out = {int(k): dict(v) for k, v in free.get("trainers", {}).items()}
+    for k, v in _foreverdb_file(data_dir / "foreverdb_api.json").get("npcs", {}).items():
+        k = int(k)
+        if k not in out and v.get("map") is not None:
+            name, title = names.get(k, (f"NPC {k}", ""))
+            out[k] = {"name": name, "title": title, "side": v["side"], "map": v["map"], "x": v["x"], "y": v["y"],
+                      "seen": v["seen"], "zone": v.get("zone") or f"map {v['map']}"}
+    return out
+
+
+@lru_cache(maxsize=1)
+def _npcs_cached() -> dict[int, dict]:
+    return load_trainer_npcs()
+
+
+def npcs_at(ids: list[int]) -> list[dict]:
+    npcs = _npcs_cached()
+    found = [dict(npcs[i], id=i) for i in dict.fromkeys(ids) if i in npcs]
+    return sorted(found, key=lambda n: (not n["seen"], n["zone"] or "", n["name"]))
+
+
+def load_api(data_dir: Path = DATA_DIR) -> dict[int, dict]:
+    """Per-recipe numbers from the ForeverDB API (data/foreverdb_api.json), if you imported them."""
+    return {int(k): v for k, v in _foreverdb_file(data_dir / "foreverdb_api.json").get("spells", {}).items()}
+
+
+def rank_trainers_from_api(key: str, cap: int, data_dir: Path = DATA_DIR) -> dict[str, list[int]]:
+    """Trainers who teach up to `cap` or beyond, by side (from the API's profession trainer list)."""
+    rows = _foreverdb_file(data_dir / "foreverdb_api.json").get("profession_trainers", {}).get(key, [])
+    npcs = _npcs_cached()
+    out: dict[str, list[int]] = {}
+    for npc, up_to in rows:
+        if up_to >= cap and npc in npcs:
+            out.setdefault(npcs[npc]["side"], []).append(npc)
+    return out
+
+
+def _apply_api(r: Recipe, info: dict) -> None:
+    """Recipe sources, learn level, fee, trainers and vendors from the ForeverDB API."""
+    ways = set(info.get("ways", []))
+    if not ways:
+        return
+    level = info.get("learn_at")
+    if "auto" in ways:
+        r.source, r.learn_cost, r.orange, r.learn_known, r.learn_from = "auto", 0, 1, True, "game"
+    elif "trainer" in ways:
+        if r.source != "trainer":
+            r.source, r.learn_cost, r.fee_from = "trainer", None, None
+        if info.get("trainer_cost") is not None:
+            r.learn_cost = info["trainer_cost"]
+            r.fee_from = "forever" if info.get("trainer_cost_seen") else "classic"
+        if level:
+            r.orange = max(1, min(level, r.grey - 1))
+            r.learn_known = not info.get("learn_at_classic")
+            r.learn_from = "classic" if info.get("learn_at_classic") else "forever"
+        r.trainers = info.get("trainers", r.trainers)
+    else:  # vendor, drop or quest: a recipe item
+        r.source, r.learn_cost = "recipe", 0
+        r.recipe_items = sorted(set(r.recipe_items) | set(info.get("recipe_items", [])))
+        r.vendors = info.get("vendors", {})
+        if level:
+            r.orange, r.learn_known, r.learn_from = max(1, min(level, r.grey - 1)), True, "game"
+    r.yellow = max(r.yellow, r.orange)
+    r.green = max(r.green, r.yellow)
 
 
 def load_recipe_trainers(data_dir: Path = DATA_DIR) -> dict[int, dict[str, list[int]]]:
@@ -228,6 +302,7 @@ def load_profession(key: str, data_dir: Path = DATA_DIR) -> Profession:
     yours = load_trainer(data_dir)
     classic = load_trainer(data_dir, "trainer_classic.json")
     fdb = load_foreverdb(data_dir)
+    api = load_api(data_dir)
     named_trainers = load_recipe_trainers(data_dir)
     recipes = []
     for raw in d["recipes"]:
@@ -241,9 +316,11 @@ def load_profession(key: str, data_dir: Path = DATA_DIR) -> Profession:
         _apply_trainer(r, classic.get(r.spell) if r.spell else None, "classic")
         if r.spell in fdb and not _apply_foreverdb(r, fdb[r.spell]):
             continue
-        _apply_trainer(r, info, "you")
         if r.source == "trainer":
             r.trainers = named_trainers.get(r.spell, {})
+        if r.spell in api:
+            _apply_api(r, api[r.spell])
+        _apply_trainer(r, info, "you")
         recipes.append(r)
     return Profession(key=key, name=d["name"], recipes=recipes, note=d.get("note", ""), ranks=load_ranks(key, data_dir))
 

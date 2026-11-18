@@ -63,6 +63,7 @@ python -m cheapest_skillup leatherworking --from 120 --to 225
 python -m cheapest_skillup                                 # all professions, plus a summary
 python -m cheapest_skillup alchemy --region eu --realm normal-alliance
 python -m cheapest_skillup cooking --sources trainer       # don't buy recipe items
+python -m cheapest_skillup cooking --sources trainer,vendor  # vendor recipes, but not from the AH
 python -m cheapest_skillup tailoring --sell-back           # credit the vendor value of what you craft
 python -m cheapest_skillup tailoring --sell-back ah        # ...or its AH value (optimistic)
 python -m cheapest_skillup tailoring --price marketValue   # if min buyouts are thin
@@ -118,7 +119,8 @@ intermediates (so the estimate errs high), the items you enchant, and the AH ord
 |------|------|--------|--------------|
 | `data/recipes/*.json` | Every craft: reagents, product, skill colours, tools | WoW Forever client tables via [wago.tools](https://wago.tools) | `python -m cheapest_skillup.gamedata` |
 | `data/vendor_sell.json`, `data/item_names.json` | Vendor sell prices, item names | same | same |
-| `data/foreverdb.json` | How each recipe is learned, trainer fees seen in Forever, rank fees, trainer locations | [ForeverDB.net](https://foreverdb.net) addon data | `python -m cheapest_skillup.foreverdb` |
+| `data/foreverdb.json` | How each recipe is learned, trainer fees seen in Forever, rank fees, trainer locations, NPC names | [ForeverDB.net](https://foreverdb.net) addon data | `python -m cheapest_skillup.foreverdb` |
+| `data/foreverdb_api.json` | Per recipe: vendors and their prices, trainers per faction, fees, learn levels (numbers and ids only) | [ForeverDB API](https://foreverdb.net/developers) | `python -m cheapest_skillup.foreverdb_api` (needs a key) |
 | `data/trainer_classic.json` | Classic trainer fees and learn levels, used where nothing better is known | [CMaNGOS classic-db](https://github.com/cmangos/classic-db) | `python -m cheapest_skillup.classic_trainers <dump>` |
 | `data/trainer.json` | **Your own** trainer fees, learn levels and exclusions | you | |
 
@@ -128,14 +130,35 @@ intermediates (so the estimate errs high), the items you enchant, and the AH ord
 |-------------|---------|--------------|
 | `Known`     | Learned with the profession | free |
 | `Trainer`   | Taught by a profession trainer | its fee |
-| `AH recipe` | Taught by a recipe item (Pattern:, Recipe:, Plans:...) | that item's price on your AH |
+| `Vendor recipe` | A recipe item sold by a vendor on your faction | the vendor's price |
+| `AH recipe` | A recipe item bought on the AH (Pattern:, Recipe:, Plans:...) | that item's price on your AH |
 
-* A recipe item is used only if it's listed on your auction house.
+* A recipe item is used only if a vendor on your faction sells it or it's listed on your auction house,
+  whichever is cheaper. Vendors whose price includes something other than gold (Merchant's Favor) are
+  skipped.
 * Recipes taught only by bind-on-pickup items (quest rewards, BoP drops) are left out. So are recipes
   with no known source, and recipes ForeverDB marks as probably not in the live game.
 * For trainer fees and learn levels, priority goes: your `trainer.json`, then ForeverDB (fees seen at
   Forever trainers, shown as *seen*), then Classic values (shown as `~` or *Classic*). Otherwise the fee
   counts as 0 and the learn level is assumed to be the recipe's yellow level (*est.*).
+
+### The ForeverDB API (optional) and your key
+
+The committed `data/foreverdb_api.json` was made with an API key, so you don't need one to use the tool.
+To refresh it yourself:
+
+```powershell
+$env:FOREVERDB_API_KEY = "fdb_..."        # your key, for this PowerShell window only
+python -m cheapest_skillup.foreverdb_api
+Remove-Item Env:FOREVERDB_API_KEY
+```
+
+The key is read only from that environment variable, sent only to foreverdb.net, and never printed or
+written to a file. The API's text is watermarked to the key that fetched it, so the importer keeps only
+numbers, ids, coordinates and flags: no names or descriptions. It also refuses to write data that
+contains hidden characters or the key. `tests/test_no_secrets.py` fails if anything key-like or
+watermarked is ever committed. Never put the key in a file in this folder; `.gitignore` also blocks
+`.env` and `*.key` files.
 
 ### Your corrections: `data/trainer.json`
 
@@ -153,8 +176,9 @@ removes a recipe you can't get. Rank fees can be overridden too, with
 * Prices: [TradeSkillMaster](https://tradeskillmaster.com/public-data) public pricing data.
 * Game data: WoW Forever client tables via [wago.tools](https://wago.tools). World of Warcraft is a
   trademark of Blizzard Entertainment. This tool is not affiliated with Blizzard.
-* Recipe sources, trainer fees, ranks and trainer locations: **Data from ForeverDB.net
-  (https://foreverdb.net)**, GPL-3.0 with attribution.
+* Recipe sources, trainer fees, vendor prices, ranks and trainer/vendor locations: **Data from
+  ForeverDB.net (https://foreverdb.net)**, addon data under GPL-3.0 with attribution, and the ForeverDB
+  API.
 * Classic trainer estimates: [CMaNGOS classic-db](https://github.com/cmangos/classic-db), GPL-3.0.
 
 ## Tests
