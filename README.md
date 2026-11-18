@@ -109,15 +109,31 @@ How each recipe is learned (the *Learn* column):
   they can never be bought.
 * `--sources trainer` (GUI: untick *AH recipe items*) plans without buying any recipe items.
 
+### How recipes are learned: ForeverDB.net
+
+`data/foreverdb.json` comes from [ForeverDB.net](https://foreverdb.net)'s free addon data
+(`Data/Recipes.lua`). It corrects what the game files can't tell:
+
+* how each recipe is really learned, including recipe items whose names Blizzard keeps on its servers;
+* recipes with no known way to learn them, and recipes ForeverDB marks as probably not in the live
+  game (Season of Discovery leftovers and the like): both are left out;
+* trainer fees players saw at Forever trainers (shown as *seen*), and Classic fees for the rest.
+
+Refresh it with `python -m cheapest_skillup.foreverdb`.
+
+**Data from ForeverDB.net (https://foreverdb.net).** Used under GPL-3.0 with ForeverDB's attribution
+term. Keep this credit wherever the data is shown.
+
 ### Trainer fees and learn levels
 
 The game files don't contain trainer fees or the skill a trainer requires; the server sends those.
-They're filled in from three places, highest priority first:
+They're filled in from these places, highest priority first:
 
 1. **`data/trainer.json`: your values.** It lists every trainer recipe with `"cost": null,
    "learn": null`. Fill in what your trainer shows (`cost` in copper, 1s 25c = `125`; `learn` = skill
    needed). Re-running the importer keeps what you entered.
-2. **`data/trainer_classic.json`: Classic estimates.** Classic (1.12) trainer fees and learn levels for
+2. **`data/foreverdb.json`: ForeverDB.net.** Fees seen at Forever trainers, otherwise Classic fees.
+3. **`data/trainer_classic.json`: Classic estimates.** Classic (1.12) trainer fees and learn levels for
    the ~400 trainer recipes Forever kept from Classic, from the open-source
    [CMaNGOS classic-db](https://github.com/cmangos/classic-db) (GPL-3.0). Shown with `~` / *Classic*.
    A Classic learn level above Forever's yellow level is capped at yellow, since Forever made that
@@ -127,13 +143,22 @@ They're filled in from three places, highest priority first:
    git clone --depth 1 https://github.com/cmangos/classic-db
    python -m cheapest_skillup.classic_trainers classic-db/Full_DB/ClassicDB_*.sql.gz
    ```
-3. **Otherwise:** the fee counts as 0 (the report says how many) and the recipe is assumed learnable at
+4. **Otherwise:** the fee counts as 0 (the report says how many) and the recipe is assumed learnable at
    its yellow level (*est.*), which never schedules it before you could train it. This applies mostly to
    Forever-only trainer recipes.
 
 The route only goes through recipes the game data marks as craftable profession recipes. A few
 trainer recipes may not actually be offered by trainers (event or removed recipes); if the plan uses
 one you can't learn, add `"exclude": true` to its entry in `data/trainer.json`.
+
+## Credits
+
+* Prices: [TradeSkillMaster](https://tradeskillmaster.com/public-data) public pricing data.
+* Game data: WoW Forever client tables via [wago.tools](https://wago.tools). World of Warcraft is a
+  trademark of Blizzard Entertainment; this tool is not affiliated with Blizzard.
+* Recipe sources and trainer fees: **Data from ForeverDB.net (https://foreverdb.net)**, GPL-3.0 with
+  attribution.
+* Classic trainer estimates: [CMaNGOS classic-db](https://github.com/cmangos/classic-db), GPL-3.0.
 
 ## Tests
 

@@ -19,7 +19,7 @@ from urllib.parse import parse_qs, urlparse
 from .cli import PRICE_FIELDS, plan_to_dict
 from .optimizer import cheapest_plan
 from .prices import load_pricebook
-from .recipes import (available_professions, load_item_names, load_profession, load_vendor_names, load_vendor_prices,
+from .recipes import (available_professions, load_foreverdb, load_item_names, load_profession, load_vendor_names, load_vendor_prices,
                       load_vendor_sell)
 
 PAGE = Path(__file__).resolve().parent / "web" / "index.html"
@@ -80,6 +80,7 @@ def make_plan(q: dict[str, list[str]]) -> dict:
         "auction_house": f"{game}/{region}/{realm}",
         "price_field": price,
         "plans": [plan_to_dict(p, prices, vendor_names) for p in plans],
+        "foreverdb": bool(load_foreverdb()),
     }
 
 

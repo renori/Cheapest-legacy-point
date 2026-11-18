@@ -8,8 +8,10 @@ import sys
 
 from .optimizer import Plan, ceil, cheapest_plan
 from .prices import PriceBook, load_pricebook
-from .recipes import (available_professions, load_item_names, load_profession, load_vendor_names, load_vendor_prices,
-                      load_vendor_sell)
+from .recipes import (available_professions, load_foreverdb, load_item_names, load_profession, load_vendor_names,
+                      load_vendor_prices, load_vendor_sell)
+
+FOREVERDB_CREDIT = "Data from ForeverDB.net (https://foreverdb.net)"
 
 SOURCE_LABEL = {"auto": "known", "trainer": "trainer", "recipe": "AH recipe"}
 
@@ -74,8 +76,9 @@ def render(plan: Plan, prices: PriceBook, vendor_names: dict[int, str]) -> str:
                 where = f"buy {' / '.join(item_name(i, prices, vendor_names) for i in r.recipe_items)} on the AH"
             else:
                 level = {"classic": f"learn at ~{r.orange} (Classic estimate)", "assumed": f"learn level unknown, assumed {r.orange}",
-                         "you": f"learn at {r.orange}", "game": f"learn at {r.orange}"}[r.learn_from]
-                where = f"trainer, {level}"
+                         "you": f"learn at {r.orange}", "game": f"learn at {r.orange}", "forever": f"learn at {r.orange}"}[r.learn_from]
+                fee_note = {"forever": ", fee seen in Forever", "you": ", your fee"}.get(r.fee_from or "", "")
+                where = f"trainer, {level}{fee_note}"
             fee = "fee unknown" if c is None else ("~" if r.fee_from == "classic" else "") + money(c)
             out.append(f"  {r.name:<38} {fee:>14}  ({where})")
 
@@ -190,6 +193,8 @@ def main(argv: list[str] | None = None) -> int:
     else:
         print(f"Prices: TSM {args.price} for {args.game}/{args.region}/{args.realm}, scanned {updated}\n")
         print("\n\n".join(render(p, prices, vendor_names) for p in results))
+        if load_foreverdb():
+            print(f"\nRecipe sources and trainer fees: {FOREVERDB_CREDIT}")
         if len(results) > 1:
             print("\nSummary")
             for p in sorted(results, key=lambda p: p.grand_total):

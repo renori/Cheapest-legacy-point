@@ -81,6 +81,7 @@ ul.plain { margin: 0; padding-left: 18px; }
 .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: spin .8s linear infinite; vertical-align: -2px; margin-right: 6px; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .note { color: var(--muted); font-size: 12px; margin-top: 14px; }
+a { color: var(--accent); }
 </style>
 </head>
 <body>
@@ -235,6 +236,7 @@ function showError(msg) {
 const fullCost = p => p.grand_total_copper;
 const HOW = {auto: "Known", trainer: "Trainer", recipe: "AH recipe"};
 const LEARN_NOTE = {
+  forever: '<span class="src" title="Seen at a Forever trainer (ForeverDB.net)"> Forever</span>',
   classic: '<span class="src" title="Classic trainer requirement, used as an estimate"> Classic</span>',
   assumed: '<span class="src" title="Unknown; assumed to be the recipe\'s yellow level. Correct it in data/trainer.json."> est.</span>',
 };
@@ -244,7 +246,7 @@ function render() {
   const scanned = new Date(d.prices_updated);
   const when = isNaN(scanned) ? d.prices_updated : scanned.toLocaleString();
   let h = `<div class="meta">${esc(PRICE_LABEL[d.price_field] || d.price_field)} from TSM <b>${esc(d.auction_house)}</b> · scanned ${esc(when)}</div>`;
-  h += `<div class="warn">Recipes come from WoW Forever's game data. Trainer fees and learn levels aren't in it, so Classic trainer values are used as estimates where they exist; the rest count as free and learnable at the recipe's yellow level. Your own values in <code>data/trainer.json</code> override both.</div>`;
+  h += `<div class="warn">Recipes come from WoW Forever's game data. How each recipe is learned and trainer fees come from ForeverDB.net (fees players saw at Forever trainers, marked "seen"); Classic values fill gaps, marked ~. Your own values in <code>data/trainer.json</code> override both.</div>`;
 
   if (d.plans.length > 1) {
     const sorted = [...d.plans].sort((a, b) => fullCost(a) - fullCost(b));
@@ -307,7 +309,8 @@ function renderDetail(p) {
       [...p.learn].sort((a, b) => a.learn_level - b.learn_level || a.recipe.localeCompare(b.recipe)).map(l => `<tr><td>${esc(l.recipe)}</td>
         <td>${l.how === "recipe" ? "AH: " + l.recipe_items.map(i => esc(i.name)).join(" / ") : "Trainer"}</td>
         <td class="num">${l.learn_level}${LEARN_NOTE[l.learn_from] || ""}</td>
-        <td class="num">${l.cost_copper === null ? '<span class="src">fee unknown</span>' : (l.fee_from === "classic" ? '<span class="src" title="Classic trainer fee, used as an estimate">~</span>' : "") + money(l.cost_copper)}</td></tr>`).join("") + `</tbody></table></div>`;
+        <td class="num">${l.cost_copper === null ? '<span class="src">fee unknown</span>' : (l.fee_from === "classic" ? '<span class="src" title="Classic trainer fee, used as an estimate">~</span>' : "") + money(l.cost_copper)
+          + (l.fee_from === "forever" ? '<span class="src" title="Fee players saw at a Forever trainer (ForeverDB.net)"> seen</span>' : "")}</td></tr>`).join("") + `</tbody></table></div>`;
     const est = p.learn.filter(l => l.fee_from === "classic" || l.learn_from === "classic").length;
     const notes = [];
     if (est) notes.push(`${est} trainer recipe(s) use Classic fees/levels as estimates (marked ~ and "Classic").`);
@@ -316,6 +319,7 @@ function renderDetail(p) {
   }
   if (p.no_sell_price.length) h += `<div class="warn" style="margin-top:14px">No ${p.sell_back === "vendor" ? "vendor sell" : "AH"} price for: ${p.no_sell_price.map(esc).join(", ")}. Counted as 0${p.sell_back === "vendor" ? " — add them to <code>data/vendor_sell.json</code>" : ""}.</div>`;
   if (p.unpriced.length) h += `<div class="error" style="margin-top:14px">No price found for: ${p.unpriced.map(esc).join(", ")}</div>`;
+  if (LAST.foreverdb) h += `<div class="note">Recipe sources and trainer fees: <a href="https://foreverdb.net" target="_blank" rel="noopener">Data from ForeverDB.net</a></div>`;
   h += `<div class="note">Quantities are expected values; buy a little extra. Min buyout is the cheapest single listing, so large orders will cost more.</div>`;
   $("#detail").innerHTML = h;
 }

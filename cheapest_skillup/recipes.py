@@ -26,7 +26,7 @@ class Recipe:
     spell: int | None = None
     learn_known: bool = True  # False: learn level not in game data, assumed = yellow
     recipe_items: list[int] = field(default_factory=list)  # items that teach it (source "recipe")
-    fee_from: str | None = None  # trainer fee origin: "you" (trainer.json), "classic" (estimate), None
+    fee_from: str | None = None  # trainer fee: "you" (trainer.json), "forever" (seen at a Forever trainer), "classic", None
     learn_from: str = "game"  # learn level origin: "game", "you", "classic", "assumed" (= yellow)
 
     def skillup_chance(self, skill: int) -> float:
@@ -77,6 +77,44 @@ def load_trainer(data_dir: Path = DATA_DIR, name: str = "trainer.json") -> dict[
     return {int(k): v for k, v in d.get("spells", {}).items()}
 
 
+def load_foreverdb(data_dir: Path = DATA_DIR) -> dict[int, dict]:
+    """How each recipe is learned, from ForeverDB.net (data/foreverdb.json), by spell id."""
+    path = data_dir / "foreverdb.json"
+    if not path.exists():
+        return {}
+    d = json.loads(path.read_text(encoding="utf-8"))
+    return {int(k): v for k, v in d.get("spells", {}).items()}
+
+
+def _apply_foreverdb(r: Recipe, info: dict) -> bool:
+    """Correct how `r` is learned from ForeverDB. False = leave the recipe out."""
+    if info.get("speculation") or info["learn"] == "unknown":
+        return False  # probably not in the live game, or no known way to learn it
+    how = info["learn"]
+    level = info.get("learn_level")
+    if how == "auto":
+        r.source, r.learn_cost, r.recipe_items = "auto", 0, []
+        r.orange, r.learn_known, r.learn_from = 1, True, "game"
+    elif how == "recipe":
+        r.source, r.learn_cost, r.recipe_items = "recipe", 0, info.get("recipe_items", [])
+        if level:
+            r.orange, r.learn_known, r.learn_from = max(1, min(level, r.grey - 1)), True, "game"
+    else:  # trainer
+        if r.source != "trainer":
+            r.source, r.recipe_items, r.learn_cost = "trainer", [], None
+            r.orange, r.learn_known, r.learn_from = max(1, min(r.yellow, r.grey - 1)), False, "assumed"
+        if level:
+            r.orange = max(1, min(level, r.grey - 1))
+            r.learn_known = not info.get("learn_level_classic")
+            r.learn_from = "classic" if info.get("learn_level_classic") else "forever"
+        if info.get("fee") is not None:
+            r.learn_cost = info["fee"]
+            r.fee_from = "forever" if info.get("fee_seen_in_forever") else "classic"
+    r.yellow = max(r.yellow, r.orange)
+    r.green = max(r.green, r.yellow)
+    return True
+
+
 def _apply_trainer(r: Recipe, info: dict | None, origin: str) -> None:
     if r.source != "trainer" or not info:
         return
@@ -87,6 +125,8 @@ def _apply_trainer(r: Recipe, info: dict | None, origin: str) -> None:
         r.orange = max(1, min(int(info["learn"]), r.grey - 1))
         r.learn_known = origin == "you"
         r.learn_from = origin
+        r.yellow = max(r.yellow, r.orange)
+        r.green = max(r.green, r.yellow)
 
 
 def load_profession(key: str, data_dir: Path = DATA_DIR) -> Profession:
@@ -94,6 +134,7 @@ def load_profession(key: str, data_dir: Path = DATA_DIR) -> Profession:
     d = json.loads(path.read_text(encoding="utf-8"))
     yours = load_trainer(data_dir)
     classic = load_trainer(data_dir, "trainer_classic.json")
+    fdb = load_foreverdb(data_dir)
     recipes = []
     for raw in d["recipes"]:
         r = _recipe(raw)
@@ -102,8 +143,11 @@ def load_profession(key: str, data_dir: Path = DATA_DIR) -> Profession:
         info = yours.get(r.spell) if r.spell else None
         if info and info.get("exclude"):
             continue  # you marked it as not available
+        # Lowest priority first: Classic estimates, then ForeverDB, then your own values.
         _apply_trainer(r, classic.get(r.spell) if r.spell else None, "classic")
-        _apply_trainer(r, info, "you")  # your values win
+        if r.spell in fdb and not _apply_foreverdb(r, fdb[r.spell]):
+            continue
+        _apply_trainer(r, info, "you")
         recipes.append(r)
     return Profession(key=key, name=d["name"], recipes=recipes, note=d.get("note", ""))
 
