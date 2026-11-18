@@ -1,0 +1,8 @@
+## Interface: 11507
+## Title: Cheapest Skill-up Export
+## Notes: Exports vendor sell prices of crafted items for the Cheapest Skill-up planner. Type /csexport.
+## SavedVariables: CheapestSkillupExportDB
+## Version: 1.0
+
+Items.lua
+Export.lua

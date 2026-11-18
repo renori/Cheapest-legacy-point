@@ -33,7 +33,8 @@ class Step:
     start: int  # skill at the start of this step
     end: int  # skill after this step
     expected_crafts: float
-    cost: float  # copper, expected
+    cost: float  # copper, expected, after any sell-back credit
+    credit: float = 0.0  # copper recovered by selling what this step crafts
 
 
 @dataclass
@@ -50,6 +51,12 @@ class Plan:
     total_cost: float  # copper, materials for the skill-ups
     unpriced: set[int] = field(default_factory=set)
     tool_costs: dict[int, tuple[str, float]] = field(default_factory=dict)  # item -> (name, cost of one)
+    sell_back: str | None = None  # None, "vendor" or "ah"
+    no_sell_price: set[int] = field(default_factory=set)  # crafted items with no sell price known
+
+    @property
+    def sell_credit(self) -> float:
+        return sum(s.credit for s in self.steps)
 
     @property
     def tools_cost(self) -> float:
@@ -66,8 +73,10 @@ class Optimizer:
         profession: Profession,
         prices: PriceBook,
         allowed_sources: set[str] = frozenset({"trainer", "vendor"}),
-        sell_back: bool = False,
+        sell_back: str | None = None,  # None, "vendor" or "ah"
     ):
+        if sell_back not in (None, "vendor", "ah"):
+            raise ValueError(f"sell_back must be None, 'vendor' or 'ah', not {sell_back!r}")
         self.prof = profession
         self.prices = prices
         self.recipes = [r for r in profession.recipes if r.source in allowed_sources]
@@ -100,11 +109,14 @@ class Optimizer:
     def reagent_cost(self, r: Recipe, skill: int, _stack: frozenset = frozenset()) -> float:
         return sum(qty * self.unit_cost(item, skill, _stack)[0] for item, qty in r.reagents.items())
 
+    def credit(self, r: Recipe) -> float:
+        """Copper recovered per craft by selling what it makes."""
+        if not self.sell_back or not r.makes:
+            return 0.0
+        return self.prices.sell_value(r.makes, self.sell_back) * r.makes_qty
+
     def craft_cost(self, r: Recipe, skill: int) -> float:
-        c = self.reagent_cost(r, skill, frozenset({r.name}))
-        if self.sell_back and r.makes:
-            c -= self.prices.sell_value(r.makes) * r.makes_qty
-        return c
+        return self.reagent_cost(r, skill, frozenset({r.name})) - self.credit(r)
 
     def point_cost(self, r: Recipe, skill: int) -> float:
         p = r.skillup_chance(skill)
@@ -121,11 +133,13 @@ class Optimizer:
             if best is None or cost == INF:
                 break
             p = best.skillup_chance(skill)
+            credit = self.credit(best) / p
             if steps and steps[-1].recipe is best:
                 s = steps[-1]
                 s.end, s.expected_crafts, s.cost = skill + 1, s.expected_crafts + 1 / p, s.cost + cost
+                s.credit += credit
             else:
-                steps.append(Step(best, skill, skill + 1, 1 / p, cost))
+                steps.append(Step(best, skill, skill + 1, 1 / p, cost, credit))
             skill += 1
 
         buy: dict[int, float] = defaultdict(float)
@@ -172,6 +186,9 @@ class Optimizer:
             total_cost=sum(s.cost for s in steps),
             unpriced=unpriced,
             tool_costs=tool_costs,
+            sell_back=self.sell_back,
+            no_sell_price={s.recipe.makes for s in steps if self.sell_back and s.recipe.makes
+                           and not self.prices.sell_value(s.recipe.makes, self.sell_back)},
         )
 
 

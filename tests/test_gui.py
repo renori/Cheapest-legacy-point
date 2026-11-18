@@ -18,6 +18,8 @@ class GuiApi(unittest.TestCase):
             gui.make_plan({"professions": ["tailoring"], "price": ["bogus"]})
         with self.assertRaises(ValueError):
             gui.make_plan({"professions": ["tailoring"], "from": ["150"], "to": ["100"]})
+        with self.assertRaises(ValueError):
+            gui.make_plan({"professions": ["tailoring"], "sell_back": ["1"]})
 
 
 if __name__ == "__main__":

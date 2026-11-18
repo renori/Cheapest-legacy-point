@@ -19,7 +19,7 @@ from urllib.parse import parse_qs, urlparse
 from .cli import PRICE_FIELDS, plan_to_dict
 from .optimizer import Optimizer
 from .prices import load_pricebook
-from .recipes import available_professions, load_profession, load_vendor_names, load_vendor_prices
+from .recipes import available_professions, load_profession, load_vendor_names, load_vendor_prices, load_vendor_sell
 
 PAGE = Path(__file__).resolve().parent / "web" / "index.html"
 REALMS = ["normal-alliance", "normal-horde", "pvp-alliance", "pvp-horde"]
@@ -39,7 +39,7 @@ def options() -> dict:
         "price_fields": list(PRICE_FIELDS),
         "sources": ["trainer", "vendor", "quest", "drop"],
         "defaults": {"game": "forever", "region": "us", "realm": "pvp-horde", "price": "minBuyout",
-                     "from": 1, "to": 150, "sources": ["trainer", "vendor"], "sell_back": False},
+                     "from": 1, "to": 150, "sources": ["trainer", "vendor"], "sell_back": "none"},
     }
 
 
@@ -58,7 +58,10 @@ def make_plan(q: dict[str, list[str]]) -> dict:
         raise ValueError("Skill range must satisfy 1 <= from < to.")
     game, region, realm = get("game", "forever"), get("region", "us"), get("realm", "pvp-horde")
     sources = {s for s in get("sources", "trainer,vendor").split(",") if s}
-    sell_back = get("sell_back", "0") == "1"
+    sell_back = get("sell_back", "none")
+    if sell_back not in ("none", "vendor", "ah"):
+        raise ValueError(f"Unknown sell-back mode: {sell_back}")
+    sell_back = None if sell_back == "none" else sell_back
     overrides = {}
     for pair in get("overrides", "").split(","):
         if "=" in pair:
@@ -68,7 +71,8 @@ def make_plan(q: dict[str, list[str]]) -> dict:
     vendor_names = load_vendor_names()
     with _lock:
         prices, updated = load_pricebook(game, region, realm, load_vendor_prices(), price,
-                                         refresh=get("refresh", "0") == "1", overrides=overrides)
+                                         refresh=get("refresh", "0") == "1", overrides=overrides,
+                                         vendor_sell=load_vendor_sell())
     plans = [Optimizer(load_profession(k), prices, sources, sell_back).plan(start, target) for k in profs]
     return {
         "prices_updated": updated,

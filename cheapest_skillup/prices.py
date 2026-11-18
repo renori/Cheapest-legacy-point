@@ -89,12 +89,14 @@ class PriceBook:
         vendor_prices: dict[int, int],
         price_field: str = "minBuyout",
         overrides: dict[int, int] | None = None,
+        vendor_sell: dict[int, int] | None = None,
     ):
         self.realm_rows = realm_rows
         self.region_rows = region_rows
         self.vendor_prices = vendor_prices
         self.price_field = price_field
         self.overrides = overrides or {}
+        self.vendor_sell = vendor_sell or {}
 
     def name(self, item_id: int) -> str | None:
         for rows in (self.realm_rows, self.region_rows):
@@ -122,8 +124,14 @@ class PriceBook:
             return Quote(item_id, None, "unavailable")
         return min(candidates, key=lambda q: q.price)
 
-    def sell_value(self, item_id: int) -> int:
-        """What a crafted item is worth if sold on the AH (after the 5% cut)."""
+    def sell_value(self, item_id: int, mode: str = "vendor") -> int:
+        """What one crafted item is worth when sold back.
+
+        mode "vendor": the vendor sell price (data/vendor_sell.json, exported
+        from the game). mode "ah": the AH price after the 5% cut.
+        """
+        if mode == "vendor":
+            return self.vendor_sell.get(item_id, 0)
         realm = self.realm_rows.get(item_id)
         ah = _int(realm.get(self.price_field)) if realm else None
         return int(ah * 0.95) if ah else 0
@@ -138,10 +146,11 @@ def load_pricebook(
     cache_dir: Path | None = None,
     refresh: bool = False,
     overrides: dict[int, int] | None = None,
+    vendor_sell: dict[int, int] | None = None,
 ) -> tuple[PriceBook, str]:
     realm_text = fetch_csv(realm_url(game, region, realm), cache_dir, refresh)
     region_text = fetch_csv(region_url(game, region), cache_dir, refresh)
     realm_rows = parse_csv(realm_text)
     region_rows = parse_csv(region_text)
     updated = next(iter(realm_rows.values()), {}).get("updatedAt", "unknown")
-    return PriceBook(realm_rows, region_rows, vendor_prices, price_field, overrides), updated
+    return PriceBook(realm_rows, region_rows, vendor_prices, price_field, overrides, vendor_sell), updated

@@ -28,7 +28,8 @@ python -m cheapest_skillup                                 # all of them, plus a
 python -m cheapest_skillup alchemy --realm pvp-horde --region eu
 python -m cheapest_skillup leatherworking --from 75 --to 150
 python -m cheapest_skillup cooking --sources trainer,vendor,quest
-python -m cheapest_skillup tailoring --sell-back           # subtract AH value of what you craft
+python -m cheapest_skillup tailoring --sell-back           # subtract vendor value of what you craft
+python -m cheapest_skillup tailoring --sell-back ah        # ...or its AH value (optimistic)
 python -m cheapest_skillup tailoring --price marketValue   # if min buyouts are thin
 python -m cheapest_skillup tailoring --json
 ```
@@ -56,6 +57,28 @@ For each reagent the tool uses the cheapest of:
    Linen Cloth).
 
 `--price-override 2589=20` forces a price in copper, for example for mats you already own (`=0`).
+
+## Selling crafted items back (vendor prices)
+
+With `--sell-back` (GUI: *Crafted items → Sell to a vendor*), each craft is credited with the vendor
+sell price of what it makes, and the route is re-optimised with that credit. TSM's data has no vendor
+prices, so they come from the game via a small addon:
+
+1. Copy `addon/CheapestSkillupExport` into your WoW Forever `Interface\AddOns` folder. If the
+   character screen lists it as out of date, tick **Load out of date AddOns**.
+2. Log in, type `/csexport`, wait for the "exported" message, then type `/reload` to save the file.
+3. Import it (adjust the path to your install and account name):
+
+   ```sh
+   python -m cheapest_skillup.vendor_sell import "C:\Program Files (x86)\World of Warcraft\_classic_\WTF\Account\YOURACCOUNT\SavedVariables\CheapestSkillupExport.lua"
+   ```
+
+   This writes `data/vendor_sell.json`. The report lists any crafted item that still has no price
+   (counted as 0).
+
+After adding recipes, run `python -m cheapest_skillup.vendor_sell addon` and copy the addon again so it
+exports the new items too. `--sell-back ah` uses the AH min buyout minus the 5% cut instead; that
+assumes everything sells at the lowest listing, so treat it as a best case.
 
 ## How the plan is chosen
 

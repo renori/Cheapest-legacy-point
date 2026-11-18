@@ -71,10 +71,31 @@ class Planning(unittest.TestCase):
         plan = Optimizer(self.prof(), book()).plan(1, 60)
         self.assertEqual(plan.reached, 50)
 
-    def test_sell_back_lowers_cost(self):
+    def test_sell_back_to_ah_lowers_cost(self):
         a = Optimizer(self.prof(), book()).plan(1, 30).total_cost
-        b = Optimizer(self.prof(), book(), sell_back=True).plan(1, 30).total_cost
+        b = Optimizer(self.prof(), book(), sell_back="ah").plan(1, 30).total_cost
         self.assertLess(b, a)
+
+    def test_sell_back_to_vendor_uses_vendor_sell_prices(self):
+        plain = Optimizer(self.prof(), book()).plan(1, 30)
+        # Hats vendor for 10c, bolts for nothing known.
+        plan = Optimizer(self.prof(), book(vendor_sell={3: 10}), sell_back="vendor").plan(1, 30)
+        hat_steps = [s for s in plan.steps if s.recipe.name == "Hat"]
+        self.assertTrue(hat_steps)
+        for s in hat_steps:
+            self.assertAlmostEqual(s.credit, 10 * s.expected_crafts)
+            self.assertAlmostEqual(s.cost, 45 * s.expected_crafts - s.credit)  # 45c of mats per hat
+        # The credit makes hats worth switching to one point earlier (35c/point beats bolts at 15).
+        self.assertEqual(hat_steps[0].start, 15)
+        self.assertLess(plan.total_cost, plain.total_cost)
+        self.assertEqual(plan.no_sell_price, {2})  # bolts were crafted and sold, no vendor price
+        # Vendor mode never uses the AH price (80c for hats).
+        self.assertEqual(book().sell_value(3, "vendor"), 0)
+        self.assertEqual(book().sell_value(3, "ah"), 76)
+
+    def test_bad_sell_back_mode(self):
+        with self.assertRaises(ValueError):
+            Optimizer(self.prof(), book(), sell_back="banana")
 
 
 class Data(unittest.TestCase):

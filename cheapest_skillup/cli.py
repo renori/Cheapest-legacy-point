@@ -8,7 +8,7 @@ import sys
 
 from .optimizer import Optimizer, Plan, ceil
 from .prices import PriceBook, load_pricebook
-from .recipes import available_professions, load_profession, load_vendor_names, load_vendor_prices
+from .recipes import available_professions, load_profession, load_vendor_names, load_vendor_prices, load_vendor_sell
 
 PRICE_FIELDS = ("minBuyout", "marketValue", "recent", "historical")
 
@@ -68,7 +68,14 @@ def render(plan: Plan, prices: PriceBook, vendor_names: dict[int, str]) -> str:
         for r in learn_extra:
             out.append(f"  {r.name} ({r.source}{', ~' + money(r.learn_cost) if r.learn_cost else ''})")
 
-    out += ["", f"Total materials (expected): {money(plan.total_cost)}"]
+    if plan.sell_back:
+        how = "to a vendor" if plan.sell_back == "vendor" else "on the AH"
+        out += ["", f"Materials (expected): {money(plan.total_cost + plan.sell_credit)}",
+                f"Selling crafted items {how}: -{money(plan.sell_credit)}"]
+        if plan.no_sell_price:
+            names = ", ".join(item_name(i, prices, vendor_names) for i in sorted(plan.no_sell_price))
+            out.append(f"  (no {'vendor' if plan.sell_back == 'vendor' else 'AH'} price for: {names}; counted as 0)")
+    out += [f"Total (expected): {money(plan.total_cost)}" if plan.sell_back else f"Total materials (expected): {money(plan.total_cost)}"]
     if plan.tools_cost:
         out.append(f"Plus tools: {money(plan.tools_cost)}  ->  {money(plan.total_cost + plan.tools_cost)}")
     if plan.learn_cost:
@@ -91,8 +98,11 @@ def plan_to_dict(plan: Plan, prices: PriceBook, vendor_names: dict[int, str]) ->
         "reached": plan.reached,
         "total_cost_copper": round(plan.total_cost),
         "tools_cost_copper": round(plan.tools_cost),
+        "sell_back": plan.sell_back,
+        "sell_credit_copper": round(plan.sell_credit),
+        "no_sell_price": [item_name(i, prices, vendor_names) for i in sorted(plan.no_sell_price)],
         "steps": [
-            {"recipe": s.recipe.name, "from": s.start, "to": s.end, "expected_crafts": round(s.expected_crafts, 2), "cost_copper": round(s.cost)}
+            {"recipe": s.recipe.name, "from": s.start, "to": s.end, "expected_crafts": round(s.expected_crafts, 2), "cost_copper": round(s.cost), "credit_copper": round(s.credit)}
             for s in plan.steps
         ],
         "craft_first": {k: round(v, 2) for k, v in plan.craft_first.items()},
@@ -117,7 +127,9 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--from", dest="start", type=int, default=1, help="current skill (default: 1)")
     ap.add_argument("--to", dest="target", type=int, default=150, help="target skill (default: 150)")
     ap.add_argument("--sources", default="trainer,vendor", help="recipe sources you can use (trainer,vendor,quest,drop)")
-    ap.add_argument("--sell-back", action="store_true", help="subtract the AH value of what you craft (after 5%% cut)")
+    ap.add_argument("--sell-back", nargs="?", const="vendor", choices=("vendor", "ah"), default=None,
+                    help="subtract what you get for selling what you craft: 'vendor' (default) uses vendor sell "
+                         "prices from data/vendor_sell.json, 'ah' uses the AH price after the 5%% cut")
     ap.add_argument("--price-override", action="append", default=[], metavar="ITEM=COPPER", help="force a price, e.g. 2589=20 (repeatable)")
     ap.add_argument("--refresh", action="store_true", help="ignore the 3-hour download cache")
     ap.add_argument("--json", action="store_true", help="print JSON instead of a report")
@@ -135,7 +147,8 @@ def main(argv: list[str] | None = None) -> int:
     vendor_prices = load_vendor_prices()
     vendor_names = load_vendor_names()
     try:
-        prices, updated = load_pricebook(args.game, args.region, args.realm, vendor_prices, args.price, refresh=args.refresh, overrides=overrides)
+        prices, updated = load_pricebook(args.game, args.region, args.realm, vendor_prices, args.price, refresh=args.refresh,
+                                         overrides=overrides, vendor_sell=load_vendor_sell())
     except Exception as e:  # network / 404 for a wrong realm slug
         print(f"Could not download TSM prices for {args.game}/{args.region}/{args.realm}: {e}", file=sys.stderr)
         print("Check the slugs in your realm's URL on tradeskillmaster.com.", file=sys.stderr)

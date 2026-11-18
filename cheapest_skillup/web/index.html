@@ -113,8 +113,13 @@ ul.plain { margin: 0; padding-left: 18px; }
       <label class="f">Recipe sources allowed</label>
       <div class="chips" id="sources"></div>
 
-      <label class="check"><input type="checkbox" id="sellback"> Sell crafted items back</label>
-      <div class="hint">Subtracts each item's AH value after the 5% cut.</div>
+      <label class="f" for="sellback">Crafted items</label>
+      <select id="sellback">
+        <option value="none">Keep or destroy (no credit)</option>
+        <option value="vendor">Sell to a vendor</option>
+        <option value="ah">Sell on the AH (min buyout − 5%)</option>
+      </select>
+      <div class="hint">Vendor prices come from <code>data/vendor_sell.json</code>, exported in game.</div>
 
       <label class="f" for="overrides">Price overrides</label>
       <input id="overrides" type="text" placeholder="e.g. 2589=0, 2592=100">
@@ -179,7 +184,7 @@ async function init() {
   fillSelect($("#realm"), OPTIONS.realms, d.realm, {"normal-alliance": "Normal · Alliance", "normal-horde": "Normal · Horde", "pvp-alliance": "PvP · Alliance", "pvp-horde": "PvP · Horde"});
   fillSelect($("#price"), OPTIONS.price_fields, d.price, PRICE_LABEL);
   $("#from").value = d.from; $("#to").value = d.to;
-  $("#sellback").checked = !!d.sell_back;
+  $("#sellback").value = ["none", "vendor", "ah"].includes(d.sell_back) ? d.sell_back : "none";
   $("#overrides").value = d.overrides || "";
   $("#all").onclick = () => document.querySelectorAll("#profs .chip").forEach(b => b.setAttribute("aria-pressed", "true"));
   $("#none").onclick = () => document.querySelectorAll("#profs .chip").forEach(b => b.setAttribute("aria-pressed", "false"));
@@ -190,7 +195,7 @@ async function run() {
   const form = {
     professions: pressed($("#profs")), sources: pressed($("#sources")),
     region: $("#region").value, realm: $("#realm").value, price: $("#price").value,
-    from: +$("#from").value, to: +$("#to").value, sell_back: $("#sellback").checked,
+    from: +$("#from").value, to: +$("#to").value, sell_back: $("#sellback").value,
     overrides: $("#overrides").value.replace(/\s+/g, ""),
   };
   if (!form.professions.length) return showError("Pick at least one profession.");
@@ -199,7 +204,7 @@ async function run() {
   const q = new URLSearchParams({
     professions: form.professions.join(","), sources: form.sources.join(","),
     region: form.region, realm: form.realm, price: form.price, from: form.from, to: form.to,
-    sell_back: form.sell_back ? "1" : "0", overrides: form.overrides, refresh: $("#refresh").checked ? "1" : "0",
+    sell_back: form.sell_back, overrides: form.overrides, refresh: $("#refresh").checked ? "1" : "0",
   });
   const go = $("#go");
   go.disabled = true; go.innerHTML = '<span class="spinner"></span>Pricing…';
@@ -265,7 +270,8 @@ function renderDetail(p) {
   const span = p.target - p.start;
   let h = `<div class="total">
     <div><div class="lbl">Total</div><div class="big">${money(fullCost(p))}</div></div>
-    <div><div class="lbl">Materials</div><div>${money(p.total_cost_copper)}</div></div>
+    <div><div class="lbl">Materials</div><div>${money(p.total_cost_copper + p.sell_credit_copper)}</div></div>
+    ${p.sell_back ? `<div><div class="lbl">Sold ${p.sell_back === "vendor" ? "to vendor" : "on AH"}</div><div>${money(-p.sell_credit_copper)}</div></div>` : ""}
     ${p.tools_cost_copper ? `<div><div class="lbl">Tools</div><div>${money(p.tools_cost_copper)}</div></div>` : ""}
     <div><div class="lbl">Crafts</div><div>${p.steps.reduce((a, s) => a + ceil(s.expected_crafts), 0).toLocaleString()}</div></div>
   </div>`;
@@ -288,6 +294,7 @@ function renderDetail(p) {
   if (cf.length) h += `<h3>Craft these first (cheaper than buying)</h3><ul class="plain">` + cf.map(([n, q]) => `<li>${ceil(q)} × ${esc(n)}</li>`).join("") + `</ul>`;
   if (p.tools.length) h += `<h3>Tools needed once</h3><ul class="plain">` + p.tools.map(t => `<li>${esc(t.name)}: ${money(t.cost_copper)}</li>`).join("") + `</ul>`;
   if (p.recipes_to_get.length) h += `<h3>Recipes to buy or find</h3><ul class="plain">` + p.recipes_to_get.map(r => `<li>${esc(r.name)} <span class="src">${esc(r.source)}</span></li>`).join("") + `</ul>`;
+  if (p.no_sell_price.length) h += `<div class="warn" style="margin-top:14px">No ${p.sell_back === "vendor" ? "vendor sell" : "AH"} price for: ${p.no_sell_price.map(esc).join(", ")}. Counted as 0${p.sell_back === "vendor" ? " — run the in-game exporter (see README) to fill <code>data/vendor_sell.json</code>" : ""}.</div>`;
   if (p.unpriced.length) h += `<div class="error" style="margin-top:14px">No price found for: ${p.unpriced.map(esc).join(", ")}</div>`;
   h += `<div class="note">Quantities are expected values; buy a little extra. Min buyout is the cheapest single listing, so large orders will cost more.</div>`;
   $("#detail").innerHTML = h;

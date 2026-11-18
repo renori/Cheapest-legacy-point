@@ -78,3 +78,12 @@ def load_vendor_prices(data_dir: Path = DATA_DIR) -> dict[int, int]:
 def load_vendor_names(data_dir: Path = DATA_DIR) -> dict[int, str]:
     d = json.loads((data_dir / "vendor_items.json").read_text(encoding="utf-8"))
     return {int(k): v["name"] for k, v in d["items"].items()}
+
+
+def load_vendor_sell(data_dir: Path = DATA_DIR) -> dict[int, int]:
+    """Vendor sell prices (copper) of crafted items, from data/vendor_sell.json."""
+    path = data_dir / "vendor_sell.json"
+    if not path.exists():
+        return {}
+    d = json.loads(path.read_text(encoding="utf-8"))
+    return {int(k): int(v["sell"]) for k, v in d.get("items", {}).items()}
