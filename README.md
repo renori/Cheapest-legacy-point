@@ -7,6 +7,9 @@ No API key and no dependencies, just Python 3.10+.
 
 ## GUI
 
+On Windows, double-click **`start_gui.bat`** in this folder. Or open a terminal **in this folder**
+(the one that contains `cheapest_skillup`) and run:
+
 ```sh
 python -m cheapest_skillup.gui            # opens http://127.0.0.1:8765/ in your browser
 python -m cheapest_skillup.gui --port 9000 --no-browser
