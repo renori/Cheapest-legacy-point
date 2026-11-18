@@ -1,0 +1,17 @@
+{
+  "name": "Tailoring",
+  "note": "Classic Era baseline. skill = [orange/learn, yellow, green, grey]. Verify against WoW Forever and add new Forever recipes.",
+  "recipes": [
+    {"name": "Bolt of Linen Cloth", "skill": [1, 25, 37, 50], "makes": {"item": 2996}, "reagents": {"2589": 2}},
+    {"name": "Linen Cloak", "skill": [1, 35, 47, 60], "makes": {"item": 2570}, "reagents": {"2996": 1, "2320": 1}},
+    {"name": "Brown Linen Vest", "skill": [10, 45, 57, 70], "makes": {"item": 2568}, "reagents": {"2996": 1, "2320": 1}},
+    {"name": "Heavy Linen Gloves", "skill": [35, 60, 77, 95], "makes": {"item": 4307}, "reagents": {"2996": 2, "2320": 1}},
+    {"name": "Linen Bag", "skill": [45, 70, 87, 105], "makes": {"item": 4238}, "reagents": {"2996": 3, "2320": 3}},
+    {"name": "Reinforced Linen Cape", "skill": [60, 85, 102, 120], "makes": {"item": 2580}, "reagents": {"2996": 2, "2320": 3}},
+    {"name": "Bolt of Woolen Cloth", "skill": [75, 90, 97, 105], "makes": {"item": 2997}, "reagents": {"2592": 3}},
+    {"name": "Gray Woolen Shirt", "skill": [100, 110, 125, 140], "makes": {"item": 2587}, "reagents": {"2997": 2, "2321": 1, "4340": 1}},
+    {"name": "Double-stitched Woolen Shoulders", "skill": [110, 135, 152, 170], "makes": {"item": 4314}, "reagents": {"2997": 3, "2321": 2}},
+    {"name": "Bolt of Silk Cloth", "skill": [125, 135, 140, 145], "makes": {"item": 4305}, "reagents": {"4306": 4}},
+    {"name": "Azure Silk Hood", "skill": [145, 155, 170, 185], "makes": {"item": 7048}, "reagents": {"4305": 2, "6260": 2, "2321": 1}}
+  ]
+}

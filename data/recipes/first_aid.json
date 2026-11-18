@@ -1,0 +1,11 @@
+{
+  "name": "First Aid",
+  "note": "Classic Era baseline. skill = [orange/learn, yellow, green, grey]. Verify against WoW Forever (it adds Teas, e.g. Triage Tea, that may belong here).",
+  "recipes": [
+    {"name": "Linen Bandage", "skill": [1, 30, 45, 60], "makes": {"item": 1251}, "reagents": {"2589": 1}},
+    {"name": "Heavy Linen Bandage", "skill": [40, 50, 75, 100], "makes": {"item": 2581}, "reagents": {"2589": 2}},
+    {"name": "Wool Bandage", "skill": [80, 80, 115, 150], "makes": {"item": 3530}, "reagents": {"2592": 1}},
+    {"name": "Heavy Wool Bandage", "skill": [115, 115, 150, 185], "makes": {"item": 3531}, "reagents": {"2592": 2}},
+    {"name": "Silk Bandage", "skill": [150, 150, 180, 210], "makes": {"item": 6450}, "reagents": {"4306": 1}}
+  ]
+}

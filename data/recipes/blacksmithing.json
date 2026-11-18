@@ -1,0 +1,19 @@
+{
+  "name": "Blacksmithing",
+  "note": "Classic Era baseline. skill = [orange/learn, yellow, green, grey]. Needs a Blacksmith Hammer. Verify against WoW Forever (new items like Sandpaper may matter).",
+  "recipes": [
+    {"name": "Rough Sharpening Stone", "skill": [1, 15, 35, 55], "makes": {"item": 2862}, "reagents": {"2835": 1}},
+    {"name": "Rough Weightstone", "skill": [1, 15, 35, 55], "makes": {"item": 3239}, "reagents": {"2835": 1, "2589": 1}},
+    {"name": "Copper Bracers", "skill": [1, 20, 40, 60], "makes": {"item": 2853}, "reagents": {"2840": 2}},
+    {"name": "Rough Grinding Stone", "skill": [25, 45, 65, 85], "makes": {"item": 3470}, "reagents": {"2835": 2}},
+    {"name": "Copper Chain Pants", "skill": [1, 50, 70, 90], "makes": {"item": 2852}, "reagents": {"2840": 4}},
+    {"name": "Copper Chain Belt", "skill": [35, 75, 87, 100], "makes": {"item": 2851}, "reagents": {"2840": 6}},
+    {"name": "Coarse Sharpening Stone", "skill": [65, 65, 72, 80], "makes": {"item": 2863}, "reagents": {"2836": 1}},
+    {"name": "Coarse Grinding Stone", "skill": [75, 75, 87, 100], "makes": {"item": 3478}, "reagents": {"2836": 2}},
+    {"name": "Runed Copper Belt", "skill": [90, 115, 127, 140], "makes": {"item": 2857}, "reagents": {"2840": 10}},
+    {"name": "Silver Rod", "skill": [100, 105, 107, 110], "makes": {"item": 6338}, "reagents": {"2842": 1, "3470": 2}},
+    {"name": "Rough Bronze Leggings", "skill": [105, 145, 160, 175], "makes": {"item": 2865}, "reagents": {"2841": 6}},
+    {"name": "Patterned Bronze Bracers", "skill": [120, 150, 165, 180], "makes": {"item": 2868}, "reagents": {"2841": 5}},
+    {"name": "Heavy Grinding Stone", "skill": [125, 125, 137, 150], "makes": {"item": 3486}, "reagents": {"2838": 3}}
+  ]
+}

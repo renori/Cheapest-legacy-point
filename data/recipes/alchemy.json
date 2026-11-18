@@ -1,0 +1,17 @@
+{
+  "name": "Alchemy",
+  "note": "Classic Era baseline. skill = [orange/learn, yellow, green, grey]. Forever adds new potion/elixir lines (Cleric's, Mageblood, Spellblasting, Frenzy, Minor Arcane Elixir...) that are not listed yet.",
+  "recipes": [
+    {"name": "Minor Healing Potion", "skill": [1, 55, 75, 95], "makes": {"item": 118}, "reagents": {"2447": 1, "765": 1, "3371": 1}},
+    {"name": "Elixir of Minor Strength", "skill": [1, 55, 75, 95], "makes": {"item": 2454}, "reagents": {"2449": 1, "765": 1, "3371": 1}},
+    {"name": "Elixir of Minor Defense", "skill": [1, 55, 75, 95], "makes": {"item": 5997}, "reagents": {"765": 2, "3371": 1}},
+    {"name": "Minor Troll's Blood Elixir", "skill": [15, 60, 80, 100], "makes": {"item": 3382}, "reagents": {"2447": 1, "2449": 2, "3371": 1}},
+    {"name": "Minor Mana Potion", "skill": [25, 65, 85, 105], "makes": {"item": 2455}, "reagents": {"785": 1, "765": 1, "3371": 1}},
+    {"name": "Minor Rejuvenation Potion", "skill": [40, 70, 90, 110], "makes": {"item": 2456}, "reagents": {"785": 2, "2447": 1, "3371": 1}},
+    {"name": "Lesser Healing Potion", "skill": [55, 85, 105, 125], "makes": {"item": 858}, "reagents": {"118": 1, "2450": 1, "3371": 1}},
+    {"name": "Swiftness Potion", "skill": [60, 90, 110, 130], "makes": {"item": 2459}, "reagents": {"2452": 1, "2450": 1, "3371": 1}, "source": "vendor"},
+    {"name": "Elixir of Wisdom", "skill": [90, 120, 140, 160], "makes": {"item": 3383}, "reagents": {"785": 1, "2450": 2, "3371": 1}},
+    {"name": "Healing Potion", "skill": [110, 135, 155, 175], "makes": {"item": 929}, "reagents": {"2453": 1, "2450": 1, "3372": 1}},
+    {"name": "Lesser Mana Potion", "skill": [120, 145, 165, 185], "makes": {"item": 3385}, "reagents": {"785": 1, "3820": 1, "3371": 1}}
+  ]
+}

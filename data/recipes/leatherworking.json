@@ -1,0 +1,15 @@
+{
+  "name": "Leatherworking",
+  "note": "Classic Era baseline. skill = [orange/learn, yellow, green, grey]. Verify against WoW Forever (it adds Pristine Leather/Hide/Scale).",
+  "recipes": [
+    {"name": "Light Armor Kit", "skill": [1, 30, 45, 60], "makes": {"item": 2304}, "reagents": {"2318": 1}},
+    {"name": "Handstitched Leather Boots", "skill": [1, 40, 55, 70], "makes": {"item": 2302}, "reagents": {"2318": 2, "2320": 1}},
+    {"name": "Cured Light Hide", "skill": [35, 55, 65, 75], "makes": {"item": 4231}, "reagents": {"783": 1, "4289": 1}},
+    {"name": "Embossed Leather Gloves", "skill": [55, 85, 100, 115], "makes": {"item": 4239}, "reagents": {"2318": 3, "2320": 2}},
+    {"name": "Embossed Leather Boots", "skill": [55, 85, 100, 115], "makes": {"item": 2309}, "reagents": {"2318": 8, "2320": 5}},
+    {"name": "Fine Leather Belt", "skill": [80, 110, 125, 140], "makes": {"item": 4246}, "reagents": {"2318": 6, "2320": 2}},
+    {"name": "Medium Armor Kit", "skill": [100, 115, 122, 130], "makes": {"item": 2313}, "reagents": {"2319": 4, "2320": 1}},
+    {"name": "Cured Medium Hide", "skill": [100, 115, 122, 130], "makes": {"item": 4233}, "reagents": {"4232": 1, "4289": 1}},
+    {"name": "Gray Leather Boots", "skill": [100, 125, 137, 150], "makes": {"item": 2315}, "reagents": {"2319": 4, "4340": 2, "2321": 2}}
+  ]
+}

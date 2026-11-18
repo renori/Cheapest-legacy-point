@@ -1,0 +1,91 @@
+import unittest
+
+from cheapest_skillup.optimizer import Optimizer
+from cheapest_skillup.prices import PriceBook, parse_csv
+from cheapest_skillup.recipes import Profession, Recipe, available_professions, load_profession
+
+REALM_CSV = """itemId,name,marketValue,minBuyout,recent,historical,updatedAt
+1,Cloth,10,10,10,10,2026-01-01T00:00:00Z
+2,Bolt,50,50,50,50,2026-01-01T00:00:00Z
+3,Hat,100,80,100,100,2026-01-01T00:00:00Z
+"""
+REGION_CSV = """itemId,name,marketValue,historical,avgSalePrice,saleRate,soldPerDay,updatedAt
+1,Cloth,12,12,12,0.5,10,2026-01-01T00:00:00Z
+4,Rare Gem,999,999,999,0.1,1,2026-01-01T00:00:00Z
+"""
+
+
+def book(**kw):
+    return PriceBook(parse_csv(REALM_CSV), parse_csv(REGION_CSV), {9: 5}, **kw)
+
+
+class SkillupChance(unittest.TestCase):
+    def test_colors(self):
+        r = Recipe("x", 10, 20, 30, 40, {})
+        self.assertEqual(r.skillup_chance(9), 0)  # not learnable yet
+        self.assertEqual(r.skillup_chance(10), 1)  # orange
+        self.assertEqual(r.skillup_chance(20), 1)  # (40-20)/(40-20)
+        self.assertEqual(r.skillup_chance(30), 0.5)
+        self.assertEqual(r.skillup_chance(40), 0)  # grey
+
+
+class Prices(unittest.TestCase):
+    def test_min_buyout_then_region_then_vendor(self):
+        b = book()
+        self.assertEqual(b.quote(3).price, 80)
+        self.assertEqual(b.quote(3).source, "minBuyout")
+        self.assertEqual(b.quote(4).source, "region marketValue")
+        self.assertEqual(b.quote(9).source, "vendor")
+        self.assertIsNone(b.quote(12345).price)
+
+    def test_override(self):
+        self.assertEqual(book(overrides={3: 1}).quote(3).price, 1)
+
+
+class Planning(unittest.TestCase):
+    def prof(self):
+        return Profession("t", "Test", [
+            Recipe("Make Bolt", 1, 10, 15, 20, {1: 2}, makes=2),  # 20c per bolt crafted vs 50c bought
+            Recipe("Hat", 1, 30, 40, 50, {2: 2, 9: 1}, makes=3),  # 2 bolts + 5c thread
+        ])
+
+    def test_crafts_intermediates_when_cheaper(self):
+        opt = Optimizer(self.prof(), book())
+        cost, maker = opt.unit_cost(2, 5)
+        self.assertEqual(cost, 20)
+        self.assertEqual(maker.name, "Make Bolt")
+
+    def test_picks_cheapest_per_point_and_totals(self):
+        plan = Optimizer(self.prof(), book()).plan(1, 30)
+        self.assertEqual(plan.reached, 30)
+        # Bolt: 20c per craft, chance (20-s)/10 from skill 10 -> 40c/point at 15, 50c at 16.
+        # Hat: 2 crafted bolts + thread = 45c per point (orange until 30).
+        self.assertEqual(plan.steps[0].recipe.name, "Make Bolt")
+        self.assertEqual((plan.steps[0].start, plan.steps[0].end), (1, 16))
+        self.assertEqual(plan.steps[1].recipe.name, "Hat")
+        bolt = sum(20 / min(1, (20 - s) / 10) for s in range(1, 16))
+        self.assertAlmostEqual(plan.total_cost, bolt + 45 * (30 - 16))
+        self.assertEqual(plan.craft_first, {"Make Bolt": 28})  # 14 hats x 2 bolts
+
+    def test_stuck_when_nothing_skills_up(self):
+        plan = Optimizer(self.prof(), book()).plan(1, 60)
+        self.assertEqual(plan.reached, 50)
+
+    def test_sell_back_lowers_cost(self):
+        a = Optimizer(self.prof(), book()).plan(1, 30).total_cost
+        b = Optimizer(self.prof(), book(), sell_back=True).plan(1, 30).total_cost
+        self.assertLess(b, a)
+
+
+class Data(unittest.TestCase):
+    def test_all_profession_files_load_and_are_sane(self):
+        for key in available_professions():
+            prof = load_profession(key)
+            self.assertTrue(prof.recipes, key)
+            for r in prof.recipes:
+                self.assertTrue(r.orange <= r.yellow <= r.green <= r.grey, f"{key}: {r.name}")
+                self.assertTrue(r.reagents, f"{key}: {r.name}")
+
+
+if __name__ == "__main__":
+    unittest.main()

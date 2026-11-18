@@ -1,0 +1,17 @@
+{
+  "name": "Enchanting",
+  "note": "Classic Era baseline. skill = [orange/learn, yellow, green, grey]. Enchants need an item to enchant (not costed) and a Runed Copper Rod / Runed Silver Rod. Verify against WoW Forever.",
+  "recipes": [
+    {"name": "Runed Copper Rod", "skill": [1, 5, 7, 10], "makes": {"item": 6218}, "reagents": {"6217": 1, "10940": 1, "10938": 1}},
+    {"name": "Enchant Bracer - Minor Health", "skill": [1, 70, 90, 110], "reagents": {"10940": 1}, "tools": [6218]},
+    {"name": "Lesser Magic Wand", "skill": [10, 75, 95, 115], "makes": {"item": 11287}, "reagents": {"4470": 1, "10938": 1}},
+    {"name": "Enchant Chest - Minor Health", "skill": [15, 70, 90, 110], "reagents": {"10940": 1}, "tools": [6218]},
+    {"name": "Enchant Chest - Minor Mana", "skill": [20, 80, 100, 120], "reagents": {"10938": 1}, "tools": [6218]},
+    {"name": "Enchant Cloak - Minor Protection", "skill": [70, 110, 130, 150], "reagents": {"10940": 1, "10938": 1}, "tools": [6218]},
+    {"name": "Greater Magic Wand", "skill": [70, 110, 130, 150], "makes": {"item": 11288}, "reagents": {"4470": 1, "10939": 1}},
+    {"name": "Enchant Bracer - Minor Stamina", "skill": [80, 115, 135, 155], "reagents": {"10940": 3}, "tools": [6218]},
+    {"name": "Runed Silver Rod", "skill": [100, 130, 150, 170], "makes": {"item": 6339}, "reagents": {"6338": 1, "10940": 6, "10939": 3, "5500": 1}, "tools": [6218]},
+    {"name": "Enchant Cloak - Minor Agility", "skill": [110, 135, 155, 175], "reagents": {"10998": 1}, "tools": [6218]},
+    {"name": "Enchant Bracer - Lesser Spirit", "skill": [120, 145, 165, 185], "reagents": {"10998": 2}, "tools": [6218]}
+  ]
+}
