@@ -127,8 +127,7 @@ class PriceBook:
     def sell_value(self, item_id: int, mode: str = "vendor") -> int:
         """What one crafted item is worth when sold back.
 
-        mode "vendor": the vendor sell price (data/vendor_sell.json, exported
-        from the game). mode "ah": the AH price after the 5% cut.
+        mode "vendor": the vendor sell price from data/vendor_sell.json. mode "ah": the AH price after the 5% cut.
         """
         if mode == "vendor":
             return self.vendor_sell.get(item_id, 0)

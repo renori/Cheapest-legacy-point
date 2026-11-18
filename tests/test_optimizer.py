@@ -2,7 +2,11 @@ import unittest
 
 from cheapest_skillup.optimizer import Optimizer
 from cheapest_skillup.prices import PriceBook, parse_csv
-from cheapest_skillup.recipes import Profession, Recipe, available_professions, load_profession
+import json
+import tempfile
+from pathlib import Path
+
+from cheapest_skillup.recipes import Profession, Recipe, available_professions, load_profession, load_vendor_sell
 
 REALM_CSV = """itemId,name,marketValue,minBuyout,recent,historical,updatedAt
 1,Cloth,10,10,10,10,2026-01-01T00:00:00Z
@@ -106,6 +110,16 @@ class Data(unittest.TestCase):
             for r in prof.recipes:
                 self.assertTrue(r.orange <= r.yellow <= r.green <= r.grey, f"{key}: {r.name}")
                 self.assertTrue(r.reagents, f"{key}: {r.name}")
+
+    def test_vendor_sell_file_skips_unknown_prices(self):
+        with tempfile.TemporaryDirectory() as d:
+            Path(d, "vendor_sell.json").write_text(json.dumps(
+                {"items": {"2996": {"name": "Bolt of Linen Cloth", "sell": 40}, "2570": {"name": "Linen Cloak", "sell": None}}}))
+            self.assertEqual(load_vendor_sell(Path(d)), {2996: 40})
+            self.assertEqual(load_vendor_sell(Path(d, "missing")), {})
+
+    def test_shipped_vendor_sell_file_loads(self):
+        load_vendor_sell()
 
 
 if __name__ == "__main__":

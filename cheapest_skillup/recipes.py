@@ -86,4 +86,4 @@ def load_vendor_sell(data_dir: Path = DATA_DIR) -> dict[int, int]:
     if not path.exists():
         return {}
     d = json.loads(path.read_text(encoding="utf-8"))
-    return {int(k): int(v["sell"]) for k, v in d.get("items", {}).items()}
+    return {int(k): int(v["sell"]) for k, v in d.get("items", {}).items() if v.get("sell") is not None}

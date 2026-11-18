@@ -1,0 +1,349 @@
+{
+  "note": "Vendor sell price in copper of each crafted item, used by sell-back to a vendor. Fill in 'sell' (e.g. 1s 25c = 125); null means unknown and counts as 0.",
+  "items": {
+    "118": {
+      "name": "Minor Healing Potion",
+      "sell": null
+    },
+    "724": {
+      "name": "Goretusk Liver Pie",
+      "sell": null
+    },
+    "787": {
+      "name": "Slitherskin Mackerel",
+      "sell": null
+    },
+    "858": {
+      "name": "Lesser Healing Potion",
+      "sell": null
+    },
+    "929": {
+      "name": "Healing Potion",
+      "sell": null
+    },
+    "1017": {
+      "name": "Seasoned Wolf Kabob",
+      "sell": null
+    },
+    "1251": {
+      "name": "Linen Bandage",
+      "sell": null
+    },
+    "2302": {
+      "name": "Handstitched Leather Boots",
+      "sell": null
+    },
+    "2304": {
+      "name": "Light Armor Kit",
+      "sell": null
+    },
+    "2309": {
+      "name": "Embossed Leather Boots",
+      "sell": null
+    },
+    "2313": {
+      "name": "Medium Armor Kit",
+      "sell": null
+    },
+    "2315": {
+      "name": "Gray Leather Boots",
+      "sell": null
+    },
+    "2454": {
+      "name": "Elixir of Minor Strength",
+      "sell": null
+    },
+    "2455": {
+      "name": "Minor Mana Potion",
+      "sell": null
+    },
+    "2456": {
+      "name": "Minor Rejuvenation Potion",
+      "sell": null
+    },
+    "2459": {
+      "name": "Swiftness Potion",
+      "sell": null
+    },
+    "2568": {
+      "name": "Brown Linen Vest",
+      "sell": null
+    },
+    "2570": {
+      "name": "Linen Cloak",
+      "sell": null
+    },
+    "2580": {
+      "name": "Reinforced Linen Cape",
+      "sell": null
+    },
+    "2581": {
+      "name": "Heavy Linen Bandage",
+      "sell": null
+    },
+    "2587": {
+      "name": "Gray Woolen Shirt",
+      "sell": null
+    },
+    "2679": {
+      "name": "Charred Wolf Meat",
+      "sell": null
+    },
+    "2680": {
+      "name": "Spiced Wolf Meat",
+      "sell": null
+    },
+    "2681": {
+      "name": "Roasted Boar Meat",
+      "sell": null
+    },
+    "2683": {
+      "name": "Crab Cake",
+      "sell": null
+    },
+    "2684": {
+      "name": "Coyote Steak",
+      "sell": null
+    },
+    "2687": {
+      "name": "Dry Pork Ribs",
+      "sell": null
+    },
+    "2851": {
+      "name": "Copper Chain Belt",
+      "sell": null
+    },
+    "2852": {
+      "name": "Copper Chain Pants",
+      "sell": null
+    },
+    "2853": {
+      "name": "Copper Bracers",
+      "sell": null
+    },
+    "2857": {
+      "name": "Runed Copper Belt",
+      "sell": null
+    },
+    "2862": {
+      "name": "Rough Sharpening Stone",
+      "sell": null
+    },
+    "2863": {
+      "name": "Coarse Sharpening Stone",
+      "sell": null
+    },
+    "2865": {
+      "name": "Rough Bronze Leggings",
+      "sell": null
+    },
+    "2868": {
+      "name": "Patterned Bronze Bracers",
+      "sell": null
+    },
+    "2996": {
+      "name": "Bolt of Linen Cloth",
+      "sell": null
+    },
+    "2997": {
+      "name": "Bolt of Woolen Cloth",
+      "sell": null
+    },
+    "3239": {
+      "name": "Rough Weightstone",
+      "sell": null
+    },
+    "3382": {
+      "name": "Minor Troll's Blood Elixir",
+      "sell": null
+    },
+    "3383": {
+      "name": "Elixir of Wisdom",
+      "sell": null
+    },
+    "3385": {
+      "name": "Lesser Mana Potion",
+      "sell": null
+    },
+    "3470": {
+      "name": "Rough Grinding Stone",
+      "sell": null
+    },
+    "3478": {
+      "name": "Coarse Grinding Stone",
+      "sell": null
+    },
+    "3486": {
+      "name": "Heavy Grinding Stone",
+      "sell": null
+    },
+    "3530": {
+      "name": "Wool Bandage",
+      "sell": null
+    },
+    "3531": {
+      "name": "Heavy Wool Bandage",
+      "sell": null
+    },
+    "3663": {
+      "name": "Murloc Fin Soup",
+      "sell": null
+    },
+    "3665": {
+      "name": "Curiously Tasty Omelet",
+      "sell": null
+    },
+    "3726": {
+      "name": "Big Bear Steak",
+      "sell": null
+    },
+    "3727": {
+      "name": "Hot Lion Chops",
+      "sell": null
+    },
+    "4231": {
+      "name": "Cured Light Hide",
+      "sell": null
+    },
+    "4233": {
+      "name": "Cured Medium Hide",
+      "sell": null
+    },
+    "4238": {
+      "name": "Linen Bag",
+      "sell": null
+    },
+    "4239": {
+      "name": "Embossed Leather Gloves",
+      "sell": null
+    },
+    "4246": {
+      "name": "Fine Leather Belt",
+      "sell": null
+    },
+    "4305": {
+      "name": "Bolt of Silk Cloth",
+      "sell": null
+    },
+    "4307": {
+      "name": "Heavy Linen Gloves",
+      "sell": null
+    },
+    "4314": {
+      "name": "Double-stitched Woolen Shoulders",
+      "sell": null
+    },
+    "4357": {
+      "name": "Rough Blasting Powder",
+      "sell": null
+    },
+    "4358": {
+      "name": "Rough Dynamite",
+      "sell": null
+    },
+    "4359": {
+      "name": "Handful of Copper Bolts",
+      "sell": null
+    },
+    "4360": {
+      "name": "Rough Copper Bomb",
+      "sell": null
+    },
+    "4361": {
+      "name": "Copper Tube",
+      "sell": null
+    },
+    "4362": {
+      "name": "Rough Boomstick",
+      "sell": null
+    },
+    "4364": {
+      "name": "Coarse Blasting Powder",
+      "sell": null
+    },
+    "4365": {
+      "name": "Coarse Dynamite",
+      "sell": null
+    },
+    "4371": {
+      "name": "Bronze Tube",
+      "sell": null
+    },
+    "4382": {
+      "name": "Bronze Framework",
+      "sell": null
+    },
+    "4404": {
+      "name": "Silver Contact",
+      "sell": null
+    },
+    "4407": {
+      "name": "Standard Scope",
+      "sell": null
+    },
+    "4592": {
+      "name": "Longjaw Mud Snapper",
+      "sell": null
+    },
+    "4593": {
+      "name": "Bristle Whisker Catfish",
+      "sell": null
+    },
+    "5095": {
+      "name": "Rainbow Fin Albacore",
+      "sell": null
+    },
+    "5525": {
+      "name": "Boiled Clams",
+      "sell": null
+    },
+    "5997": {
+      "name": "Elixir of Minor Defense",
+      "sell": null
+    },
+    "6218": {
+      "name": "Runed Copper Rod",
+      "sell": null
+    },
+    "6219": {
+      "name": "Arclight Spanner",
+      "sell": null
+    },
+    "6290": {
+      "name": "Brilliant Smallfish",
+      "sell": null
+    },
+    "6338": {
+      "name": "Silver Rod",
+      "sell": null
+    },
+    "6339": {
+      "name": "Runed Silver Rod",
+      "sell": null
+    },
+    "6450": {
+      "name": "Silk Bandage",
+      "sell": null
+    },
+    "6888": {
+      "name": "Herb Baked Egg",
+      "sell": null
+    },
+    "6890": {
+      "name": "Smoked Bear Meat",
+      "sell": null
+    },
+    "7048": {
+      "name": "Azure Silk Hood",
+      "sell": null
+    },
+    "11287": {
+      "name": "Lesser Magic Wand",
+      "sell": null
+    },
+    "11288": {
+      "name": "Greater Magic Wand",
+      "sell": null
+    }
+  }
+}

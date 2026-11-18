@@ -119,7 +119,7 @@ ul.plain { margin: 0; padding-left: 18px; }
         <option value="vendor">Sell to a vendor</option>
         <option value="ah">Sell on the AH (min buyout − 5%)</option>
       </select>
-      <div class="hint">Vendor prices come from <code>data/vendor_sell.json</code>, exported in game.</div>
+      <div class="hint">Vendor prices come from <code>data/vendor_sell.json</code>.</div>
 
       <label class="f" for="overrides">Price overrides</label>
       <input id="overrides" type="text" placeholder="e.g. 2589=0, 2592=100">
@@ -294,7 +294,7 @@ function renderDetail(p) {
   if (cf.length) h += `<h3>Craft these first (cheaper than buying)</h3><ul class="plain">` + cf.map(([n, q]) => `<li>${ceil(q)} × ${esc(n)}</li>`).join("") + `</ul>`;
   if (p.tools.length) h += `<h3>Tools needed once</h3><ul class="plain">` + p.tools.map(t => `<li>${esc(t.name)}: ${money(t.cost_copper)}</li>`).join("") + `</ul>`;
   if (p.recipes_to_get.length) h += `<h3>Recipes to buy or find</h3><ul class="plain">` + p.recipes_to_get.map(r => `<li>${esc(r.name)} <span class="src">${esc(r.source)}</span></li>`).join("") + `</ul>`;
-  if (p.no_sell_price.length) h += `<div class="warn" style="margin-top:14px">No ${p.sell_back === "vendor" ? "vendor sell" : "AH"} price for: ${p.no_sell_price.map(esc).join(", ")}. Counted as 0${p.sell_back === "vendor" ? " — run the in-game exporter (see README) to fill <code>data/vendor_sell.json</code>" : ""}.</div>`;
+  if (p.no_sell_price.length) h += `<div class="warn" style="margin-top:14px">No ${p.sell_back === "vendor" ? "vendor sell" : "AH"} price for: ${p.no_sell_price.map(esc).join(", ")}. Counted as 0${p.sell_back === "vendor" ? " — add them to <code>data/vendor_sell.json</code>" : ""}.</div>`;
   if (p.unpriced.length) h += `<div class="error" style="margin-top:14px">No price found for: ${p.unpriced.map(esc).join(", ")}</div>`;
   h += `<div class="note">Quantities are expected values; buy a little extra. Min buyout is the cheapest single listing, so large orders will cost more.</div>`;
   $("#detail").innerHTML = h;
