@@ -42,7 +42,7 @@ Downloaded from `https://public-data.tradeskillmaster.com` and cached for 3 hour
 |------------|-------------------|---------------------------------------------------------------------|
 | `--game`   | `forever`         | TSM game type                                                       |
 | `--region` | `us`              | `us`, `eu`, ...                                                     |
-| `--realm`  | `normal-alliance` | Forever auction house: `normal-alliance`, `normal-horde`, `pvp-alliance`, `pvp-horde` |
+| `--realm`  | `pvp-horde`       | Forever auction house: `normal-alliance`, `normal-horde`, `pvp-alliance`, `pvp-horde` |
 | `--price`  | `minBuyout`       | TSM column used for buying: `minBuyout`, `marketValue`, `recent`, `historical` |
 
 For each reagent the tool uses the cheapest of:

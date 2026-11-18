@@ -112,7 +112,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("professions", nargs="*", help=f"one or more of: {', '.join(profs)} (default: all)")
     ap.add_argument("--game", default="forever", help="TSM game type (default: forever)")
     ap.add_argument("--region", default="us", help="TSM region slug, e.g. us, eu (default: us)")
-    ap.add_argument("--realm", default="normal-alliance", help="TSM auction house slug, e.g. normal-alliance, pvp-horde")
+    ap.add_argument("--realm", default="pvp-horde", help="TSM auction house slug, e.g. normal-alliance, pvp-horde")
     ap.add_argument("--price", choices=PRICE_FIELDS, default="minBuyout", help="TSM price column to buy at (default: minBuyout)")
     ap.add_argument("--from", dest="start", type=int, default=1, help="current skill (default: 1)")
     ap.add_argument("--to", dest="target", type=int, default=150, help="target skill (default: 150)")

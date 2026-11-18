@@ -9,6 +9,7 @@ class GuiApi(unittest.TestCase):
         self.assertIn("tailoring", [p["key"] for p in o["professions"]])
         self.assertIn("pvp-horde", o["realms"])
         self.assertEqual(o["defaults"]["price"], "minBuyout")
+        self.assertEqual((o["defaults"]["region"], o["defaults"]["realm"]), ("us", "pvp-horde"))
 
     def test_bad_input_is_rejected_before_downloading(self):
         with self.assertRaises(ValueError):

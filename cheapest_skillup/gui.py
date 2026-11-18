@@ -38,7 +38,7 @@ def options() -> dict:
         "realms": REALMS,
         "price_fields": list(PRICE_FIELDS),
         "sources": ["trainer", "vendor", "quest", "drop"],
-        "defaults": {"game": "forever", "region": "us", "realm": "normal-alliance", "price": "minBuyout",
+        "defaults": {"game": "forever", "region": "us", "realm": "pvp-horde", "price": "minBuyout",
                      "from": 1, "to": 150, "sources": ["trainer", "vendor"], "sell_back": False},
     }
 
@@ -56,7 +56,7 @@ def make_plan(q: dict[str, list[str]]) -> dict:
     start, target = int(get("from", "1")), int(get("to", "150"))
     if not (1 <= start < target <= 450):
         raise ValueError("Skill range must satisfy 1 <= from < to.")
-    game, region, realm = get("game", "forever"), get("region", "us"), get("realm", "normal-alliance")
+    game, region, realm = get("game", "forever"), get("region", "us"), get("realm", "pvp-horde")
     sources = {s for s in get("sources", "trainer,vendor").split(",") if s}
     sell_back = get("sell_back", "0") == "1"
     overrides = {}
