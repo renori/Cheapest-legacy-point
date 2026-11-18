@@ -6,9 +6,12 @@ import argparse
 import json
 import sys
 
-from .optimizer import Optimizer, Plan, ceil
+from .optimizer import Plan, ceil, cheapest_plan
 from .prices import PriceBook, load_pricebook
-from .recipes import available_professions, load_profession, load_vendor_names, load_vendor_prices, load_vendor_sell
+from .recipes import (available_professions, load_item_names, load_profession, load_vendor_names, load_vendor_prices,
+                      load_vendor_sell)
+
+SOURCE_LABEL = {"auto": "known", "trainer": "trainer", "recipe": "AH recipe"}
 
 PRICE_FIELDS = ("minBuyout", "marketValue", "recent", "historical")
 
@@ -35,9 +38,10 @@ def render(plan: Plan, prices: PriceBook, vendor_names: dict[int, str]) -> str:
     out: list[str] = []
     title = f"{plan.profession.name}: {plan.start} -> {plan.target}"
     out += [title, "=" * len(title)]
-    out.append(f"{'Skill':<10} {'Recipe':<38} {'Crafts':>6} {'Cost':>14}")
+    out.append(f"{'Skill':<10} {'Recipe':<38} {'Learn':<10} {'Crafts':>6} {'Cost':>14}")
     for s in plan.steps:
-        out.append(f"{s.start:>3}-{s.end:<6} {s.recipe.name:<38} {ceil(s.expected_crafts):>6} {money(s.cost):>14}")
+        out.append(f"{s.start:>3}-{s.end:<6} {s.recipe.name:<38} {SOURCE_LABEL.get(s.recipe.source, s.recipe.source):<10} "
+                   f"{ceil(s.expected_crafts):>6} {money(s.cost):>14}")
     if plan.reached < plan.target:
         out.append(f"!! Stuck at {plan.reached}: no allowed recipe can skill up from here with known prices.")
 
@@ -62,11 +66,15 @@ def render(plan: Plan, prices: PriceBook, vendor_names: dict[int, str]) -> str:
         out += ["", "Tools needed once (not consumed):"]
         for name, cost in plan.tool_costs.values():
             out.append(f"  {name:<40} {money(cost):>14}")
-    learn_extra = [r for r in plan.learn if r.source != "trainer"]
-    if learn_extra:
-        out += ["", "Recipes you must buy or find:"]
-        for r in learn_extra:
-            out.append(f"  {r.name} ({r.source}{', ~' + money(r.learn_cost) if r.learn_cost else ''})")
+    to_learn = [(r, c) for r, c in plan.learn_costs if r.source != "auto"]
+    if to_learn:
+        out += ["", "Recipes to learn:"]
+        for r, c in sorted(to_learn, key=lambda rc: (rc[0].orange, rc[0].name)):
+            if r.source == "recipe":
+                where = f"buy {' / '.join(item_name(i, prices, vendor_names) for i in r.recipe_items)} on the AH"
+            else:
+                where = "trainer" + ("" if r.learn_known else f", learn level not in game data (assumed {r.orange})")
+            out.append(f"  {r.name:<38} {money(c) if c is not None else 'fee unknown':>14}  ({where})")
 
     if plan.sell_back:
         how = "to a vendor" if plan.sell_back == "vendor" else "on the AH"
@@ -77,9 +85,11 @@ def render(plan: Plan, prices: PriceBook, vendor_names: dict[int, str]) -> str:
             out.append(f"  (no {'vendor' if plan.sell_back == 'vendor' else 'AH'} price for: {names}; counted as 0)")
     out += [f"Total (expected): {money(plan.total_cost)}" if plan.sell_back else f"Total materials (expected): {money(plan.total_cost)}"]
     if plan.tools_cost:
-        out.append(f"Plus tools: {money(plan.tools_cost)}  ->  {money(plan.total_cost + plan.tools_cost)}")
-    if plan.learn_cost:
-        out.append(f"Recipe/training costs (approx.): {money(plan.learn_cost)}")
+        out.append(f"Tools: {money(plan.tools_cost)}")
+    if plan.learn_total:
+        out.append(f"Learning recipes: {money(plan.learn_total)}")
+    unknown = sum(1 for r, c in plan.learn_costs if c is None)
+    out.append(f"Grand total: {money(plan.grand_total)}" + (f"  (+ {unknown} trainer fee(s) not entered in data/trainer.json)" if unknown else ""))
     if plan.unpriced:
         out.append("Warning: no price found for " + ", ".join(item_name(i, prices, vendor_names) for i in plan.unpriced))
     return "\n".join(out)
@@ -91,18 +101,24 @@ def plan_to_dict(plan: Plan, prices: PriceBook, vendor_names: dict[int, str]) ->
         "name": plan.profession.name,
         "data_note": plan.profession.note,
         "tools": [{"item_id": i, "name": n, "cost_copper": None if c == float("inf") else round(c)} for i, (n, c) in plan.tool_costs.items()],
-        "recipes_to_get": [{"name": r.name, "source": r.source, "cost_copper": r.learn_cost} for r in plan.learn if r.source != "trainer"],
         "unpriced": [item_name(i, prices, vendor_names) for i in plan.unpriced],
         "start": plan.start,
         "target": plan.target,
         "reached": plan.reached,
         "total_cost_copper": round(plan.total_cost),
         "tools_cost_copper": round(plan.tools_cost),
+        "learn_cost_copper": round(plan.learn_total),
+        "grand_total_copper": round(plan.grand_total),
+        "learn": [
+            {"recipe": r.name, "spell": r.spell, "how": r.source, "cost_copper": c, "learn_level": r.orange,
+             "learn_level_known": r.learn_known, "recipe_items": [{"item_id": i, "name": item_name(i, prices, vendor_names)} for i in r.recipe_items]}
+            for r, c in plan.learn_costs if r.source != "auto"
+        ],
         "sell_back": plan.sell_back,
         "sell_credit_copper": round(plan.sell_credit),
         "no_sell_price": [item_name(i, prices, vendor_names) for i in sorted(plan.no_sell_price)],
         "steps": [
-            {"recipe": s.recipe.name, "from": s.start, "to": s.end, "expected_crafts": round(s.expected_crafts, 2), "cost_copper": round(s.cost), "credit_copper": round(s.credit)}
+            {"recipe": s.recipe.name, "how": s.recipe.source, "from": s.start, "to": s.end, "expected_crafts": round(s.expected_crafts, 2), "cost_copper": round(s.cost), "credit_copper": round(s.credit)}
             for s in plan.steps
         ],
         "craft_first": {k: round(v, 2) for k, v in plan.craft_first.items()},
@@ -126,7 +142,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--price", choices=PRICE_FIELDS, default="minBuyout", help="TSM price column to buy at (default: minBuyout)")
     ap.add_argument("--from", dest="start", type=int, default=1, help="current skill (default: 1)")
     ap.add_argument("--to", dest="target", type=int, default=150, help="target skill (default: 150)")
-    ap.add_argument("--sources", default="trainer,vendor", help="recipe sources you can use (trainer,vendor,quest,drop)")
+    ap.add_argument("--sources", default="trainer,recipe",
+                    help="how you're willing to learn recipes: trainer, recipe (recipe items on your AH, at their AH price)")
     ap.add_argument("--sell-back", nargs="?", const="vendor", choices=("vendor", "ah"), default=None,
                     help="subtract what you get for selling what you craft: 'vendor' (default) uses vendor sell "
                          "prices from data/vendor_sell.json, 'ah' uses the AH price after the 5%% cut")
@@ -145,10 +162,10 @@ def main(argv: list[str] | None = None) -> int:
         overrides[int(k)] = int(v)
 
     vendor_prices = load_vendor_prices()
-    vendor_names = load_vendor_names()
+    vendor_names = {**load_item_names(), **load_vendor_names()}
     try:
         prices, updated = load_pricebook(args.game, args.region, args.realm, vendor_prices, args.price, refresh=args.refresh,
-                                         overrides=overrides, vendor_sell=load_vendor_sell())
+                                         overrides=overrides, vendor_sell=load_vendor_sell(), names=load_item_names())
     except Exception as e:  # network / 404 for a wrong realm slug
         print(f"Could not download TSM prices for {args.game}/{args.region}/{args.realm}: {e}", file=sys.stderr)
         print("Check the slugs in your realm's URL on tradeskillmaster.com.", file=sys.stderr)
@@ -158,7 +175,7 @@ def main(argv: list[str] | None = None) -> int:
     results = []
     for key in chosen:
         prof = load_profession(key)
-        plan = Optimizer(prof, prices, sources, args.sell_back).plan(args.start, args.target)
+        plan = cheapest_plan(prof, prices, args.start, args.target, sources, args.sell_back)
         results.append(plan)
 
     if args.json:
@@ -169,6 +186,6 @@ def main(argv: list[str] | None = None) -> int:
         print("\n\n".join(render(p, prices, vendor_names) for p in results))
         if len(results) > 1:
             print("\nSummary")
-            for p in sorted(results, key=lambda p: p.total_cost + p.tools_cost):
-                print(f"  {p.profession.name:<16} {money(p.total_cost + p.tools_cost):>14}" + ("" if p.reached >= p.target else f"  (stuck at {p.reached})"))
+            for p in sorted(results, key=lambda p: p.grand_total):
+                print(f"  {p.profession.name:<16} {money(p.grand_total):>14}" + ("" if p.reached >= p.target else f"  (stuck at {p.reached})"))
     return 0

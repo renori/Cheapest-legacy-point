@@ -19,10 +19,13 @@ class Recipe:
     reagents: dict[int, int]
     makes: int | None = None  # item id produced (None for enchants)
     makes_qty: float = 1.0
-    source: str = "trainer"  # trainer | vendor | quest | drop
-    learn_cost: int = 0  # copper, approximate
+    source: str = "trainer"  # auto (free with the profession) | trainer | recipe (taught by a recipe item)
+    learn_cost: int | None = 0  # copper for trainer recipes; None = fee unknown
     tools: list[int] = field(default_factory=list)  # needed, not consumed
     note: str = ""
+    spell: int | None = None
+    learn_known: bool = True  # False: learn level not in game data, assumed = yellow
+    recipe_items: list[int] = field(default_factory=list)  # items that teach it (source "recipe")
 
     def skillup_chance(self, skill: int) -> float:
         """Chance one craft raises `skill` by a point (Classic formula)."""
@@ -53,17 +56,56 @@ def _recipe(d: dict) -> Recipe:
         reagents={int(k): int(v) for k, v in d.get("reagents", {}).items()},
         makes=(makes or {}).get("item"),
         makes_qty=(makes or {}).get("qty", 1),
-        source=d.get("source", "trainer"),
-        learn_cost=d.get("learn_cost", 0),
+        source=d.get("learn") or d.get("source", "trainer"),
+        learn_cost=d.get("learn_cost", 0 if (d.get("learn") or d.get("source")) != "trainer" else None),
         tools=[int(t) for t in d.get("tools", [])],
         note=d.get("note", ""),
+        spell=d.get("spell"),
+        learn_known=d.get("learn_level_known", True),
+        recipe_items=[int(i) for i in d.get("recipe_items", [])],
     )
+
+
+def load_trainer(data_dir: Path = DATA_DIR) -> dict[int, dict]:
+    """Trainer fees and learn levels you entered in data/trainer.json, by spell id."""
+    path = data_dir / "trainer.json"
+    if not path.exists():
+        return {}
+    d = json.loads(path.read_text(encoding="utf-8"))
+    return {int(k): v for k, v in d.get("spells", {}).items()}
+
+
+def _apply_trainer(r: Recipe, info: dict | None) -> None:
+    if r.source != "trainer" or not info:
+        return
+    if info.get("cost") is not None:
+        r.learn_cost = int(info["cost"])
+    if info.get("learn") is not None:
+        r.orange = max(1, min(int(info["learn"]), r.grey - 1))
+        r.learn_known = True
 
 
 def load_profession(key: str, data_dir: Path = DATA_DIR) -> Profession:
     path = data_dir / "recipes" / f"{key}.json"
     d = json.loads(path.read_text(encoding="utf-8"))
-    return Profession(key=key, name=d["name"], recipes=[_recipe(r) for r in d["recipes"]], note=d.get("note", ""))
+    trainer = load_trainer(data_dir)
+    recipes = []
+    for raw in d["recipes"]:
+        r = _recipe(raw)
+        info = trainer.get(r.spell) if r.spell else None
+        if info and info.get("exclude"):
+            continue  # you marked it as not available
+        _apply_trainer(r, info)
+        recipes.append(r)
+    return Profession(key=key, name=d["name"], recipes=recipes, note=d.get("note", ""))
+
+
+def load_item_names(data_dir: Path = DATA_DIR) -> dict[int, str]:
+    path = data_dir / "item_names.json"
+    if not path.exists():
+        return {}
+    d = json.loads(path.read_text(encoding="utf-8"))
+    return {int(k): v for k, v in d.get("items", {}).items()}
 
 
 def available_professions(data_dir: Path = DATA_DIR) -> list[str]:

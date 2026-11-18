@@ -53,6 +53,15 @@ class Plan:
     tool_costs: dict[int, tuple[str, float]] = field(default_factory=dict)  # item -> (name, cost of one)
     sell_back: str | None = None  # None, "vendor" or "ah"
     no_sell_price: set[int] = field(default_factory=set)  # crafted items with no sell price known
+    learn_costs: list[tuple[Recipe, int | None]] = field(default_factory=list)  # (recipe, copper or None=unknown)
+
+    @property
+    def learn_total(self) -> float:
+        return sum(c for _, c in self.learn_costs if c)
+
+    @property
+    def grand_total(self) -> float:
+        return self.total_cost + self.tools_cost + self.learn_total
 
     @property
     def sell_credit(self) -> float:
@@ -62,24 +71,37 @@ class Plan:
     def tools_cost(self) -> float:
         return sum(c for _, c in self.tool_costs.values() if c != INF)
 
-    @property
-    def learn_cost(self) -> int:
-        return sum(r.learn_cost for r in self.learn)
-
 
 class Optimizer:
     def __init__(
         self,
         profession: Profession,
         prices: PriceBook,
-        allowed_sources: set[str] = frozenset({"trainer", "vendor"}),
+        allowed_sources: set[str] = frozenset({"trainer", "recipe"}),
         sell_back: str | None = None,  # None, "vendor" or "ah"
+        exclude: frozenset[int] = frozenset(),  # id() of recipes to leave out
     ):
         if sell_back not in (None, "vendor", "ah"):
             raise ValueError(f"sell_back must be None, 'vendor' or 'ah', not {sell_back!r}")
         self.prof = profession
         self.prices = prices
-        self.recipes = [r for r in profession.recipes if r.source in allowed_sources]
+        self._learn: dict[int, int | None] = {}
+        self.recipes = []
+        for r in profession.recipes:
+            if id(r) in exclude:
+                continue
+            if r.source == "auto":
+                self._learn[id(r)] = 0
+            elif r.source == "trainer" and "trainer" in allowed_sources:
+                self._learn[id(r)] = r.learn_cost
+            elif r.source == "recipe" and "recipe" in allowed_sources:
+                listed = [p for p in (prices.ah_price(i) for i in r.recipe_items) if p is not None]
+                if not listed:
+                    continue  # recipe item not on your AH (or bind-on-pickup): not available
+                self._learn[id(r)] = min(listed)
+            else:
+                continue
+            self.recipes.append(r)
         self.sell_back = sell_back
         self._makers: dict[int, list[Recipe]] = defaultdict(list)
         for r in self.recipes:
@@ -108,6 +130,10 @@ class Optimizer:
 
     def reagent_cost(self, r: Recipe, skill: int, _stack: frozenset = frozenset()) -> float:
         return sum(qty * self.unit_cost(item, skill, _stack)[0] for item, qty in r.reagents.items())
+
+    def learn_cost(self, r: Recipe) -> int | None:
+        """Copper to learn `r`: 0 for auto, trainer fee (None if unknown), AH price of its recipe item."""
+        return self._learn.get(id(r), 0)
 
     def credit(self, r: Recipe) -> float:
         """Copper recovered per craft by selling what it makes."""
@@ -169,6 +195,8 @@ class Optimizer:
         tool_costs: dict[int, tuple[str, float]] = {}
         for tool in sorted(tools):
             cost, maker = self.unit_cost(tool, target)
+            if maker is not None:
+                expand(maker, 1 / maker.makes_qty, target)  # crafting the tool: learn it, buy its mats
             name = self.prices.name(tool) or (maker.name if maker else None) or next(
                 (r.name for r in self.prof.recipes if r.makes == tool), f"item {tool}")
             tool_costs[tool] = (name, cost)
@@ -186,10 +214,45 @@ class Optimizer:
             total_cost=sum(s.cost for s in steps),
             unpriced=unpriced,
             tool_costs=tool_costs,
+            learn_costs=[(r, self.learn_cost(r)) for r in learn.values()],
             sell_back=self.sell_back,
             no_sell_price={s.recipe.makes for s in steps if self.sell_back and s.recipe.makes
                            and not self.prices.sell_value(s.recipe.makes, self.sell_back)},
         )
+
+
+def cheapest_plan(
+    profession: Profession,
+    prices: PriceBook,
+    start: int,
+    target: int,
+    allowed_sources: set[str] = frozenset({"trainer", "recipe"}),
+    sell_back: str | None = None,
+) -> Plan:
+    """Plan including what it costs to learn the recipes.
+
+    The per-point planner ignores one-off learning costs, so afterwards try
+    leaving out each paid recipe it used (most expensive first) and keep the
+    change whenever the grand total drops.
+    """
+    exclude: set[int] = set()
+
+    def run() -> Plan:
+        return Optimizer(profession, prices, allowed_sources, sell_back, frozenset(exclude)).plan(start, target)
+
+    best = run()
+    improved = True
+    while improved:
+        improved = False
+        paid = sorted(((r, c) for r, c in best.learn_costs if c), key=lambda rc: -rc[1])
+        for r, _ in paid:
+            exclude.add(id(r))
+            trial = run()
+            if trial.reached >= best.reached and trial.grand_total < best.grand_total:
+                best, improved = trial, True
+                break
+            exclude.discard(id(r))
+    return best
 
 
 def ceil(x: float) -> int:

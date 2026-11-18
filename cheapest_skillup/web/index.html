@@ -24,8 +24,9 @@ body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.45 syst
 header { padding: 18px 24px 12px; border-bottom: 1px solid var(--line); display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
 header h1 { margin: 0; font-size: 21px; letter-spacing: .2px; }
 header .sub { color: var(--muted); font-size: 13px; }
-.layout { display: grid; grid-template-columns: 300px 1fr; gap: 20px; padding: 20px 24px 40px; max-width: 1280px; margin: 0 auto; }
-@media (max-width: 860px) { .layout { grid-template-columns: 1fr; padding: 16px; } header { padding: 14px 16px 10px; } }
+.layout > * { min-width: 0; }
+.layout { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 20px; padding: 20px 24px 40px; max-width: 1280px; margin: 0 auto; }
+@media (max-width: 860px) { .layout { grid-template-columns: minmax(0, 1fr); padding: 16px; } header { padding: 14px 16px 10px; } }
 .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px; }
 aside.panel { align-self: start; position: sticky; top: 16px; }
 @media (max-width: 860px) { aside.panel { position: static; } }
@@ -110,7 +111,7 @@ ul.plain { margin: 0; padding-left: 18px; }
         <input id="to" type="number" min="2" max="450" aria-label="To skill">
       </div>
 
-      <label class="f">Recipe sources allowed</label>
+      <label class="f">Learn recipes from</label>
       <div class="chips" id="sources"></div>
 
       <label class="f" for="sellback">Crafted items</label>
@@ -179,7 +180,9 @@ async function init() {
   const d = Object.assign({}, OPTIONS.defaults, store.get("form") || {});
   const profSel = d.professions || OPTIONS.professions.map(p => p.key);
   OPTIONS.professions.forEach(p => chip($("#profs"), p.key, p.name, profSel.includes(p.key)));
-  OPTIONS.sources.forEach(s => chip($("#sources"), s, s, d.sources.includes(s)));
+  const SRC = {trainer: "Trainer", recipe: "AH recipe items"};
+  const srcSel = d.sources.filter(s => OPTIONS.sources.includes(s));
+  OPTIONS.sources.forEach(s => chip($("#sources"), s, SRC[s] || s, (srcSel.length ? srcSel : OPTIONS.defaults.sources).includes(s)));
   fillSelect($("#region"), OPTIONS.regions, d.region, {us: "US", eu: "EU"});
   fillSelect($("#realm"), OPTIONS.realms, d.realm, {"normal-alliance": "Normal · Alliance", "normal-horde": "Normal · Horde", "pvp-alliance": "PvP · Alliance", "pvp-horde": "PvP · Horde"});
   fillSelect($("#price"), OPTIONS.price_fields, d.price, PRICE_LABEL);
@@ -199,7 +202,6 @@ async function run() {
     overrides: $("#overrides").value.replace(/\s+/g, ""),
   };
   if (!form.professions.length) return showError("Pick at least one profession.");
-  if (!form.sources.length) return showError("Allow at least one recipe source.");
   store.set("form", form);
   const q = new URLSearchParams({
     professions: form.professions.join(","), sources: form.sources.join(","),
@@ -230,14 +232,15 @@ function showError(msg) {
   out.querySelector(".empty")?.remove();
 }
 
-const fullCost = p => p.total_cost_copper + p.tools_cost_copper;
+const fullCost = p => p.grand_total_copper;
+const HOW = {auto: "Known", trainer: "Trainer", recipe: "AH recipe"};
 
 function render() {
   const d = LAST, out = $("#out");
   const scanned = new Date(d.prices_updated);
   const when = isNaN(scanned) ? d.prices_updated : scanned.toLocaleString();
   let h = `<div class="meta">${esc(PRICE_LABEL[d.price_field] || d.price_field)} from TSM <b>${esc(d.auction_house)}</b> · scanned ${esc(when)}</div>`;
-  h += `<div class="warn">Recipe data is a Classic Era baseline. WoW Forever has renamed and added recipes, so verify routes in game and update <code>data/recipes/*.json</code>.</div>`;
+  h += `<div class="warn">Recipes come from WoW Forever's game data. Trainer fees and trainer learn levels aren't in it: unknown fees count as 0 and "est." learn levels assume the recipe's yellow level. Fill in <code>data/trainer.json</code> to correct them.</div>`;
 
   if (d.plans.length > 1) {
     const sorted = [...d.plans].sort((a, b) => fullCost(a) - fullCost(b));
@@ -273,16 +276,17 @@ function renderDetail(p) {
     <div><div class="lbl">Materials</div><div>${money(p.total_cost_copper + p.sell_credit_copper)}</div></div>
     ${p.sell_back ? `<div><div class="lbl">Sold ${p.sell_back === "vendor" ? "to vendor" : "on AH"}</div><div>${money(-p.sell_credit_copper)}</div></div>` : ""}
     ${p.tools_cost_copper ? `<div><div class="lbl">Tools</div><div>${money(p.tools_cost_copper)}</div></div>` : ""}
+    ${p.learn_cost_copper ? `<div><div class="lbl">Recipes</div><div>${money(p.learn_cost_copper)}</div></div>` : ""}
     <div><div class="lbl">Crafts</div><div>${p.steps.reduce((a, s) => a + ceil(s.expected_crafts), 0).toLocaleString()}</div></div>
   </div>`;
-  if (p.reached < p.target) h += `<div class="error" style="margin-top:12px">Stuck at ${p.reached}: no allowed recipe skills up past this with known prices. Try allowing more recipe sources.</div>`;
+  if (p.reached < p.target) h += `<div class="error" style="margin-top:12px">Stuck at ${p.reached}: no allowed recipe skills up past this with known prices. Try allowing AH recipe items.</div>`;
 
   h += `<h3>Route</h3><div class="route">` + p.steps.map(s =>
     `<div style="width:${((s.to - s.from) / span * 100).toFixed(2)}%;background:${colors[s.recipe]}" title="${esc(s.recipe)}: ${s.from}–${s.to}"></div>`).join("") + `</div>
     <div class="route-scale"><span>${p.start}</span><span>${p.target}</span></div>`;
 
-  h += `<div class="table-wrap"><table><thead><tr><th>Skill</th><th>Recipe</th><th class="num">Crafts</th><th class="num">Cost</th></tr></thead><tbody>` +
-    p.steps.map(s => `<tr><td class="money">${s.from}–${s.to}</td><td><span class="sw" style="background:${colors[s.recipe]}"></span>${esc(s.recipe)}</td>
+  h += `<div class="table-wrap"><table><thead><tr><th>Skill</th><th>Recipe</th><th>Learn</th><th class="num">Crafts</th><th class="num">Cost</th></tr></thead><tbody>` +
+    p.steps.map(s => `<tr><td class="money">${s.from}–${s.to}</td><td><span class="sw" style="background:${colors[s.recipe]}"></span>${esc(s.recipe)}</td><td><span class="src">${esc(HOW[s.how] || s.how)}</span></td>
       <td class="num">${ceil(s.expected_crafts)}</td><td class="num">${money(s.cost_copper)}</td></tr>`).join("") + `</tbody></table></div>`;
 
   const buy = [...p.buy].map(b => ({...b, total: b.unit_price_copper == null ? Infinity : b.unit_price_copper * b.quantity})).sort((a, b) => b.total - a.total);
@@ -293,7 +297,15 @@ function renderDetail(p) {
   const cf = Object.entries(p.craft_first);
   if (cf.length) h += `<h3>Craft these first (cheaper than buying)</h3><ul class="plain">` + cf.map(([n, q]) => `<li>${ceil(q)} × ${esc(n)}</li>`).join("") + `</ul>`;
   if (p.tools.length) h += `<h3>Tools needed once</h3><ul class="plain">` + p.tools.map(t => `<li>${esc(t.name)}: ${money(t.cost_copper)}</li>`).join("") + `</ul>`;
-  if (p.recipes_to_get.length) h += `<h3>Recipes to buy or find</h3><ul class="plain">` + p.recipes_to_get.map(r => `<li>${esc(r.name)} <span class="src">${esc(r.source)}</span></li>`).join("") + `</ul>`;
+  if (p.learn.length) {
+    const unknown = p.learn.filter(l => l.cost_copper === null).length;
+    h += `<h3>Recipes to learn</h3><div class="table-wrap"><table><thead><tr><th>Recipe</th><th>From</th><th class="num">Learn at</th><th class="num">Cost</th></tr></thead><tbody>` +
+      [...p.learn].sort((a, b) => a.learn_level - b.learn_level || a.recipe.localeCompare(b.recipe)).map(l => `<tr><td>${esc(l.recipe)}</td>
+        <td>${l.how === "recipe" ? "AH: " + l.recipe_items.map(i => esc(i.name)).join(" / ") : "Trainer"}</td>
+        <td class="num">${l.learn_level}${l.learn_level_known ? "" : '<span class="src" title="Not in the game files; assumed to be the yellow level. Correct it in data/trainer.json."> est.</span>'}</td>
+        <td class="num">${l.cost_copper === null ? '<span class="src">fee unknown</span>' : money(l.cost_copper)}</td></tr>`).join("") + `</tbody></table></div>`;
+    if (unknown) h += `<div class="note">${unknown} trainer fee(s) unknown and counted as 0. The game files don't include trainer fees or the skill needed to train; enter what your trainer shows in <code>data/trainer.json</code>.</div>`;
+  }
   if (p.no_sell_price.length) h += `<div class="warn" style="margin-top:14px">No ${p.sell_back === "vendor" ? "vendor sell" : "AH"} price for: ${p.no_sell_price.map(esc).join(", ")}. Counted as 0${p.sell_back === "vendor" ? " — add them to <code>data/vendor_sell.json</code>" : ""}.</div>`;
   if (p.unpriced.length) h += `<div class="error" style="margin-top:14px">No price found for: ${p.unpriced.map(esc).join(", ")}</div>`;
   h += `<div class="note">Quantities are expected values; buy a little extra. Min buyout is the cheapest single listing, so large orders will cost more.</div>`;

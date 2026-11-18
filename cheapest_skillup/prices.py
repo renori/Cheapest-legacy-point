@@ -90,6 +90,7 @@ class PriceBook:
         price_field: str = "minBuyout",
         overrides: dict[int, int] | None = None,
         vendor_sell: dict[int, int] | None = None,
+        names: dict[int, str] | None = None,
     ):
         self.realm_rows = realm_rows
         self.region_rows = region_rows
@@ -97,13 +98,14 @@ class PriceBook:
         self.price_field = price_field
         self.overrides = overrides or {}
         self.vendor_sell = vendor_sell or {}
+        self.names = names or {}
 
     def name(self, item_id: int) -> str | None:
         for rows in (self.realm_rows, self.region_rows):
             row = rows.get(item_id)
             if row and row.get("name"):
                 return row["name"]
-        return None
+        return self.names.get(item_id)
 
     def quote(self, item_id: int) -> Quote:
         if item_id in self.overrides:
@@ -123,6 +125,13 @@ class PriceBook:
         if not candidates:
             return Quote(item_id, None, "unavailable")
         return min(candidates, key=lambda q: q.price)
+
+    def ah_price(self, item_id: int) -> int | None:
+        """Price on your auction house right now (the chosen column), or None if not listed."""
+        if item_id in self.overrides:
+            return self.overrides[item_id]
+        realm = self.realm_rows.get(item_id)
+        return _int(realm.get(self.price_field)) if realm else None
 
     def sell_value(self, item_id: int, mode: str = "vendor") -> int:
         """What one crafted item is worth when sold back.
@@ -146,10 +155,11 @@ def load_pricebook(
     refresh: bool = False,
     overrides: dict[int, int] | None = None,
     vendor_sell: dict[int, int] | None = None,
+    names: dict[int, str] | None = None,
 ) -> tuple[PriceBook, str]:
     realm_text = fetch_csv(realm_url(game, region, realm), cache_dir, refresh)
     region_text = fetch_csv(region_url(game, region), cache_dir, refresh)
     realm_rows = parse_csv(realm_text)
     region_rows = parse_csv(region_text)
     updated = next(iter(realm_rows.values()), {}).get("updatedAt", "unknown")
-    return PriceBook(realm_rows, region_rows, vendor_prices, price_field, overrides, vendor_sell), updated
+    return PriceBook(realm_rows, region_rows, vendor_prices, price_field, overrides, vendor_sell, names), updated

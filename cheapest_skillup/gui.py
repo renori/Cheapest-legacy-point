@@ -17,9 +17,10 @@ from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
 from .cli import PRICE_FIELDS, plan_to_dict
-from .optimizer import Optimizer
+from .optimizer import cheapest_plan
 from .prices import load_pricebook
-from .recipes import available_professions, load_profession, load_vendor_names, load_vendor_prices, load_vendor_sell
+from .recipes import (available_professions, load_item_names, load_profession, load_vendor_names, load_vendor_prices,
+                      load_vendor_sell)
 
 PAGE = Path(__file__).resolve().parent / "web" / "index.html"
 REALMS = ["normal-alliance", "normal-horde", "pvp-alliance", "pvp-horde"]
@@ -37,9 +38,9 @@ def options() -> dict:
         "regions": REGIONS,
         "realms": REALMS,
         "price_fields": list(PRICE_FIELDS),
-        "sources": ["trainer", "vendor", "quest", "drop"],
+        "sources": ["trainer", "recipe"],
         "defaults": {"game": "forever", "region": "us", "realm": "pvp-horde", "price": "minBuyout",
-                     "from": 1, "to": 150, "sources": ["trainer", "vendor"], "sell_back": "none"},
+                     "from": 1, "to": 150, "sources": ["trainer", "recipe"], "sell_back": "none"},
     }
 
 
@@ -57,7 +58,7 @@ def make_plan(q: dict[str, list[str]]) -> dict:
     if not (1 <= start < target <= 450):
         raise ValueError("Skill range must satisfy 1 <= from < to.")
     game, region, realm = get("game", "forever"), get("region", "us"), get("realm", "pvp-horde")
-    sources = {s for s in get("sources", "trainer,vendor").split(",") if s}
+    sources = {s for s in get("sources", "trainer,recipe").split(",") if s}
     sell_back = get("sell_back", "none")
     if sell_back not in ("none", "vendor", "ah"):
         raise ValueError(f"Unknown sell-back mode: {sell_back}")
@@ -68,12 +69,12 @@ def make_plan(q: dict[str, list[str]]) -> dict:
             k, v = pair.split("=", 1)
             overrides[int(k)] = int(v)
 
-    vendor_names = load_vendor_names()
+    vendor_names = {**load_item_names(), **load_vendor_names()}
     with _lock:
         prices, updated = load_pricebook(game, region, realm, load_vendor_prices(), price,
                                          refresh=get("refresh", "0") == "1", overrides=overrides,
-                                         vendor_sell=load_vendor_sell())
-    plans = [Optimizer(load_profession(k), prices, sources, sell_back).plan(start, target) for k in profs]
+                                         vendor_sell=load_vendor_sell(), names=load_item_names())
+    plans = [cheapest_plan(load_profession(k), prices, start, target, sources, sell_back) for k in profs]
     return {
         "prices_updated": updated,
         "auction_house": f"{game}/{region}/{realm}",
