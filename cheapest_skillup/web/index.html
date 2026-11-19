@@ -142,6 +142,11 @@ details.cost[open] { background: var(--panel-2); border: 1px solid var(--line); 
 .unseen { font-size: 11px; color: var(--muted); }
 .cost-body { background: var(--panel-2); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; font-size: 13px; }
 tr.bd-row td { border-bottom: 1px solid var(--line); }
+tr.step { cursor: pointer; }
+tr.step:hover td { background: var(--panel-2); }
+tr.step[aria-expanded=true] td { border-bottom-color: transparent; }
+.learn-sec { padding-bottom: 8px; margin-bottom: 8px; border-bottom: 1px solid var(--line); }
+.learn-sec details.where { margin-left: 0; }
 @media (max-width: 600px) { tr.bd-row td:first-child { display: none; } tr.bd-row td { padding: 4px 0; } }
 ul.plain { margin: 0; padding-left: 18px; }
 .formula { font-size: 12px; color: var(--muted); background: var(--panel-2); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; margin: 0 0 10px; }
@@ -553,11 +558,14 @@ function drawDetail(d) {
   $("#detail").querySelectorAll(".view").forEach(b => b.onclick = () => setView(b.dataset.v));
   $("#detail").querySelectorAll("[data-go]").forEach(b => b.onclick = () => setView(b.dataset.go));
   $("#view").innerHTML = VIEW === "materials" ? materialsView(p) : VIEW === "recipes" ? recipesView(p) : routeView(p, learnBy);
-  $("#view").querySelectorAll(".bd-toggle").forEach(b => b.onclick = () => {
-    const row = b.closest("tr").nextElementSibling;
+  // One click anywhere on a step (except its links) opens its details: how to learn it, then the costs.
+  $("#view").querySelectorAll("tr.step").forEach(tr => tr.onclick = e => {
+    if (e.target.closest("a, summary, input, select") || window.getSelection().toString()) return;
+    const row = tr.nextElementSibling, b = tr.querySelector(".bd-toggle");
     row.hidden = !row.hidden;
+    tr.setAttribute("aria-expanded", String(!row.hidden));
     b.setAttribute("aria-expanded", String(!row.hidden));
-    b.textContent = row.hidden ? "Cost breakdown ▸" : "Cost breakdown ▾";
+    b.textContent = row.hidden ? "Details ▸" : "Details ▾";
   });
 }
 
@@ -577,10 +585,23 @@ function madeFrom(m) {
   return `<div class="src">from ${m.made_from.map(x => `${qty(x.qty)} × ${wh("item", x.item_id, x.name)} @ ${money(x.unit_copper)}`).join(" + ")}${m.ah_copper != null ? ` · cheaper than the AH's ${money(m.ah_copper)}` : ""}</div>`;
 }
 
-function costBreakdown(s, p) {
+const feeText = l => l.cost_copper === null ? "fee unknown" : (l.fee_from === "classic" ? "~" : "") + money(l.cost_copper);
+
+function learnPanel(s, l, first) {
+  if (s.how === "auto") return `<div class="learn-sec"><b>Learn:</b> known when you learn the profession.</div>`;
+  if (!l) return "";
+  if (!first) return `<div class="learn-sec"><b>Learn:</b> already learned for an earlier step.</div>`;
+  let h = `<div class="learn-sec"><b>Learn:</b> `;
+  if (l.how === "trainer") h += `from a trainer at skill ${l.learn_level} · ${feeText(l)}${trainersHtml(l.trainers)}`;
+  else if (l.how === "vendor") h += `buy the recipe from a vendor · ${feeText(l)}${vendorsHtml(l.vendors)}`;
+  else h += `buy ${l.recipe_items.map(i => wh("item", i.item_id, i.name)).join(" / ")} on the AH · ${feeText(l)}`;
+  return h + `</div>`;
+}
+
+function costBreakdown(s, p, learn = "") {
   const crafts = s.expected_crafts;
   const matTotal = s.materials.reduce((a, m) => a + (m.unit_copper ?? 0) * m.total, 0);
-  let h = `<div class="cost-body">
+  let h = `<div class="cost-body">${learn}
     <div class="src">${qty(crafts)} expected crafts for ${s.to - s.from} points (${(crafts / (s.to - s.from)).toFixed(2)} per point)</div>
     <div class="table-wrap"><table class="mini"><thead><tr><th>Material</th><th class="num">Per craft</th><th class="num">Total</th><th class="num">Listed (AH)</th><th class="num">You pay</th><th class="num">Vendor pays you</th><th class="num">Cost</th></tr></thead><tbody>` +
     s.materials.map(m => `<tr><td>${wh("item", m.item_id, m.name)}</td><td class="num">${qty(m.per_craft)}</td><td class="num">${qty(m.total)}</td>
@@ -620,19 +641,13 @@ function routeView(p, learnBy) {
     const l = learnBy[s.recipe];
     const first = !seen.has(s.recipe); seen.add(s.recipe);
     let learn = `<span class="src">${esc(HOW[s.how] || s.how)}</span>`;
-    let extra = "";
-    if (first && l) {
-      learn += `<div class="src">${l.cost_copper === null ? "fee unknown" : (l.fee_from === "classic" ? "~" : "") + money(l.cost_copper)}</div>`;
-      if (l.how === "trainer") extra = trainersHtml(l.trainers);
-      else if (l.how === "vendor") extra = vendorsHtml(l.vendors);
-      else if (l.how === "recipe") extra = `<div class="src">Buy ${l.recipe_items.map(i => wh("item", i.item_id, i.name)).join(" / ")} on the AH</div>`;
-    }
+    if (first && l) learn += `<div class="src">${feeText(l)}</div>`;
     const low = s.low_chance ? `<span class="badge" title="About ${s.crafts_per_point.toFixed(1)} crafts per skill point">low chance</span>` : "";
-    h += `<tr><td class="money">${s.from}–${s.to}</td>
-      <td><span class="sw" style="background:${colors[s.recipe]}"></span>${wh("spell", s.spell, s.recipe)}${low}${chanceHtml(s)}${extra}
-        <button type="button" class="linkish bd-toggle" aria-expanded="false">Cost breakdown ▸</button></td>
+    h += `<tr class="step" aria-expanded="false"><td class="money">${s.from}–${s.to}</td>
+      <td><span class="sw" style="background:${colors[s.recipe]}"></span>${wh("spell", s.spell, s.recipe)}${low}${chanceHtml(s)}
+        <button type="button" class="linkish bd-toggle" aria-expanded="false">Details ▸</button></td>
       <td class="lc">${learn}</td><td class="num">${ceil(s.expected_crafts)}</td><td class="num">${money(s.cost_copper)}</td></tr>
-      <tr class="bd-row" hidden><td></td><td colspan="4">${costBreakdown(s, p)}</td></tr>`;
+      <tr class="bd-row" hidden><td></td><td colspan="4">${costBreakdown(s, p, learnPanel(s, l, first))}</td></tr>`;
   }
   for (const r of pending) h += rankRow(r);
   return h + `</tbody></table></div>`;

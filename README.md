@@ -54,7 +54,9 @@ A cost strip follows, then three views:
 * **Route:** the recipe to craft for each stretch of skill, with how many crafts and what they cost.
   * Each step shows its colour and skill-up chance at the start and end (for example
     *Orange 100% → Green 26%*).
-  * **Cost breakdown** opens each step's materials: per craft and in total, the AH listing, what you
+  * **Click a step** (or its *Details*) to open everything about it in one panel. It starts with how to
+    learn the recipe (fee, and a nested *Where to train* / *Where to buy* list), then the step's
+    materials: per craft and in total, the AH listing, what you
     pay and where, and **what a vendor pays you** for it. It also shows the item made, with its AH
     listing, what a vendor pays you for it, and any sell-back credit.
   * Rank rows (*Train Journeyman*, *Learn Expert*, *Quest for Artisan*) appear where you hit each cap,
