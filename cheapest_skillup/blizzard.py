@@ -7,8 +7,9 @@ Writes, per region, one file per auction house: prices/<region>/<house>.json =
 describing the houses and when they were fetched.
 
 Forever has no realms: auction houses hang off rulesets (dynamic-forever-<region>
-namespace, /data/wow/ruleset/{id}/auctions/). Every ruleset currently lists the same
-houses, so one ruleset is enough. The client ID and secret are read from the
+namespace, /data/wow/ruleset/{id}/auctions/), one Alliance, Horde and Blackwater house
+per ruleset (PvP, Normal, Roleplay, ...). Each house is fetched once and tagged with its
+ruleset where the API says which one it is. The client ID and secret are read from the
 environment only and never printed or written anywhere.
 """
 
@@ -91,27 +92,80 @@ def summarize(auctions: list[dict], commodities: list[dict]) -> dict[str, list[i
     return {str(k): v for k, v in sorted(best.items())}
 
 
+def ruleset_ref(value) -> tuple[int | None, str | None]:
+    """The ruleset a house response names: {"id":..,"name":..} or a bare id."""
+    if isinstance(value, dict):
+        rid = value.get("id")
+        name = value.get("name")
+        if isinstance(name, dict):  # localized name objects
+            name = name.get("en_US") or next(iter(name.values()), None)
+        return (int(rid) if rid is not None else None), name
+    if isinstance(value, int):
+        return value, None
+    return None, None
+
+
+def assign_rulesets(rulesets: dict[int, str], listed: dict[int, list[int]],
+                    reported: dict[int, int | None]) -> dict[int, int | None]:
+    """Which ruleset each house belongs to.
+
+    1. If house responses name different rulesets, trust them.
+    2. Else if the per-ruleset house lists differ, a house belongs to the ruleset(s) that list it
+       (only when exactly one does).
+    3. Else unknown (None)."""
+    houses = sorted({h for hs in listed.values() for h in hs} | set(reported))
+    if len({r for r in reported.values() if r is not None}) > 1:
+        return {h: reported.get(h) for h in houses}
+    lists = {rid: set(hs) for rid, hs in listed.items()}
+    if len({frozenset(v) for v in lists.values()}) > 1:
+        out = {}
+        for h in houses:
+            owners = [rid for rid, hs in lists.items() if h in hs]
+            out[h] = owners[0] if len(owners) == 1 else None
+        return out
+    return {h: None for h in houses}
+
+
 def fetch_region(region: str, access_token: str, out: Path) -> list[dict]:
     api = Api(region, access_token)
-    rulesets = (api.get("/data/wow/ruleset/index") or {}).get("rulesets", [])
-    if not rulesets:
+    index = (api.get("/data/wow/ruleset/index") or {}).get("rulesets", [])
+    if not index:
         print(f"{region}: no Forever rulesets", file=sys.stderr)
         return []
-    rs = rulesets[0]["id"]  # every ruleset lists the same houses for now
-    houses = (api.get(f"/data/wow/ruleset/{rs}/auctions/") or {}).get("auctions", [])
-    result = []
-    for h in houses:
-        hid = h["id"]
+    rulesets: dict[int, str] = {}
+    for r in index:
+        rid, name = ruleset_ref(r)
+        if rid is not None:
+            rulesets[rid] = name or (api.get(f"/data/wow/ruleset/{rid}") or {}).get("name") or f"Ruleset {rid}"
+    # Every ruleset's house list (cheap). Forever has so far listed the same houses under every ruleset.
+    listed: dict[int, list[int]] = {}
+    names: dict[int, str] = {}
+    for rid in rulesets:
+        hs = (api.get(f"/data/wow/ruleset/{rid}/auctions/") or {}).get("auctions", [])
+        listed[rid] = [h["id"] for h in hs]
+        names.update({h["id"]: h.get("name", f"House {h['id']}") for h in hs})
+    print(f"{region} rulesets: " + ", ".join(f"{rid}={n} houses={sorted(listed[rid])}" for rid, n in rulesets.items()),
+          file=sys.stderr)
+    rs = next(iter(rulesets))
+    result, reported = [], {}
+    for hid in sorted(names):
         data = api.get(f"/data/wow/ruleset/{rs}/auctions/{hid}") or {}
         comm = api.get(f"/data/wow/ruleset/{rs}/auctions/{hid}/commodities") or {}
+        reported[hid] = ruleset_ref(data.get("ruleset"))[0]
         prices = summarize(data.get("auctions") or [], comm.get("auctions") or [])
         path = out / region / f"{hid}.json"
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(prices, separators=(",", ":")), encoding="utf-8")
-        result.append({"region": region, "id": hid, "name": h.get("name", f"House {hid}"),
-                       "faction": faction(h.get("name", "")), "items": len(prices),
+        result.append({"region": region, "id": hid, "name": names[hid], "faction": faction(names[hid]),
+                       "items": len(prices),
                        "listings": len(data.get("auctions") or []) + len(comm.get("auctions") or [])})
-        print(f"{region} {hid} {h.get('name')}: {len(prices)} items", file=sys.stderr)
+        print(f"{region} house {hid} {names[hid]}: ruleset field={data.get('ruleset')!r} "
+              f"{result[-1]['listings']} listings, {len(prices)} items", file=sys.stderr)
+    owner = assign_rulesets(rulesets, listed, reported)
+    for h in result:
+        rid = owner.get(h["id"])
+        h["ruleset"] = rid
+        h["ruleset_name"] = rulesets.get(rid) if rid is not None else None
     return result
 
 

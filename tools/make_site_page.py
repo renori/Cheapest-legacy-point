@@ -22,8 +22,25 @@ async function loadJSON(path, fresh = false) {
   return r.json();
 }
 const houses = region => (DATA.index?.houses || []).filter(h => h.region === region);
-const FACTION = {a: "Alliance", h: "Horde", n: "Neutral"};
-const houseLabel = h => `${FACTION[h.faction] || ""} #${h.id}`;
+const FACTION = {a: "Alliance", h: "Horde", n: "Blackwater"};
+// Each ruleset (PvP, Normal, Roleplay, ...) has its own Alliance, Horde and Blackwater house, with its
+// own prices. Where the API names the ruleset we use it; otherwise houses are grouped into sets by ID
+// order (the n-th Alliance, n-th Horde and n-th Blackwater house belong together).
+function houseSets(region) {
+  const hs = houses(region), sets = new Map();
+  const rank = {};
+  for (const f of ["a", "h", "n"]) hs.filter(h => h.faction === f).sort((a, b) => a.id - b.id).forEach((h, i) => rank[h.id] = i);
+  for (const h of hs) {
+    const key = h.ruleset_name ? `r${h.ruleset}` : `s${rank[h.id]}`;
+    if (!sets.has(key)) sets.set(key, {key, name: h.ruleset_name, houses: [], listings: 0});
+    const s = sets.get(key); s.houses.push(h); s.listings += h.listings || 0;
+  }
+  for (const s of sets.values()) s.name ||= `Ruleset (houses ${s.houses.map(h => h.id).sort((a, b) => a - b).join(" / ")})`;
+  return [...sets.values()].sort((a, b) => b.listings - a.listings);
+}
+const houseSet = h => houseSets(h.region).find(s => s.houses.includes(h));
+const houseLabel = h => `${houseSet(h)?.name || ""} · ${FACTION[h.faction] || ""}`;
+const fmtCount = n => n >= 1000 ? `${Math.round(n / 1000)}k` : String(n);
 const currentHouse = () => houses(SETTINGS.region).find(h => String(h.id) === String(SETTINGS.realm));
 
 function parseOverrides(s) {
@@ -78,6 +95,7 @@ INIT = r'''async function init() {
   DATA.profs = Object.fromEntries(Object.entries(DATA.professions).map(([k, p]) => [k, new Profession(k, p)]));
   const regions = [...new Set(DATA.index.houses.map(h => h.region))];
   const busiest = region => [...houses(region)].sort((a, b) => (b.faction === "h") - (a.faction === "h") || b.listings - a.listings)[0];
+  const FORDER = {h: 0, a: 1, n: 2};
   OPT = {
     professions: Object.entries(DATA.professions).map(([key, p]) => ({key, name: p.name})).sort((a, b) => a.name.localeCompare(b.name)),
     milestones: [75, 150, 225, 300], max_skill: 300, sources: ["trainer", "vendor", "recipe"],
@@ -86,8 +104,12 @@ INIT = r'''async function init() {
   const d = Object.assign({}, OPT.defaults, {wh: "forever"}, store.get("settings") || {});
   if (!regions.includes(d.region)) d.region = OPT.defaults.region;
   const fillHouses = region => {
-    const hs = [...houses(region)].sort((a, b) => a.faction.localeCompare(b.faction) || a.id - b.id);
-    $("#realm").innerHTML = hs.map(h => `<option value="${h.id}">${esc(houseLabel(h))}</option>`).join("");
+    const sets = houseSets(region).filter(s => s.listings > 0);  // skip rulesets with no auctions yet
+    const hs = sets.flatMap(s => s.houses.filter(h => h.listings > 0));
+    $("#realm").innerHTML = sets.map(s => `<optgroup label="${esc(s.name)}">` + [...s.houses]
+      .filter(h => h.listings > 0).sort((a, b) => FORDER[a.faction] - FORDER[b.faction])
+      .map(h => `<option value="${h.id}">${esc(`${FACTION[h.faction]} (#${h.id}, ${fmtCount(h.listings)} listings)`)}</option>`).join("")
+      + `</optgroup>`).join("");
     const keep = hs.find(h => String(h.id) === String(d.realm));
     $("#realm").value = keep ? keep.id : (busiest(region)?.id ?? "");
   };
@@ -119,7 +141,7 @@ def main() -> None:
 
     swap("priced from TradeSkillMaster's public data", "priced from Blizzard's auction house data")
     swap('<div class="hint">Trainers and vendors follow this faction.</div>',
-         '<div class="hint">Trainers and vendors follow this auction house\'s faction.</div>')
+         '<div class="hint">Each ruleset (PvP, Normal, Roleplay…) has its own Alliance, Horde and Blackwater auction house with its own prices. Trainers and vendors follow the house\'s faction.</div>')
     swap("""      <label class="f" for="price">Buy at</label>
       <select id="price"></select>
 """, "")
