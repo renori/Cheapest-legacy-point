@@ -9,7 +9,12 @@
   --bg: #f6f3ec; --panel: #fffdf8; --panel-2: #f9f5ec; --ink: #2a2620; --muted: #756c5e; --line: #e4ddcf;
   --accent: #8a5a12; --accent-ink: #fff; --chip: #efe8da; --chip-on: #8a5a12;
   --gold: #c99a1c; --silver: #8e9399; --copper: #b06a3b; --bad: #b3261e; --warn-bg: #fff4d6; --warn-line: #e9cf86;
-  --rank-bg: #f3ecdc;
+  --rank-bg: #f3ecdc; --tip-bg: #2a2620; --tip-ink: #fffdf8;
+  /* Milestone ramp (ordinal, one hue), validated light vs #fffdf8 */
+  --m1: #e0ad55; --m2: #c08427; --m3: #935e12; --m4: #623d07;
+  --m1-ink: #1d1a14; --m2-ink: #1d1a14; --m3-ink: #fff; --m4-ink: #fff;
+  /* WoW recipe colours (always shown with their name) */
+  --c-orange: #e8772e; --c-yellow: #d9b400; --c-green: #3f9e3f; --c-grey: #9a9a9a;
   --s1: #8a5a12; --s2: #2f6f8f; --s3: #6b8f2f; --s4: #8f2f5c; --s5: #5c4a9e; --s6: #2f8f7a; --s7: #a3542a; --s8: #5e6b75;
 }
 @media (prefers-color-scheme: dark) {
@@ -17,18 +22,24 @@
     --bg: #17150f; --panel: #211e17; --panel-2: #1c1a14; --ink: #ece6d8; --muted: #a99f8c; --line: #383226;
     --accent: #e0a440; --accent-ink: #1b1710; --chip: #2c271d; --chip-on: #e0a440;
     --gold: #f0c040; --silver: #c4c9cf; --copper: #d88a55; --bad: #ff8a80; --warn-bg: #2e2714; --warn-line: #6b5a24;
-    --rank-bg: #2a2418;
+    --rank-bg: #2a2418; --tip-bg: #ece6d8; --tip-ink: #17150f;
+    /* validated dark vs #211e17 */
+    --m1: #f3d08e; --m2: #e0a440; --m3: #b07720; --m4: #80520e;
+    --m1-ink: #1d1a14; --m2-ink: #1d1a14; --m3-ink: #1d1a14; --m4-ink: #fff;
+    --c-orange: #ff9a52; --c-yellow: #f2d23c; --c-green: #6fcf6f; --c-grey: #b0b0b0;
     --s1: #e0a440; --s2: #5fb2d9; --s3: #a6cf5f; --s4: #e07aa8; --s5: #a796f0; --s6: #5fd1b8; --s7: #ec8f5e; --s8: #a3b0ba;
   }
 }
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
 a { color: var(--accent); }
+a.wh { color: inherit; text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 2px; }
+a.wh:hover { color: var(--accent); text-decoration-color: currentColor; }
 header { padding: 18px 24px 12px; border-bottom: 1px solid var(--line); display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
 header h1 { margin: 0; font-size: 21px; letter-spacing: .2px; }
 header h1 a { color: inherit; text-decoration: none; }
 header .sub { color: var(--muted); font-size: 13px; }
-.layout { display: grid; grid-template-columns: 290px minmax(0, 1fr); gap: 20px; padding: 20px 24px 40px; max-width: 1320px; margin: 0 auto; }
+.layout { display: grid; grid-template-columns: 290px minmax(0, 1fr); gap: 20px; padding: 20px 24px 40px; max-width: 1360px; margin: 0 auto; }
 .layout > * { min-width: 0; }
 @media (max-width: 900px) { .layout { grid-template-columns: minmax(0, 1fr); padding: 16px; } header { padding: 14px 16px 10px; } }
 .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px; }
@@ -56,37 +67,49 @@ h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .5px; color: va
 .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: spin .8s linear infinite; vertical-align: -2px; margin-right: 6px; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .note { color: var(--muted); font-size: 12px; margin-top: 14px; }
+.small-input { width: 64px !important; padding: 4px 6px !important; font-size: 13px !important; }
 
-/* Overview cards */
-.cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
-@media (max-width: 1100px) { .cards { grid-template-columns: minmax(0, 1fr); } }
-.card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
-.card.mine { border-color: var(--accent); }
-.card-head { display: flex; align-items: center; gap: 8px; }
-.card-head h2 { flex: 1; }
-.star { background: none; border: 0; font-size: 20px; line-height: 1; cursor: pointer; color: var(--muted); padding: 2px 4px; }
+/* Overview chart */
+.chart-head { display: flex; flex-wrap: wrap; gap: 10px 20px; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+.prow { display: grid; grid-template-columns: 220px minmax(0, 1fr) 150px; gap: 6px 16px; align-items: center; padding: 12px 0; border-top: 1px solid var(--line); }
+.prow:first-of-type { border-top: 0; }
+@media (max-width: 700px) { .prow { grid-template-columns: minmax(0, 1fr) auto; } .prow .bar-cell { grid-column: 1 / -1; grid-row: 2; } }
+.pname { display: flex; align-items: center; gap: 4px; }
+.pname button.name { background: none; border: 0; padding: 0; font: inherit; font-weight: 700; font-size: 16px; color: var(--ink); cursor: pointer; text-align: left; }
+.pname button.name:hover { color: var(--accent); text-decoration: underline; }
+.star { background: none; border: 0; font-size: 18px; line-height: 1; cursor: pointer; color: var(--muted); padding: 2px 4px; }
 .star[aria-pressed=true] { color: var(--gold); }
-.inputs { display: grid; grid-template-columns: 80px minmax(0, 1fr); gap: 8px 10px; align-items: center; font-size: 13px; color: var(--muted); }
-.inputs input[type=number] { padding: 6px 8px; max-width: 110px; }
-.targets { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
-.targets .chip { padding: 4px 10px; }
-.targets input[type=number] { width: 80px; }
-.miles { width: 100%; border-collapse: collapse; font-size: 14px; }
-.miles td { padding: 5px 4px; border-top: 1px solid var(--line); }
-.miles td.num { text-align: right; }
-.miles tr.sel td { font-weight: 700; color: var(--accent); }
-.miles .bar { height: 6px; background: var(--chip); border-radius: 3px; overflow: hidden; min-width: 40px; }
-.miles .bar span { display: block; height: 100%; background: var(--accent); }
-.card .open { align-self: flex-start; background: none; border: 1px solid var(--accent); color: var(--accent); border-radius: 7px; padding: 6px 12px; font: inherit; font-weight: 600; cursor: pointer; }
-.card .open:hover { background: var(--accent); color: var(--accent-ink); }
+.pctl { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); margin-top: 4px; flex-wrap: wrap; }
+.bar { display: flex; gap: 2px; height: 28px; align-items: stretch; }
+.seg { border-radius: 4px; position: relative; cursor: pointer; display: flex; align-items: center; padding: 0 6px; font-size: 12px; font-weight: 600; white-space: nowrap; overflow: visible; min-width: 3px; }
+.seg span { pointer-events: none; }
+.seg.past { background-image: repeating-linear-gradient(45deg, color-mix(in srgb, var(--panel) 55%, transparent) 0 3px, transparent 3px 7px); }
+.bar { position: relative; }
+.target-mark { position: absolute; top: -4px; bottom: -4px; width: 2px; background: var(--ink); border-radius: 1px; pointer-events: none; }
+.seg:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.ptotal { text-align: right; }
+.ptotal .big { font-weight: 700; font-size: 16px; }
+.tip { position: fixed; z-index: 10; background: var(--tip-bg); color: var(--tip-ink); padding: 8px 10px; border-radius: 6px; font-size: 13px; pointer-events: none; max-width: 260px; box-shadow: 0 4px 14px rgba(0,0,0,.25); }
+.tip .money .coin { box-shadow: 0 0 0 1px rgba(0,0,0,.15); }
 
 /* Profession page */
 .back { background: none; border: 0; padding: 0; color: var(--accent); font: inherit; cursor: pointer; margin-bottom: 10px; }
 .prof-head { display: flex; flex-wrap: wrap; gap: 14px 24px; align-items: center; margin-bottom: 14px; }
 .prof-head h2 { font-size: 22px; flex: 1 1 200px; }
-.strip { display: flex; flex-wrap: wrap; gap: 10px 26px; padding: 12px 14px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 8px; margin-bottom: 14px; }
+.inputs { display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: center; font-size: 13px; color: var(--muted); }
+.targets { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.targets .chip { padding: 4px 10px; }
+.need { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 10px 18px; padding: 14px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 8px; margin-bottom: 14px; }
+.need h4 { margin: 0 0 4px; font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); }
+.need ul { margin: 0; padding-left: 16px; font-size: 14px; }
+.need li { margin: 2px 0; }
+.need .total { font-size: 24px; font-weight: 700; }
+.linkish { background: none; border: 0; padding: 0; color: var(--accent); font: inherit; font-size: 12px; cursor: pointer; text-decoration: underline; }
+.strip { display: flex; flex-wrap: wrap; gap: 10px 26px; padding: 10px 14px; border: 1px solid var(--line); border-radius: 8px; margin-bottom: 14px; }
 .strip .lbl { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .5px; }
-.strip .big { font-size: 22px; font-weight: 700; }
 .views { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin-bottom: 14px; flex-wrap: wrap; }
 .view { background: none; border: 0; border-bottom: 2px solid transparent; padding: 8px 14px; font: inherit; color: var(--muted); cursor: pointer; }
 .view[aria-selected=true] { color: var(--ink); border-color: var(--accent); font-weight: 600; }
@@ -99,16 +122,30 @@ table.t { width: 100%; border-collapse: collapse; font-size: 14px; }
 table.t th, table.t td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
 table.t th { font-size: 12px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .4px; }
 table.t td.num, table.t th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+table.mini { width: 100%; border-collapse: collapse; font-size: 13px; margin: 6px 0 4px; }
+table.mini th, table.mini td { padding: 4px 6px; border-bottom: 1px solid var(--line); text-align: left; }
+table.mini th { font-size: 11px; color: var(--muted); font-weight: 600; }
+table.mini td.num, table.mini th.num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+table.mini tr.sum td { font-weight: 700; border-bottom: 0; }
 tr.rank td { background: var(--rank-bg); }
 tr.rank .rname { font-weight: 700; }
 .sw { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 7px; }
 .badge { display: inline-block; font-size: 11px; padding: 1px 7px; border-radius: 999px; border: 1px solid var(--warn-line); background: var(--warn-bg); margin-left: 6px; white-space: nowrap; }
-details.where { margin-top: 4px; font-size: 13px; }
-details.where summary { cursor: pointer; color: var(--accent); font-size: 12px; }
+.chance { font-size: 12px; color: var(--muted); margin-top: 2px; white-space: nowrap; }
+.dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 3px; vertical-align: 0; }
+.d-orange { background: var(--c-orange); } .d-yellow { background: var(--c-yellow); } .d-green { background: var(--c-green); } .d-grey { background: var(--c-grey); }
+details.where, details.cost { margin-top: 4px; font-size: 13px; }
+details.where summary, details.cost summary { cursor: pointer; color: var(--accent); font-size: 12px; }
 details.where ul { margin: 6px 0 2px; padding-left: 18px; }
 details.where li { margin: 2px 0; }
+details.cost[open] { background: var(--panel-2); border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; }
 .unseen { font-size: 11px; color: var(--muted); }
+.cost-body { background: var(--panel-2); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; font-size: 13px; }
+tr.bd-row td { border-bottom: 1px solid var(--line); }
+@media (max-width: 600px) { tr.bd-row td:first-child { display: none; } tr.bd-row td { padding: 4px 0; } }
 ul.plain { margin: 0; padding-left: 18px; }
+.formula { font-size: 12px; color: var(--muted); background: var(--panel-2); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; margin: 0 0 10px; }
+.formula code { font-size: 12px; }
 @media (max-width: 600px) {
   table.t th, table.t td { padding: 6px 4px; font-size: 13px; }
   table.t .lc { display: none; }
@@ -130,7 +167,7 @@ ul.plain { margin: 0; padding-left: 18px; }
         <select id="region" aria-label="Region" style="flex:0 0 76px"></select>
         <select id="realm" aria-label="Auction house"></select>
       </div>
-      <div class="hint">Trainer locations follow this faction.</div>
+      <div class="hint">Trainers and vendors follow this faction.</div>
 
       <label class="f" for="price">Buy at</label>
       <select id="price"></select>
@@ -149,6 +186,12 @@ ul.plain { margin: 0; padding-left: 18px; }
       <input id="overrides" type="text" placeholder="e.g. 2589=0, 2592=100">
       <div class="hint">itemId=copper. Use 0 for mats you already have.</div>
 
+      <label class="f" for="wh">Links</label>
+      <select id="wh">
+        <option value="forever">Wowhead (WoW Forever)</option>
+        <option value="classic">Wowhead (Classic)</option>
+      </select>
+
       <button class="go" id="go" type="submit">Re-download prices</button>
       <div class="hint" id="scan"></div>
     </form>
@@ -156,6 +199,7 @@ ul.plain { margin: 0; padding-left: 18px; }
 
   <main id="main"></main>
 </div>
+<div class="tip" id="tip" hidden></div>
 
 <script>
 const $ = (s, el = document) => el.querySelector(s);
@@ -164,12 +208,15 @@ const SWATCH = ["--s1","--s2","--s3","--s4","--s5","--s6","--s7","--s8"].map(v =
 const PRICE_LABEL = {minBuyout: "Min buyout", marketValue: "Market value", recent: "Recent value", historical: "Historical price"};
 const REALM_LABEL = {"normal-alliance": "Normal · Alliance", "normal-horde": "Normal · Horde", "pvp-alliance": "PvP · Alliance", "pvp-horde": "PvP · Horde"};
 const HOW = {auto: "Known", trainer: "Trainer", recipe: "AH recipe", vendor: "Vendor recipe"};
+const TIERS = [{cap: 75, name: "Apprentice"}, {cap: 150, name: "Journeyman"}, {cap: 225, name: "Expert"}, {cap: 300, name: "Artisan"}];
 const store = {
   get(k) { try { return JSON.parse(localStorage.getItem("csu:" + k)); } catch { return null; } },
   set(k, v) { try { localStorage.setItem("csu:" + k, JSON.stringify(v)); } catch {} },
 };
 const ceil = x => Math.ceil(x - 1e-9);
 const clamp = (v, lo, hi) => Number.isFinite(v) ? Math.max(lo, Math.min(hi, Math.round(v))) : lo;
+const pct = x => `${Math.round(x * 100)}%`;
+const qty = x => (Math.abs(x - Math.round(x)) < 0.05 ? Math.round(x) : x.toFixed(1)).toLocaleString();
 
 function money(c) {
   if (c === null || c === undefined) return '<span class="money">n/a</span>';
@@ -182,11 +229,19 @@ function money(c) {
   h += `${cp}<i class="coin cc" title="copper"></i>`;
   return `<span class="money">${neg ? "−" : ""}${h}</span>`;
 }
+function moneyText(c) {  // plain text, for bar labels
+  c = Math.round(c);
+  const g = Math.floor(c / 10000), s = Math.floor(c / 100) % 100, cp = c % 100;
+  return g >= 100 ? `${g.toLocaleString()}g` : g ? `${g}g ${s}s` : s ? `${s}s ${cp}c` : `${cp}c`;
+}
 
-let OPT;                                  // /api/options
-let SETTINGS;                             // sidebar
-let PROFS = store.get("profs") || {};     // {key: {from, to, mine}}
+/* Wowhead links */
+const wh = (type, id, text) => id ? `<a class="wh" href="https://www.wowhead.com/${SETTINGS.wh}/${type}=${id}" target="_blank" rel="noopener">${esc(text)}</a>` : esc(text);
+
+let OPT, SETTINGS;
+let PROFS = store.get("profs") || {};
 let VIEW = store.get("view") || "route";
+let SCALE = store.get("scale") || "shared";
 let refreshNext = false;
 
 function profState(key) {
@@ -228,14 +283,14 @@ function readSettings() {
   SETTINGS = {
     region: $("#region").value, realm: $("#realm").value, price: $("#price").value,
     sources: [...$("#sources").querySelectorAll(".chip[aria-pressed=true]")].map(b => b.dataset.value),
-    sell_back: $("#sellback").value, overrides: $("#overrides").value.replace(/\s+/g, ""),
+    sell_back: $("#sellback").value, overrides: $("#overrides").value.replace(/\s+/g, ""), wh: $("#wh").value,
   };
   store.set("settings", SETTINGS);
 }
 
 async function init() {
   OPT = await (await fetch("/api/options")).json();
-  const d = Object.assign({}, OPT.defaults, store.get("settings") || {});
+  const d = Object.assign({}, OPT.defaults, {wh: "forever"}, store.get("settings") || {});
   fillSelect($("#region"), OPT.regions, d.region, {us: "US", eu: "EU"});
   fillSelect($("#realm"), OPT.realms, d.realm, REALM_LABEL);
   fillSelect($("#price"), OPT.price_fields, d.price, PRICE_LABEL);
@@ -244,85 +299,138 @@ async function init() {
   OPT.sources.forEach(s => chip($("#sources"), s, SRC[s] || s, (srcSel.length ? srcSel : OPT.defaults.sources).includes(s)));
   $("#sellback").value = ["none", "vendor", "ah"].includes(d.sell_back) ? d.sell_back : "none";
   $("#overrides").value = d.overrides || "";
+  $("#wh").value = ["forever", "classic"].includes(d.wh) ? d.wh : "forever";
   readSettings();
   $("#form").onsubmit = e => { e.preventDefault(); readSettings(); refreshNext = true; route(); };
-  for (const el of ["#region", "#realm", "#price", "#sellback", "#overrides"]) $(el).onchange = () => { readSettings(); route(); };
+  for (const el of ["#region", "#realm", "#price", "#sellback", "#overrides", "#wh"]) $(el).onchange = () => { readSettings(); route(); };
   window.addEventListener("hashchange", route);
   route();
 }
 
 function route() {
+  hideTip();
   const m = location.hash.match(/^#\/([a-z_]+)/);
   if (m && OPT.professions.some(p => p.key === m[1])) renderProfession(m[1]);
   else renderOverview();
 }
 
-/* Skill + target inputs, shared by the cards and the profession page */
-function skillInputs(key, st, onchange) {
-  const custom = !OPT.milestones.includes(st.to);
-  const box = document.createElement("div");
-  box.className = "inputs";
-  box.innerHTML = `<label for="from-${key}">Your skill</label>
-    <input id="from-${key}" type="number" min="1" max="${OPT.max_skill - 1}" value="${st.from}">
-    <span>Target</span>
-    <div class="targets">${[150, 225, 300].map(t => `<button type="button" class="chip" data-t="${t}" aria-pressed="${st.to === t}">${t}</button>`).join("")}
-      <input type="number" min="2" max="${OPT.max_skill}" placeholder="other" aria-label="Custom target" value="${custom ? st.to : ""}"></div>`;
-  const fromIn = $(`#from-${key}`, box);
-  fromIn.onchange = () => {
-    st.from = clamp(+fromIn.value, 1, OPT.max_skill - 1);
-    if (st.to <= st.from) st.to = nextMilestone(st.from);
-    saveProfs(); onchange();
-  };
-  box.querySelectorAll(".targets .chip").forEach(b => b.onclick = () => {
-    if (+b.dataset.t <= st.from) return;
-    st.to = +b.dataset.t; saveProfs(); onchange();
-  });
-  const ci = $(".targets input", box);
-  ci.onchange = () => { if (ci.value === "") return; st.to = clamp(+ci.value, st.from + 1, OPT.max_skill); saveProfs(); onchange(); };
-  return box;
+/* Tooltip */
+function showTip(html, x, y) {
+  const t = $("#tip"); t.innerHTML = html; t.hidden = false;
+  const r = t.getBoundingClientRect();
+  t.style.left = Math.max(8, Math.min(window.innerWidth - r.width - 8, x + 12)) + "px";
+  t.style.top = Math.max(8, Math.min(window.innerHeight - r.height - 8, y + 14)) + "px";
 }
+const hideTip = () => { const t = $("#tip"); if (t) t.hidden = true; };
 
-/* ---------------- Overview ---------------- */
+/* ---------------- Overview: one segmented bar per profession ---------------- */
 
-function renderOverview() {
+const tierOf = to => TIERS.findIndex(t => to <= t.cap);
+
+async function renderOverview() {
   const profs = [...OPT.professions].sort((a, b) => (profState(b.key).mine - profState(a.key).mine) || a.name.localeCompare(b.name));
-  $("#main").innerHTML = `<div class="meta">Cost from your current skill to each milestone: materials, recipes, trainer fees and profession ranks. Star your professions to keep them first.</div>
-    <div class="cards" id="cards"></div>`;
-  for (const p of profs) {
-    const card = document.createElement("section");
-    card.className = "card"; card.dataset.prof = p.key;
-    $("#cards").appendChild(card);
-    drawCard(card, p);
-  }
+  $("#main").innerHTML = `<div class="panel">
+    <div class="chart-head">
+      <div class="legend" aria-label="Legend">${TIERS.map((t, i) => `<span><i style="background:var(--m${i + 1})"></i>${i ? TIERS[i - 1].cap : 1}–${t.cap} ${t.name}</span>`).join("")}</div>
+      <div class="chips" role="group" aria-label="Bar width">
+        <button type="button" class="chip" data-scale="shared" aria-pressed="${SCALE === "shared"}">Same scale</button>
+        <button type="button" class="chip" data-scale="full" aria-pressed="${SCALE === "full"}">Full width</button>
+      </div>
+    </div>
+    <div class="meta">Cost from your skill to 300, split by milestone (materials, recipes, trainer fees and ranks). The line marks your target; textured blocks lie beyond it. Click a block to make its end your target; click a name to open its route.</div>
+    <div id="rows"></div>
+    <details class="note"><summary>Show as a table</summary><div id="table" class="table-wrap"></div></details>
+  </div>`;
+  document.querySelectorAll("[data-scale]").forEach(b => b.onclick = () => { SCALE = b.dataset.scale; store.set("scale", SCALE); renderOverview(); });
+  const rows = $("#rows");
+  const results = await Promise.all(profs.map(async p => {
+    const st = profState(p.key);
+    const div = document.createElement("div");
+    div.className = "prow"; rows.appendChild(div);
+    div.innerHTML = `${rowLabel(p, st)}<div class="bar-cell"><span class="src"><span class="spinner"></span>Pricing…</span></div><div class="ptotal"></div>`;
+    wireRow(div, p, st);
+    try {
+      return {p, st, div, d: await api("overview", {prof: p.key, from: st.from, to: Math.max(st.to, st.from + 1)})};
+    } catch (e) {
+      $(".bar-cell", div).innerHTML = `<div class="error">${esc(e.message)}</div>`;
+      return null;
+    }
+  }));
+  const ok = results.filter(Boolean);
+  const max = Math.max(1, ...ok.map(r => r.d.milestones.at(-1)?.total_copper || 0));
+  for (const r of ok) drawBar(r, max);
+  drawTable(ok);
 }
 
-function drawCard(card, p) {
-  const st = profState(p.key);
-  card.classList.toggle("mine", st.mine);
-  card.innerHTML = `<div class="card-head"><h2>${esc(p.name)}</h2>
-      <button class="star" type="button" aria-pressed="${st.mine}" title="${st.mine ? "Unstar" : "Star: one of my professions"}" aria-label="My profession">★</button></div>
-    <div class="slot"></div>
-    <div class="miles-wrap"><span class="src"><span class="spinner"></span>Pricing…</span></div>
-    <button type="button" class="open">Route to ${st.to} →</button>`;
-  $(".slot", card).replaceWith(skillInputs(p.key, st, () => drawCard(card, p)));
-  $(".star", card).onclick = () => { st.mine = !st.mine; saveProfs(); renderOverview(); };
-  $(".open", card).onclick = () => { location.hash = `#/${p.key}`; };
-  loadMilestones(card, p, st);
+function rowLabel(p, st) {
+  return `<div><div class="pname">
+      <button class="star" type="button" aria-pressed="${st.mine}" title="${st.mine ? "Unstar" : "Star: one of my professions"}" aria-label="My profession">★</button>
+      <button class="name" type="button">${esc(p.name)}</button></div>
+    <div class="pctl"><label>skill <input class="small-input from" type="number" min="1" max="${OPT.max_skill - 1}" value="${st.from}"></label>
+      <label>→ target <input class="small-input to" type="number" min="2" max="${OPT.max_skill}" value="${st.to}"></label></div></div>`;
 }
 
-async function loadMilestones(card, p, st) {
-  const wrap = $(".miles-wrap", card);
-  try {
-    const d = await api("overview", {prof: p.key, from: st.from, to: st.to});
-    if (!card.isConnected || !wrap.isConnected) return;
-    const max = Math.max(...d.milestones.map(m => m.total_copper), 1);
-    wrap.innerHTML = `<table class="miles">` + d.milestones.map(m => `
-      <tr class="${m.to === st.to ? "sel" : ""}"><td>${st.from} → ${m.to}${m.reached < m.to ? ` <span class="badge">stuck at ${m.reached}</span>` : ""}</td>
-        <td style="width:40%"><div class="bar"><span style="width:${(m.total_copper / max * 100).toFixed(1)}%"></span></div></td>
-        <td class="num">${money(m.total_copper)}</td></tr>`).join("") + `</table>`;
-  } catch (e) {
-    wrap.innerHTML = `<div class="error">${esc(e.message)}</div>`;
+function wireRow(div, p, st) {
+  $(".star", div).onclick = () => { st.mine = !st.mine; saveProfs(); renderOverview(); };
+  $(".name", div).onclick = () => { location.hash = `#/${p.key}`; };
+  $(".from", div).onchange = e => { st.from = clamp(+e.target.value, 1, OPT.max_skill - 1); if (st.to <= st.from) st.to = nextMilestone(st.from); saveProfs(); renderOverview(); };
+  $(".to", div).onchange = e => { st.to = clamp(+e.target.value, st.from + 1, OPT.max_skill); saveProfs(); renderOverview(); };
+}
+
+function segments(d, st) {
+  // Cost of each stretch between goals (milestones and your target), from the cumulative plans.
+  const goals = d.milestones;
+  let prevTo = st.from, prevCost = 0;
+  return goals.map(g => {
+    const seg = {from: prevTo, to: g.to, cost: Math.max(0, g.total_copper - prevCost), cum: g.total_copper, reached: g.reached, tier: tierOf(g.to)};
+    prevTo = g.to; prevCost = g.total_copper;
+    return seg;
+  });
+}
+
+function drawBar({p, st, div, d}, max) {
+  const segs = segments(d, st);
+  const total300 = d.milestones.at(-1)?.total_copper || 0;
+  const scaleTo = SCALE === "full" ? Math.max(total300, 1) : max;
+  const toTarget = d.milestones.find(m => m.to === st.to);
+  const cell = $(".bar-cell", div);
+  cell.innerHTML = `<div class="bar" role="img" aria-label="${esc(p.name)}: ${segs.map(s => `${s.from} to ${s.to} ${moneyText(s.cost)}`).join(", ")}">` +
+    segs.map((s, i) => `<div class="seg ${s.from >= st.to ? "past" : ""}" tabindex="0" data-i="${i}"
+      style="flex:0 0 ${(s.cost / scaleTo * 100).toFixed(3)}%;background:var(--m${s.tier + 1});color:var(--m${s.tier + 1}-ink)"><span>${moneyText(s.cost)}</span></div>`).join("") +
+    `</div>`;
+  // Marker at your target (where the textured, beyond-target blocks start).
+  const past = cell.querySelector(".seg.past");
+  if (past) {
+    const bar = cell.querySelector(".bar");
+    const mark = document.createElement("div");
+    mark.className = "target-mark"; mark.title = `Your target: ${st.to}`;
+    mark.style.left = (past.offsetLeft - 2) + "px";
+    bar.appendChild(mark);
   }
+  // A label that doesn't fit is removed (never clipped); hover/table still carry it.
+  cell.querySelectorAll(".seg").forEach(el => { const sp = el.querySelector("span"); if (sp.offsetWidth + 10 > el.clientWidth) sp.remove(); });
+  cell.querySelectorAll(".seg").forEach(el => {
+    const s = segs[+el.dataset.i];
+    const tip = () => `<b>${esc(p.name)} ${s.from} → ${s.to}</b><br>${TIERS[s.tier].name} stretch: ${money(s.cost)}<br>From ${st.from}: ${money(s.cum)}${s.reached < s.to ? `<br>Stuck at ${s.reached}` : ""}<br><span style="opacity:.8">Click to set target ${s.to}</span>`;
+    el.onmousemove = e => showTip(tip(), e.clientX, e.clientY);
+    el.onmouseleave = hideTip;
+    el.onfocus = () => { const r = el.getBoundingClientRect(); showTip(tip(), r.left, r.bottom); };
+    el.onblur = hideTip;
+    const pick = () => { st.to = s.to; saveProfs(); hideTip(); renderOverview(); };
+    el.onclick = pick;
+    el.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(); } };
+  });
+  $(".ptotal", div).innerHTML = toTarget
+    ? `<div class="big">${money(toTarget.total_copper)}</div><div class="src">to ${st.to}</div>${st.to !== 300 ? `<div class="src">300: ${money(total300)}</div>` : ""}`
+    : `<div class="src">300: ${money(total300)}</div>`;
+}
+
+function drawTable(results) {
+  const cols = OPT.milestones;
+  $("#table").innerHTML = `<table class="t"><thead><tr><th>Profession</th><th class="num">From</th>${cols.map(c => `<th class="num">to ${c}</th>`).join("")}</tr></thead><tbody>` +
+    results.map(({p, st, d}) => `<tr><td>${esc(p.name)}</td><td class="num">${st.from}</td>${cols.map(c => {
+      const m = d.milestones.find(x => x.to === c); return `<td class="num">${m ? money(m.total_copper) : "—"}</td>`;
+    }).join("")}</tr>`).join("") + `</tbody></table>`;
 }
 
 /* ---------------- Profession page ---------------- */
@@ -331,12 +439,21 @@ async function renderProfession(key) {
   const p = OPT.professions.find(x => x.key === key);
   const st = profState(key);
   const main = $("#main");
+  const custom = !OPT.milestones.includes(st.to);
   main.innerHTML = `<div class="panel">
     <button class="back" type="button">← All professions</button>
-    <div class="prof-head"><h2>${esc(p.name)}</h2><div class="slot"></div></div>
+    <div class="prof-head"><h2>${esc(p.name)}</h2>
+      <div class="inputs"><label>Your skill <input id="pfrom" class="small-input" type="number" min="1" max="${OPT.max_skill - 1}" value="${st.from}"></label>
+        <span>Target</span><div class="targets">${[150, 225, 300].map(t => `<button type="button" class="chip" data-t="${t}" aria-pressed="${st.to === t}">${t}</button>`).join("")}
+        <input class="small-input" type="number" min="2" max="${OPT.max_skill}" placeholder="other" aria-label="Custom target" value="${custom ? st.to : ""}"></div></div>
+    </div>
     <div id="detail"><span class="src"><span class="spinner"></span>Planning…</span></div></div>`;
-  $(".slot", main).replaceWith(skillInputs("p-" + key, st, () => renderProfession(key)));
+  const redo = () => { saveProfs(); renderProfession(key); };
   $(".back", main).onclick = () => { location.hash = "#/"; };
+  $("#pfrom").onchange = () => { st.from = clamp(+$("#pfrom").value, 1, OPT.max_skill - 1); if (st.to <= st.from) st.to = nextMilestone(st.from); redo(); };
+  main.querySelectorAll(".targets .chip").forEach(b => b.onclick = () => { if (+b.dataset.t > st.from) { st.to = +b.dataset.t; redo(); } });
+  const ci = $(".targets input", main);
+  ci.onchange = () => { if (ci.value !== "") { st.to = clamp(+ci.value, st.from + 1, OPT.max_skill); redo(); } };
   try {
     const d = await api("plan", {prof: key, from: st.from, to: st.to});
     if (location.hash !== `#/${key}`) return;
@@ -348,19 +465,14 @@ async function renderProfession(key) {
 
 const where = n => esc(n.zone || "") + (n.x == null || n.y == null ? "" : ` (${n.x.toFixed(1)}, ${n.y.toFixed(1)})`);
 
-function trainersHtml(list, label = "Where to train") {
+function npcList(list, label, priced) {
   if (!list || !list.length) return "";
-  return `<details class="where"><summary>${label} (${list.length})</summary><ul>` + list.map(t =>
-    `<li>${esc(t.name)} <span class="src">${esc(t.title)}</span> — ${where(t)}${t.seen ? "" : ' <span class="unseen">not yet seen in Forever</span>'}</li>`
+  return `<details class="where"><summary>${label} (${list.length})</summary><ul>` + list.map(n =>
+    `<li>${wh("npc", n.id, n.name)} <span class="src">${esc(n.title || "")}</span> — ${where(n)}${priced ? " · " + money(n.price_copper) : ""}${n.seen ? "" : ' <span class="unseen">not yet seen in Forever</span>'}</li>`
   ).join("") + `</ul></details>`;
 }
-
-function vendorsHtml(list) {
-  if (!list || !list.length) return "";
-  return `<details class="where"><summary>Where to buy (${list.length})</summary><ul>` + list.map(v =>
-    `<li>${esc(v.name)} <span class="src">${esc(v.title || "")}</span> — ${where(v)} · ${money(v.price_copper)}${v.seen ? "" : ' <span class="unseen">not yet seen in Forever</span>'}</li>`
-  ).join("") + `</ul></details>`;
-}
+const trainersHtml = (list, label = "Where to train") => npcList(list, label, false);
+const vendorsHtml = list => npcList(list, "Where to buy", true);
 
 function rankCost(r) {
   if (r.how === "quest") return '<span class="src">quest</span>';
@@ -380,35 +492,110 @@ function rankRow(r) {
     <td class="lc"></td><td class="num"></td><td class="num">${rankCost(r)}</td></tr>`;
 }
 
+function needSummary(p) {
+  const level = Math.max(0, ...p.ranks.map(r => r.level || 0));
+  const levelBy = p.ranks.find(r => r.level === level);
+  const by = how => p.learn.filter(l => l.how === how);
+  const sum = list => list.reduce((a, l) => a + (l.cost_copper || 0), 0);
+  const trainers = by("trainer"), vendors = by("vendor"), ah = by("recipe");
+  const buy = [...p.buy].map(b => ({...b, total: (b.unit_price_copper ?? 0) * b.quantity})).sort((a, b) => b.total - a.total);
+  const craft = Object.entries(p.craft_first);
+  const recipeLines = [
+    trainers.length && `${trainers.length} from trainers · ${money(sum(trainers))}`,
+    vendors.length && `${vendors.length} from vendors · ${money(sum(vendors))}`,
+    ah.length && `${ah.length} recipe item${ah.length > 1 ? "s" : ""} on the AH · ${money(sum(ah))}`,
+  ].filter(Boolean);
+  return `<div class="need">
+    <div><h4>Total</h4><div class="total">${money(p.grand_total_copper)}</div>
+      <div class="src">${p.steps.reduce((a, s) => a + ceil(s.expected_crafts), 0).toLocaleString()} crafts · ${p.start} → ${p.reached}${p.reached < p.target ? ` (stuck, target ${p.target})` : ""}</div></div>
+    <div><h4>Character</h4><ul>
+      <li>${level ? `Level ${level} <span class="src">(for ${esc(levelBy.name)})</span>` : "No level requirement"}</li>
+      ${p.ranks.map(r => `<li>${{book: "Learn", quest: "Quest for"}[r.how] || "Train"} ${esc(r.name)} ${r.before ? `by ${r.before}` : "first"} · ${rankCost(r)}</li>`).join("")}</ul></div>
+    <div><h4>Recipes to learn</h4><ul>${recipeLines.length ? recipeLines.map(l => `<li>${l}</li>`).join("") : "<li>None</li>"}</ul>
+      <button class="linkish" type="button" data-go="recipes">See where</button></div>
+    <div><h4>Materials · ${money(p.total_cost_copper + p.sell_credit_copper)}</h4><ul>
+      ${buy.slice(0, 4).map(b => `<li>${ceil(b.quantity).toLocaleString()} × ${wh("item", b.item_id, b.name)}</li>`).join("")}
+      ${buy.length > 4 ? `<li class="src">+ ${buy.length - 4} more</li>` : ""}</ul>
+      <button class="linkish" type="button" data-go="materials">Shopping list</button></div>
+    ${craft.length || p.tools.length ? `<div><h4>Make first</h4><ul>
+      ${craft.map(([n, q]) => `<li>${ceil(q).toLocaleString()} × ${esc(n)}</li>`).join("")}
+      ${p.tools.map(t => `<li>Tool: ${wh("item", t.item_id, t.name)}</li>`).join("")}</ul></div>` : ""}
+  </div>`;
+}
+
 function drawDetail(d) {
   const p = d.plan;
   const learnBy = Object.fromEntries(p.learn.map(l => [l.recipe, l]));
   let h = "";
-  if (p.reached < p.target) h += `<div class="error">Stuck at ${p.reached}: no allowed recipe skills up past this with known prices. Try allowing AH recipe items.</div>`;
+  if (p.reached < p.target) h += `<div class="error">Stuck at ${p.reached}: no allowed recipe skills up past this with known prices. Try allowing more recipe sources.</div>`;
+  h += needSummary(p);
   h += `<div class="strip">
-    <div><div class="lbl">Total</div><div class="big">${money(p.grand_total_copper)}</div></div>
     <div><div class="lbl">Materials</div><div>${money(p.total_cost_copper + p.sell_credit_copper)}</div></div>
     ${p.sell_back ? `<div><div class="lbl">Sold ${p.sell_back === "vendor" ? "to vendor" : "on AH"}</div><div>${money(-p.sell_credit_copper)}</div></div>` : ""}
     <div><div class="lbl">Recipes &amp; trainer</div><div>${money(p.learn_cost_copper)}</div></div>
     <div><div class="lbl">Ranks</div><div>${money(p.ranks_cost_copper)}</div></div>
     ${p.tools_cost_copper ? `<div><div class="lbl">Tools</div><div>${money(p.tools_cost_copper)}</div></div>` : ""}
-    <div><div class="lbl">Crafts</div><div>${p.steps.reduce((a, s) => a + ceil(s.expected_crafts), 0).toLocaleString()}</div></div>
+    <div><div class="lbl">Total</div><div><b>${money(p.grand_total_copper)}</b></div></div>
   </div>
   <div class="views" role="tablist">${["route", "materials", "recipes"].map(v =>
     `<button class="view" type="button" role="tab" data-v="${v}" aria-selected="${VIEW === v}">${{route: "Route", materials: "Materials", recipes: "Recipes & ranks"}[v]}</button>`).join("")}</div>
   <div id="view"></div>`;
-  if (d.foreverdb) h += `<div class="note">Recipe sources, trainer fees, vendor prices and locations: <a href="https://foreverdb.net" target="_blank" rel="noopener">Data from ForeverDB.net</a>. Prices: TradeSkillMaster (${esc(d.auction_house)}, ${esc(PRICE_LABEL[d.price_field] || d.price_field)}).</div>`;
+  if (d.foreverdb) h += `<div class="note">Recipe sources, trainer fees, vendor prices and locations: <a href="https://foreverdb.net" target="_blank" rel="noopener">Data from ForeverDB.net</a>. Prices: TradeSkillMaster (${esc(d.auction_house)}, ${esc(PRICE_LABEL[d.price_field] || d.price_field)}). Links go to <a href="https://www.wowhead.com/${SETTINGS.wh}" target="_blank" rel="noopener">Wowhead</a>.</div>`;
   h += `<div class="note">Quantities are expected values; buy a little extra. Min buyout is the cheapest single listing, so large orders will cost more.</div>`;
   $("#detail").innerHTML = h;
-  $("#detail").querySelectorAll(".view").forEach(b => b.onclick = () => { VIEW = b.dataset.v; store.set("view", VIEW); drawDetail(d); });
+  const setView = v => { VIEW = v; store.set("view", VIEW); drawDetail(d); $("#view").scrollIntoView({block: "nearest"}); };
+  $("#detail").querySelectorAll(".view").forEach(b => b.onclick = () => setView(b.dataset.v));
+  $("#detail").querySelectorAll("[data-go]").forEach(b => b.onclick = () => setView(b.dataset.go));
   $("#view").innerHTML = VIEW === "materials" ? materialsView(p) : VIEW === "recipes" ? recipesView(p) : routeView(p, learnBy);
+  $("#view").querySelectorAll(".bd-toggle").forEach(b => b.onclick = () => {
+    const row = b.closest("tr").nextElementSibling;
+    row.hidden = !row.hidden;
+    b.setAttribute("aria-expanded", String(!row.hidden));
+    b.textContent = row.hidden ? "Cost breakdown ▸" : "Cost breakdown ▾";
+  });
+}
+
+function chanceHtml(s) {
+  const name = c => c[0].toUpperCase() + c.slice(1);
+  const a = `<span class="dot d-${s.colour_from}"></span>${name(s.colour_from)} ${pct(s.chance_from)}`;
+  const b = `<span class="dot d-${s.colour_to}"></span>${name(s.colour_to)} ${pct(s.chance_to)}`;
+  const same = s.colour_from === s.colour_to && s.chance_from === s.chance_to;
+  return `<div class="chance" title="Orange until ${s.skill[1]}, yellow until ${s.skill[2]}, green until ${s.skill[3]}">${same ? a : `${a} → ${b}`}</div>`;
+}
+
+function costBreakdown(s, p) {
+  const crafts = s.expected_crafts;
+  const matTotal = s.materials.reduce((a, m) => a + (m.unit_copper ?? 0) * m.total, 0);
+  let h = `<div class="cost-body">
+    <div class="src">${qty(crafts)} expected crafts for ${s.to - s.from} points (${(crafts / (s.to - s.from)).toFixed(2)} per point)</div>
+    <div class="table-wrap"><table class="mini"><thead><tr><th>Material</th><th class="num">Per craft</th><th class="num">Total</th><th class="num">Listed (AH)</th><th class="num">You pay</th><th class="num">Vendor sells for</th><th class="num">Cost</th></tr></thead><tbody>` +
+    s.materials.map(m => `<tr><td>${wh("item", m.item_id, m.name)}</td><td class="num">${qty(m.per_craft)}</td><td class="num">${qty(m.total)}</td>
+      <td class="num">${m.ah_copper == null ? '<span class="src">not listed</span>' : money(m.ah_copper)}</td>
+      <td class="num">${money(m.unit_copper)} <span class="src">${esc(m.source)}</span></td>
+      <td class="num">${m.vendor_sell_copper == null ? '<span class="src">—</span>' : money(m.vendor_sell_copper)}</td>
+      <td class="num">${money((m.unit_copper ?? 0) * m.total)}</td></tr>`).join("") +
+    `<tr class="sum"><td colspan="6">Materials</td><td class="num">${money(matTotal)}</td></tr></tbody></table></div>`;
+  if (s.product) {
+    const pr = s.product;
+    h += `<div class="table-wrap"><table class="mini"><thead><tr><th>Makes</th><th class="num">Per craft</th><th class="num">Total</th><th class="num">Listed (AH)</th><th class="num">Vendor sells for</th><th class="num">Credited each</th><th class="num">Credit</th></tr></thead><tbody>
+      <tr><td>${wh("item", pr.item_id, pr.name)}</td><td class="num">${qty(pr.per_craft)}</td><td class="num">${qty(pr.total)}</td>
+        <td class="num">${pr.ah_copper == null ? '<span class="src">not listed</span>' : money(pr.ah_copper)}</td>
+        <td class="num">${pr.vendor_sell_copper == null ? '<span class="src">—</span>' : money(pr.vendor_sell_copper)}</td>
+        <td class="num">${p.sell_back ? money(pr.credit_each_copper) : '<span class="src">kept</span>'}</td>
+        <td class="num">${p.sell_back ? money(-s.credit_copper) : "—"}</td></tr></tbody></table></div>`;
+  }
+  h += `<div><b>Step cost: ${money(s.cost_copper)}</b>${s.cost_copper < 0 ? ` <span class="src">— a profit only if all ${qty(s.product.total)} sell at ${p.sell_back === "ah" ? "the listed price (after the 5% cut and deposit)" : "the vendor price"}</span>` : ""}</div>`;
+  return h + `</div>`;
 }
 
 function routeView(p, learnBy) {
   const colors = {};
   [...new Set(p.steps.map(s => s.recipe))].forEach((r, i) => colors[r] = SWATCH[i % SWATCH.length]);
   const span = p.target - p.start;
-  let h = `<div class="route">` + p.steps.map(s =>
+  let h = `<div class="formula"><b>Skill-up chance:</b> a recipe always gives a point while it is <span class="dot d-orange"></span>orange (below its yellow level).
+    From yellow on, the chance falls in a straight line to 0 at grey: <code>chance = (grey − skill) ÷ (grey − yellow)</code>.
+    Each point is costed as <code>craft cost ÷ chance</code> (expected crafts = 1 ÷ chance), so a recipe gets dearer as it greys out and the route switches recipe when another is cheaper per point.</div>`;
+  h += `<div class="route">` + p.steps.map(s =>
     `<div style="width:${((s.to - s.from) / span * 100).toFixed(2)}%;background:${colors[s.recipe]}" title="${esc(s.recipe)}: ${s.from}–${s.to}"></div>`).join("") +
     `</div><div class="route-scale"><span>${p.start}</span><span>${p.target}</span></div>`;
   h += `<div class="table-wrap"><table class="t"><thead><tr><th>Skill</th><th>Recipe</th><th class="lc">Learn</th><th class="num">Crafts</th><th class="num">Cost</th></tr></thead><tbody>`;
@@ -424,11 +611,14 @@ function routeView(p, learnBy) {
       learn += `<div class="src">${l.cost_copper === null ? "fee unknown" : (l.fee_from === "classic" ? "~" : "") + money(l.cost_copper)}</div>`;
       if (l.how === "trainer") extra = trainersHtml(l.trainers);
       else if (l.how === "vendor") extra = vendorsHtml(l.vendors);
-      else if (l.how === "recipe") extra = `<div class="src">Buy ${l.recipe_items.map(i => esc(i.name)).join(" / ")} on the AH</div>`;
+      else if (l.how === "recipe") extra = `<div class="src">Buy ${l.recipe_items.map(i => wh("item", i.item_id, i.name)).join(" / ")} on the AH</div>`;
     }
     const low = s.low_chance ? `<span class="badge" title="About ${s.crafts_per_point.toFixed(1)} crafts per skill point">low chance</span>` : "";
-    h += `<tr><td class="money">${s.from}–${s.to}</td><td><span class="sw" style="background:${colors[s.recipe]}"></span>${esc(s.recipe)}${low}${extra}</td>
-      <td class="lc">${learn}</td><td class="num">${ceil(s.expected_crafts)}</td><td class="num">${money(s.cost_copper)}</td></tr>`;
+    h += `<tr><td class="money">${s.from}–${s.to}</td>
+      <td><span class="sw" style="background:${colors[s.recipe]}"></span>${wh("spell", s.spell, s.recipe)}${low}${chanceHtml(s)}${extra}
+        <button type="button" class="linkish bd-toggle" aria-expanded="false">Cost breakdown ▸</button></td>
+      <td class="lc">${learn}</td><td class="num">${ceil(s.expected_crafts)}</td><td class="num">${money(s.cost_copper)}</td></tr>
+      <tr class="bd-row" hidden><td></td><td colspan="4">${costBreakdown(s, p)}</td></tr>`;
   }
   for (const r of pending) h += rankRow(r);
   return h + `</tbody></table></div>`;
@@ -440,9 +630,9 @@ function materialsView(p) {
   if (cf.length) h += `<h3 style="margin-top:0">Craft these first (cheaper than buying)</h3><ul class="plain">` + cf.map(([n, q]) => `<li>${ceil(q)} × ${esc(n)}</li>`).join("") + `</ul>`;
   const buy = [...p.buy].map(b => ({...b, total: b.unit_price_copper == null ? Infinity : b.unit_price_copper * b.quantity})).sort((a, b) => b.total - a.total);
   h += `<h3${cf.length ? "" : ' style="margin-top:0"'}>Shopping list</h3><div class="table-wrap"><table class="t"><thead><tr><th class="num">Qty</th><th>Item</th><th class="num">Each</th><th class="num">Total</th></tr></thead><tbody>` +
-    buy.map(b => `<tr><td class="num">${ceil(b.quantity)}</td><td>${esc(b.name)} <span class="src">${esc(b.price_source)}</span></td>
+    buy.map(b => `<tr><td class="num">${ceil(b.quantity)}</td><td>${wh("item", b.item_id, b.name)} <span class="src">${esc(b.price_source)}</span></td>
       <td class="num">${money(b.unit_price_copper)}</td><td class="num">${b.total === Infinity ? "n/a" : money(b.total)}</td></tr>`).join("") + `</tbody></table></div>`;
-  if (p.tools.length) h += `<h3>Tools needed once</h3><ul class="plain">` + p.tools.map(t => `<li>${esc(t.name)}: ${money(t.cost_copper)}</li>`).join("") + `</ul>`;
+  if (p.tools.length) h += `<h3>Tools needed once</h3><ul class="plain">` + p.tools.map(t => `<li>${wh("item", t.item_id, t.name)}: ${money(t.cost_copper)}</li>`).join("") + `</ul>`;
   if (p.unpriced.length) h += `<div class="error" style="margin-top:14px">No price found for: ${p.unpriced.map(esc).join(", ")}</div>`;
   if (p.no_sell_price && p.no_sell_price.length) h += `<div class="warn" style="margin-top:14px">No sell price for: ${p.no_sell_price.map(esc).join(", ")} (counted as 0).</div>`;
   return h;
@@ -458,8 +648,8 @@ function recipesView(p) {
                 assumed: ' <span class="src" title="Unknown; assumed to be the recipe\'s yellow level">est.</span>'};
   if (p.learn.length) {
     h += `<h3${p.ranks.length ? "" : ' style="margin-top:0"'}>Recipes to learn</h3><div class="table-wrap"><table class="t"><thead><tr><th>Recipe</th><th>From</th><th class="num">Learn at</th><th class="num">Cost</th></tr></thead><tbody>` +
-      [...p.learn].sort((a, b) => a.learn_level - b.learn_level || a.recipe.localeCompare(b.recipe)).map(l => `<tr><td>${esc(l.recipe)}${l.how === "trainer" ? trainersHtml(l.trainers) : l.how === "vendor" ? vendorsHtml(l.vendors) : ""}</td>
-        <td>${l.how === "recipe" ? "AH: " + l.recipe_items.map(i => esc(i.name)).join(" / ") : l.how === "vendor" ? "Vendor" : "Trainer"}</td>
+      [...p.learn].sort((a, b) => a.learn_level - b.learn_level || a.recipe.localeCompare(b.recipe)).map(l => `<tr><td>${wh("spell", l.spell, l.recipe)}${l.how === "trainer" ? trainersHtml(l.trainers) : l.how === "vendor" ? vendorsHtml(l.vendors) : ""}</td>
+        <td>${l.how === "recipe" ? "AH: " + l.recipe_items.map(i => wh("item", i.item_id, i.name)).join(" / ") : l.how === "vendor" ? "Vendor" : "Trainer"}</td>
         <td class="num">${l.learn_level}${NOTE[l.learn_from] || ""}</td>
         <td class="num">${l.cost_copper === null ? '<span class="src">fee unknown</span>' : (l.fee_from === "classic" ? '<span class="src">~</span>' : "") + money(l.cost_copper)
           + (l.fee_from === "forever" ? ' <span class="src" title="Fee players saw at a Forever trainer">seen</span>' : "")}</td></tr>`).join("") + `</tbody></table></div>`;
@@ -469,6 +659,7 @@ function recipesView(p) {
   return h;
 }
 
+window.addEventListener("scroll", hideTip, {passive: true});
 init().catch(e => { $("#main").innerHTML = `<div class="error">Could not start: ${esc(e.message)}</div>`; });
 </script>
 </body>

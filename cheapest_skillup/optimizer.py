@@ -42,6 +42,8 @@ class Step:
     expected_crafts: float
     cost: float  # copper, expected, after any sell-back credit
     credit: float = 0.0  # copper recovered by selling what this step crafts
+    # Per craft: (item, quantity, cost each, recipe that crafts it or None if bought)
+    mats: list[tuple[int, float, float, Recipe | None]] = field(default_factory=list)
 
     @property
     def crafts_per_point(self) -> float:
@@ -254,7 +256,8 @@ class Optimizer:
                 s.end, s.expected_crafts, s.cost = skill + 1, s.expected_crafts + 1 / p, s.cost + cost
                 s.credit += credit
             else:
-                steps.append(Step(best, skill, skill + 1, 1 / p, cost, credit))
+                mats = [(item, qty, *self.unit_cost(item, skill)) for item, qty in best.reagents.items()]
+                steps.append(Step(best, skill, skill + 1, 1 / p, cost, credit, mats))
         skill = start + len(chosen)
 
         buy: dict[int, float] = defaultdict(float)

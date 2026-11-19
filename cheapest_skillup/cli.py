@@ -74,8 +74,17 @@ def where_at(trainers: list[dict], n: int = 3) -> str:
 
 
 def trainer_json(trainers: list[dict]) -> list[dict]:
-    return [{"name": t["name"], "title": t["title"], "zone": t["zone"], "x": t["x"], "y": t["y"], "seen": t["seen"]}
-            for t in trainers]
+    return [{"id": t.get("id"), "name": t["name"], "title": t["title"], "zone": t["zone"], "x": t["x"], "y": t["y"],
+             "seen": t["seen"]} for t in trainers]
+
+
+def colour(r, skill: int) -> str:
+    """The recipe's colour at `skill`: orange (always skills up), yellow, green or grey."""
+    if skill < r.yellow:
+        return "orange"
+    if skill < r.green:
+        return "yellow"
+    return "green" if skill < r.grey else "grey"
 
 
 def rank_line(rank, cost) -> str:
@@ -194,7 +203,7 @@ def plan_to_dict(plan: Plan, prices: PriceBook, vendor_names: dict[int, str], si
         "grand_total_copper": round(plan.grand_total),
         "learn": [
             {"recipe": r.name, "spell": r.spell, "how": how_of(plan, r), "cost_copper": c,
-             "vendors": [{"name": v["name"], "title": v["title"], "zone": v["zone"], "x": v["x"], "y": v["y"],
+             "vendors": [{"id": v.get("id"), "name": v["name"], "title": v["title"], "zone": v["zone"], "x": v["x"], "y": v["y"],
                           "seen": v["seen"], "price_copper": v["price"]} for v in plan.profession.vendors_for(r, side)]
              if how_of(plan, r) == "vendor" else [], "learn_level": r.orange,
              "learn_level_known": r.learn_known, "learn_from": r.learn_from, "fee_from": r.fee_from,
@@ -205,7 +214,22 @@ def plan_to_dict(plan: Plan, prices: PriceBook, vendor_names: dict[int, str], si
         "sell_credit_copper": round(plan.sell_credit),
         "no_sell_price": [item_name(i, prices, vendor_names) for i in sorted(plan.no_sell_price)],
         "steps": [
-            {"recipe": s.recipe.name, "how": how_of(plan, s.recipe), "crafts_per_point": round(s.crafts_per_point, 2),
+            {"recipe": s.recipe.name, "spell": s.recipe.spell, "makes": s.recipe.makes,
+             "how": how_of(plan, s.recipe), "crafts_per_point": round(s.crafts_per_point, 2),
+             "skill": [s.recipe.orange, s.recipe.yellow, s.recipe.green, s.recipe.grey],
+             "chance_from": round(s.recipe.skillup_chance(s.start), 3), "chance_to": round(s.recipe.skillup_chance(s.end - 1), 3),
+             "colour_from": colour(s.recipe, s.start), "colour_to": colour(s.recipe, s.end - 1),
+             "materials": [{"item_id": item, "name": item_name(item, prices, vendor_names), "per_craft": qty,
+                            "total": round(qty * s.expected_crafts, 2),
+                            "unit_copper": None if each == float("inf") else round(each),
+                            "source": f"craft: {maker.name}" if maker else prices.quote(item).source,
+                            "ah_copper": prices.ah_price(item), "vendor_sell_copper": prices.vendor_sell.get(item)}
+                           for item, qty, each, maker in s.mats],
+             "product": None if not s.recipe.makes else {
+                 "item_id": s.recipe.makes, "name": item_name(s.recipe.makes, prices, vendor_names),
+                 "per_craft": s.recipe.makes_qty, "total": round(s.recipe.makes_qty * s.expected_crafts, 2),
+                 "ah_copper": prices.ah_price(s.recipe.makes), "vendor_sell_copper": prices.vendor_sell.get(s.recipe.makes),
+                 "credit_each_copper": prices.sell_value(s.recipe.makes, plan.sell_back) if plan.sell_back else 0},
              "low_chance": s.low_chance, "from": s.start, "to": s.end, "expected_crafts": round(s.expected_crafts, 2), "cost_copper": round(s.cost), "credit_copper": round(s.credit)}
             for s in plan.steps
         ],

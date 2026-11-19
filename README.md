@@ -7,11 +7,15 @@ is.
 
 No API key and no dependencies, just Python 3.10+.
 
-![Overview: cost from your skill to each milestone, per profession](docs/images/overview.png)
+![Overview: one bar per profession, split by milestone](docs/images/overview.png)
 
-| Route with ranks and trainer locations | Recipes, ranks and their sources |
+| What you need, and the route | Cost breakdown and skill-up chance per step |
 |---|---|
-| ![Route](docs/images/route.png) | ![Recipes and ranks](docs/images/recipes.png) |
+| ![Route](docs/images/route.png) | ![Cost breakdown](docs/images/breakdown.png) |
+
+| Recipes, ranks and their sources | |
+|---|---|
+| ![Recipes and ranks](docs/images/recipes.png) | |
 
 | Dark mode | Phone |
 |---|---|
@@ -30,14 +34,29 @@ Always run the commands from inside the folder that contains `cheapest_skillup`.
 
 ## The app
 
-**Overview.** There is one card per profession. Enter your current skill and pick a target: 150, 225,
-300, or any other number. The card shows the cost from your skill to each milestone, with your target
-highlighted. Star your own professions to keep them at the top. Your entries are saved in your browser.
+**Overview.** A bar chart with one bar per profession, running from your current skill to 300. Each bar
+is split into milestone blocks, shaded light to dark: 1–75 Apprentice, 75–150 Journeyman, 150–225
+Expert and 225–300 Artisan. Each block's width is what that stretch costs.
+* *Same scale* compares professions on one axis; *Full width* shows each profession's own split.
+* A line marks your target, and textured blocks lie beyond it.
+* Set your skill and target per profession, or click a block to make its end your target.
+* Hover a block for its cost and the total from your skill. Star your professions to keep them first.
+* *Show as a table* lists every number. Your entries are saved in your browser.
 
-**Profession page.** It opens with a cost summary: materials, anything you recover by selling, recipes
-and trainer fees, profession ranks and tools. Below it are three views:
+**Profession page.** It opens with **What you need**:
+* the total cost and number of crafts;
+* the character level the ranks require, and every rank with its cost;
+* how many recipes come from trainers, vendors and the AH, with their cost;
+* the biggest materials to buy, and what to craft first.
+
+A cost strip follows, then three views:
 
 * **Route:** the recipe to craft for each stretch of skill, with how many crafts and what they cost.
+  * Each step shows its colour and skill-up chance at the start and end (for example
+    *Orange 100% → Green 26%*).
+  * **Cost breakdown** opens each step's materials: per craft and in total, the AH listing, what you
+    pay and where, and what a vendor pays for it. It also shows the item made, with its AH listing,
+    vendor price and any sell-back credit.
   * Rank rows (*Train Journeyman*, *Learn Expert*, *Quest for Artisan*) appear where you hit each cap,
     with the skill and character level they need.
   * Every trainer step has a **Where to train** list for your auction house's faction: trainer name,
@@ -46,6 +65,9 @@ and trainer fees, profession ranks and tools. Below it are three views:
 * **Materials:** the shopping list, intermediates to craft yourself, and tools.
 * **Recipes & ranks:** every recipe and rank to learn, where it comes from, its learn level and its
   cost.
+
+Items, recipes, trainers and vendors link to Wowhead. The *Links* setting in the sidebar switches
+between Wowhead's WoW Forever and Classic pages.
 
 **Sidebar.** Here you choose your auction house (region, Normal or PvP, faction), which TSM price to buy
 at, whether to buy recipe items on the AH, what to do with crafted items (keep, sell to a vendor, or
@@ -93,9 +115,17 @@ For each reagent, the tool uses the cheapest of these:
 
 ## How the route is chosen
 
-At skill `s`, a recipe skills up with probability 1 below its yellow level,
-`(grey − s) / (grey − yellow)` from yellow to grey, and 0 from grey on. The expected cost of one point
-is `craft cost / probability`, and the cheapest recipe is picked for every point.
+Skill-up chance at skill `s` (the WoW formula):
+
+| Recipe colour | Skill | Chance |
+|---|---|---|
+| Orange | below yellow | 100% |
+| Yellow → green | yellow to grey | `(grey − s) / (grey − yellow)`, falling in a straight line |
+| Grey | grey and above | 0% |
+
+A point therefore takes `1 / chance` crafts on average and costs `craft cost / chance`. For example,
+Linen Belt is 100% until 50, 50% at 67 and 26% at 76, which is why a route moves on to another recipe
+once the current one gets dear per point. The cheapest recipe is picked for every point.
 
 The raw choice is then refined:
 
