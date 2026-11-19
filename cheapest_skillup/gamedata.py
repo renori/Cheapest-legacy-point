@@ -240,8 +240,10 @@ def main(argv: list[str] | None = None) -> int:
     for k, v in vendor["items"].items():
         it = items.get(int(k))
         if it and _i(it["BuyPrice"]):
-            v["price"], v["name"] = _i(it["BuyPrice"]), it["Display_lang"]
-    vendor["note"] = (f"Reagents sold by trade-supply vendors; buy prices from build {build}. "
+            # BuyPrice is for one purchase of VendorStackCount items (Empty Vial: 20c for 5); store per item.
+            v["price"] = round(_i(it["BuyPrice"]) / max(1, _i(it.get("VendorStackCount")) or 1), 2)
+            v["name"] = it["Display_lang"]
+    vendor["note"] = (f"Reagents sold by trade-supply vendors; price per item, from build {build}. "
                       "The planner uses whichever is cheaper: this price or the AH.")
     vpath.write_text(json.dumps(vendor, indent=2) + "\n", encoding="utf-8")
     print("Done.", file=sys.stderr)

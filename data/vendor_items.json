@@ -1,29 +1,29 @@
 {
-  "note": "Reagents sold by trade-supply vendors; buy prices from build 1.60.1.70959. The planner uses whichever is cheaper: this price or the AH.",
+  "note": "Reagents sold by trade-supply vendors; price per item, from build 1.60.1.70959. The planner uses whichever is cheaper: this price or the AH.",
   "items": {
     "159": {
       "name": "Refreshing Spring Water",
-      "price": 25
+      "price": 5.0
     },
     "2320": {
       "name": "Coarse Thread",
-      "price": 10
+      "price": 10.0
     },
     "2321": {
       "name": "Fine Thread",
-      "price": 100
+      "price": 100.0
     },
     "2324": {
       "name": "Bleach",
-      "price": 25
+      "price": 25.0
     },
     "2604": {
       "name": "Red Dye",
-      "price": 50
+      "price": 50.0
     },
     "2605": {
       "name": "Green Dye",
-      "price": 100
+      "price": 100.0
     },
     "2665": {
       "name": "Stormwind Seasoning Herbs",
@@ -31,55 +31,55 @@
     },
     "2678": {
       "name": "Mild Spices",
-      "price": 10
+      "price": 2.0
     },
     "2692": {
       "name": "Hot Spices",
-      "price": 40
+      "price": 40.0
     },
     "2880": {
       "name": "Weak Flux",
-      "price": 100
+      "price": 100.0
     },
     "3371": {
       "name": "Empty Vial",
-      "price": 20
+      "price": 4.0
     },
     "3372": {
       "name": "Leaded Vial",
-      "price": 200
+      "price": 40.0
     },
     "4289": {
       "name": "Salt",
-      "price": 50
+      "price": 50.0
     },
     "4340": {
       "name": "Gray Dye",
-      "price": 350
+      "price": 350.0
     },
     "4399": {
       "name": "Wooden Stock",
-      "price": 200
+      "price": 200.0
     },
     "4470": {
       "name": "Simple Wood",
-      "price": 38
+      "price": 38.0
     },
     "6217": {
       "name": "Copper Rod",
-      "price": 124
+      "price": 124.0
     },
     "6260": {
       "name": "Blue Dye",
-      "price": 50
+      "price": 50.0
     },
     "16072": {
       "name": "Expert Cookbook",
-      "price": 10000
+      "price": 10000.0
     },
     "16084": {
       "name": "Expert First Aid - Under Wraps",
-      "price": 10000
+      "price": 10000.0
     }
   }
 }

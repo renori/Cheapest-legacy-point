@@ -38,3 +38,16 @@ class VendorPrices(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class GameDataPrices(unittest.TestCase):
+    def test_sell_price_is_per_item_and_buy_price_per_purchase(self):
+        """The game's SellPrice is for one item; BuyPrice is for one purchase of VendorStackCount items."""
+        from cheapest_skillup.recipes import DATA_DIR
+        sell = json.loads((DATA_DIR / "vendor_sell.json").read_text())["items"]
+        self.assertEqual(sell["2589"]["sell"], 13)  # Linen Cloth: 13c each (not per stack of 20)
+        self.assertEqual(sell["4358"]["sell"], 30)  # Rough Dynamite: 30c each
+        vendor = json.loads((DATA_DIR / "vendor_items.json").read_text())["items"]
+        self.assertEqual(vendor["3371"]["price"], 4)  # Empty Vial: 20c buys 5
+        self.assertEqual(vendor["2678"]["price"], 2)  # Mild Spices: 10c buys 5
+        self.assertEqual(vendor["2320"]["price"], 10)  # Coarse Thread: sold singly
