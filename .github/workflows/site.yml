@@ -32,7 +32,7 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Tests (data importers, and the planner: unit tests and route snapshot)
+      - name: Tests (data importers; planner unit tests and route snapshot)
         run: python -m unittest
 
       - name: Build the site

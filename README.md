@@ -7,7 +7,7 @@ trainer fees and profession ranks, and shows where each trainer and vendor is.
 It's a static website: an hourly GitHub Action fetches prices and publishes the site to GitHub Pages,
 and the planner runs in your browser.
 
-**Site:** https://renori.github.io/cheapest-legacy-point/
+**Site:** https://renori.github.io/Cheapest-legacy-point/
 
 ![Overview: one bar per profession, split by milestone](docs/images/overview.png)
 
