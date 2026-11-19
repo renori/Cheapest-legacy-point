@@ -23,8 +23,7 @@ and the planner runs in your browser.
 |---|---|
 | ![Dark mode overview](docs/images/overview-dark.png) | ![Phone](docs/images/phone.png) |
 
-The screenshots come from the earlier local app; the site looks the same apart from the auction house
-picker.
+Screenshots from the live site (US, PvP, Horde prices on 19 Nov 2026).
 
 ## Using the site
 
