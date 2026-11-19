@@ -108,13 +108,14 @@ Prices are downloaded from `https://public-data.tradeskillmaster.com` and cached
 | `--realm`  | `pvp-horde` | Forever auction house: `normal-alliance`, `normal-horde`, `pvp-alliance`, `pvp-horde` |
 | `--price`  | `minBuyout` | TSM column to buy at: `minBuyout`, `marketValue`, `recent`, `historical` |
 
-For each reagent, the tool uses the cheapest of these:
+For each reagent, in this order:
 
-1. The auction-house price, or the region market value if nothing is listed.
-2. The vendor price: the cheapest vendor on your faction or a neutral one, per item (a stack of 5 Empty
+1. The vendor price: the cheapest vendor on your faction or a neutral one, per item (a stack of 5 Empty
    Vials for 20c is 4c each), from ForeverDB's vendor data. **Stock a vendor has only in limited supply
-   is never used**, for materials or for vendor recipes. A vendor-sold item is bought on the AH only if
-   it's at least 10% cheaper there.
+   is never used**, for materials or for vendor recipes. An item a vendor on your side sells in unlimited
+   supply (dyes, threads, flux, vials, spices…) is always bought from the vendor, even when one AH listing
+   is cheaper: that listing rarely covers the quantity a route needs.
+2. Otherwise the auction-house price, or the region market value if nothing is listed.
 3. Crafting it yourself, when that's cheaper (for example, Rough Blasting Powder from Rough Stone at 6c
    against 14c on the AH). The cost breakdown shows what a crafted material is made from. Untick
    *Craft intermediates myself* (`--buy-intermediates`) to buy them instead.

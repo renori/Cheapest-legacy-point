@@ -17,7 +17,6 @@ from pathlib import Path
 
 BASE_URL = "https://public-data.tradeskillmaster.com"
 CACHE_TTL_SECONDS = 3 * 60 * 60  # realm files refresh roughly every 3 hours
-VENDOR_EDGE = 0.9  # buy a vendor-sold item on the AH only if it is at least 10% cheaper there
 AH_CUT = 0.05
 DEPOSIT_RATE = 0.05  # of the vendor sell price, per 2 hours of auction (lost if it doesn't sell)
 AUCTION_HOURS = 24
@@ -131,10 +130,9 @@ class PriceBook:
             if mv is not None:
                 candidates.append(Quote(item_id, mv, "region marketValue"))
         if item_id in self.vendor_prices:
-            vendor = self.vendor_prices[item_id]
-            # Not worth a trip to the AH for a copper or two: prefer the vendor unless the AH is 10% cheaper.
-            candidates = [q for q in candidates if q.price <= vendor * VENDOR_EDGE]
-            candidates.append(Quote(item_id, vendor, "vendor"))
+            # A vendor on your side sells it in unlimited supply: always buy it there. A cheaper AH listing is
+            # usually a handful of items, not the dozens a route needs.
+            return Quote(item_id, self.vendor_prices[item_id], "vendor")
         if not candidates:
             return Quote(item_id, None, "unavailable")
         return min(candidates, key=lambda q: q.price)

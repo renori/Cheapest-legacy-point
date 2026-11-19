@@ -45,7 +45,7 @@ class Ranks(unittest.TestCase):
     def test_skill_book_rank_priced_like_an_item(self):
         rk = Rank("Expert", 225, 125, 0, None, None, "book", 16084)
         opt = Optimizer(Profession("t", "T", [], ranks=[rk]), book())
-        self.assertEqual(opt.rank_cost(rk), 9000)  # AH is >10% under the 1g vendor price
+        self.assertEqual(opt.rank_cost(rk), 10000)  # a vendor sells the book: its 1g, not a cheaper AH listing
         quest = Rank("Artisan", 300, 200, 0, 0, None, "quest")
         self.assertEqual(opt.rank_cost(quest), 0)
 
@@ -63,12 +63,12 @@ class Ranks(unittest.TestCase):
 
 
 class Planner(unittest.TestCase):
-    def test_vendor_item_bought_on_ah_only_if_10_percent_cheaper(self):
-        self.assertEqual(book().quote(2).source, "vendor")  # same price on the AH: buy from the vendor
-        dearish = PriceBook(parse_csv(REALM.replace("2,Thread,10,10,10,10", "2,Thread,10,10,10,10").replace(",10,10,10,10,x", ",10,10,10,10,x")), {}, {2: 11})
-        self.assertEqual(dearish.quote(2).source, "vendor")  # 10c vs 11c: under 10% cheaper, not worth the trip
-        cheap = PriceBook(parse_csv(REALM.replace("2,Thread,10,10,10,10", "2,Thread,9,9,9,9")), {}, {2: 10})
-        self.assertEqual(cheap.quote(2).source, "minBuyout")
+    def test_vendor_items_always_bought_from_the_vendor(self):
+        self.assertEqual(book().quote(2).source, "vendor")  # same price on the AH
+        cheap = PriceBook(parse_csv(REALM.replace("2,Thread,10,10,10,10", "2,Thread,5,5,5,5")), {}, {2: 10})
+        self.assertEqual((cheap.quote(2).source, cheap.quote(2).price), ("vendor", 10))  # half price on the AH: still vendor
+        not_vendor = PriceBook(parse_csv(REALM), {}, {})
+        self.assertEqual(not_vendor.quote(2).source, "minBuyout")  # no vendor sells it: the AH
 
     def test_ah_sell_back_counts_cut_and_deposit(self):
         b = book(vendor_sell={3: 100})
