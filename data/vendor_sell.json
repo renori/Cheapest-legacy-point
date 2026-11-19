@@ -1,21 +1,69 @@
 {
- "note": "Vendor sell prices (copper) of crafted items, from build 1.60.1.70959.",
+ "note": "What a vendor pays you (copper) for each item the recipes use or make, from build 1.60.1.70959.",
  "items": {
   "118": {
    "name": "Minor Healing Potion",
    "sell": 5
   },
+  "159": {
+   "name": "Refreshing Spring Water",
+   "sell": 1
+  },
+  "723": {
+   "name": "Goretusk Liver",
+   "sell": 15
+  },
   "724": {
    "name": "Goretusk Liver Pie",
    "sell": 25
+  },
+  "728": {
+   "name": "Recipe: Westfall Stew",
+   "sell": 50
+  },
+  "729": {
+   "name": "Stringy Vulture Meat",
+   "sell": 17
+  },
+  "730": {
+   "name": "Murloc Eye",
+   "sell": 16
+  },
+  "731": {
+   "name": "Goretusk Snout",
+   "sell": 27
   },
   "733": {
    "name": "Westfall Stew",
    "sell": 100
   },
+  "765": {
+   "name": "Silverleaf",
+   "sell": 10
+  },
+  "769": {
+   "name": "Chunk of Boar Meat",
+   "sell": 3
+  },
+  "774": {
+   "name": "Malachite",
+   "sell": 15
+  },
+  "783": {
+   "name": "Light Hide",
+   "sell": 50
+  },
+  "785": {
+   "name": "Mageroyal",
+   "sell": 20
+  },
   "787": {
    "name": "Slitherskin Mackerel",
    "sell": 1
+  },
+  "818": {
+   "name": "Tigerseye",
+   "sell": 100
   },
   "858": {
    "name": "Lesser Healing Potion",
@@ -25,21 +73,69 @@
    "name": "Healing Potion",
    "sell": 75
   },
+  "1015": {
+   "name": "Lean Wolf Flank",
+   "sell": 24
+  },
   "1017": {
    "name": "Seasoned Wolf Kabob",
    "sell": 100
+  },
+  "1080": {
+   "name": "Tough Condor Meat",
+   "sell": 78
+  },
+  "1081": {
+   "name": "Crisp Spider Meat",
+   "sell": 50
   },
   "1082": {
    "name": "Redridge Goulash",
    "sell": 150
   },
+  "1179": {
+   "name": "Ice Cold Milk",
+   "sell": 6
+  },
+  "1206": {
+   "name": "Moss Agate",
+   "sell": 400
+  },
+  "1210": {
+   "name": "Shadowgem",
+   "sell": 250
+  },
   "1251": {
    "name": "Linen Bandage",
    "sell": 10
   },
+  "1288": {
+   "name": "Large Venom Sac",
+   "sell": 185
+  },
+  "1468": {
+   "name": "Murloc Fin",
+   "sell": 28
+  },
+  "1475": {
+   "name": "Small Venom Sac",
+   "sell": 82
+  },
+  "1529": {
+   "name": "Jade",
+   "sell": 700
+  },
+  "1705": {
+   "name": "Lesser Moonstone",
+   "sell": 600
+  },
   "1710": {
    "name": "Greater Healing Potion",
    "sell": 125
+  },
+  "2251": {
+   "name": "Gooey Spider Leg",
+   "sell": 12
   },
   "2300": {
    "name": "Embossed Leather Vest",
@@ -109,6 +205,58 @@
    "name": "Medium Leather",
    "sell": 50
   },
+  "2320": {
+   "name": "Coarse Thread",
+   "sell": 2
+  },
+  "2321": {
+   "name": "Fine Thread",
+   "sell": 25
+  },
+  "2324": {
+   "name": "Bleach",
+   "sell": 6
+  },
+  "2325": {
+   "name": "Black Dye",
+   "sell": 250
+  },
+  "2406": {
+   "name": "Pattern: Fine Leather Boots",
+   "sell": 25
+  },
+  "2407": {
+   "name": "Pattern: White Leather Jerkin",
+   "sell": 162
+  },
+  "2408": {
+   "name": "Pattern: Fine Leather Gloves",
+   "sell": 125
+  },
+  "2409": {
+   "name": "Pattern: Dark Leather Tunic",
+   "sell": 350
+  },
+  "2447": {
+   "name": "Peacebloom",
+   "sell": 10
+  },
+  "2449": {
+   "name": "Earthroot",
+   "sell": 20
+  },
+  "2450": {
+   "name": "Briarthorn",
+   "sell": 25
+  },
+  "2452": {
+   "name": "Swiftthistle",
+   "sell": 15
+  },
+  "2453": {
+   "name": "Bruiseweed",
+   "sell": 25
+  },
   "2454": {
    "name": "Elixir of Minor Strength",
    "sell": 20
@@ -132,6 +280,14 @@
   "2459": {
    "name": "Swiftness Potion",
    "sell": 25
+  },
+  "2553": {
+   "name": "Recipe: Elixir of Minor Agility",
+   "sell": 25
+  },
+  "2555": {
+   "name": "Recipe: Swiftness Potion",
+   "sell": 40
   },
   "2568": {
    "name": "Brown Linen Vest",
@@ -197,6 +353,62 @@
    "name": "Gray Woolen Shirt",
    "sell": 200
   },
+  "2589": {
+   "name": "Linen Cloth",
+   "sell": 13
+  },
+  "2592": {
+   "name": "Wool Cloth",
+   "sell": 33
+  },
+  "2594": {
+   "name": "Flagon of Dwarven Honeymead",
+   "sell": 375
+  },
+  "2596": {
+   "name": "Skin of Dwarven Stout",
+   "sell": 30
+  },
+  "2598": {
+   "name": "Pattern: Red Linen Robe",
+   "sell": 30
+  },
+  "2601": {
+   "name": "Pattern: Gray Woolen Robe",
+   "sell": 100
+  },
+  "2604": {
+   "name": "Red Dye",
+   "sell": 12
+  },
+  "2605": {
+   "name": "Green Dye",
+   "sell": 25
+  },
+  "2672": {
+   "name": "Stringy Wolf Meat",
+   "sell": 4
+  },
+  "2673": {
+   "name": "Coyote Meat",
+   "sell": 10
+  },
+  "2674": {
+   "name": "Crawler Meat",
+   "sell": 12
+  },
+  "2675": {
+   "name": "Crawler Claw",
+   "sell": 11
+  },
+  "2677": {
+   "name": "Boar Ribs",
+   "sell": 15
+  },
+  "2678": {
+   "name": "Mild Spices",
+   "sell": 1
+  },
   "2679": {
    "name": "Charred Wolf Meat",
    "sell": 5
@@ -225,9 +437,69 @@
    "name": "Succulent Pork Ribs",
    "sell": 75
   },
+  "2686": {
+   "name": "Thunder Ale",
+   "sell": 12
+  },
   "2687": {
    "name": "Dry Pork Ribs",
    "sell": 25
+  },
+  "2692": {
+   "name": "Hot Spices",
+   "sell": 10
+  },
+  "2697": {
+   "name": "Recipe: Goretusk Liver Pie",
+   "sell": 100
+  },
+  "2698": {
+   "name": "Recipe: Cooked Crab Claw",
+   "sell": 100
+  },
+  "2699": {
+   "name": "Recipe: Redridge Goulash",
+   "sell": 200
+  },
+  "2700": {
+   "name": "Recipe: Succulent Pork Ribs",
+   "sell": 100
+  },
+  "2701": {
+   "name": "Recipe: Seasoned Wolf Kabob",
+   "sell": 400
+  },
+  "2723": {
+   "name": "Bottle of Dalaran Noir",
+   "sell": 12
+  },
+  "2772": {
+   "name": "Iron Ore",
+   "sell": 150
+  },
+  "2835": {
+   "name": "Rough Stone",
+   "sell": 2
+  },
+  "2836": {
+   "name": "Coarse Stone",
+   "sell": 15
+  },
+  "2838": {
+   "name": "Heavy Stone",
+   "sell": 60
+  },
+  "2840": {
+   "name": "Copper Bar",
+   "sell": 10
+  },
+  "2841": {
+   "name": "Bronze Bar",
+   "sell": 50
+  },
+  "2842": {
+   "name": "Silver Bar",
+   "sell": 100
   },
   "2844": {
    "name": "Copper Mace",
@@ -313,9 +585,45 @@
    "name": "Heavy Sharpening Stone",
    "sell": 40
   },
+  "2880": {
+   "name": "Weak Flux",
+   "sell": 25
+  },
+  "2881": {
+   "name": "Plans: Runed Copper Breastplate",
+   "sell": 150
+  },
+  "2882": {
+   "name": "Plans: Silvered Bronze Shoulders",
+   "sell": 300
+  },
+  "2883": {
+   "name": "Plans: Deadly Bronze Poniard",
+   "sell": 375
+  },
+  "2886": {
+   "name": "Crag Boar Rib",
+   "sell": 5
+  },
   "2888": {
    "name": "Beer Basted Boar Ribs",
    "sell": 10
+  },
+  "2889": {
+   "name": "Recipe: Beer Basted Boar Ribs",
+   "sell": 60
+  },
+  "2894": {
+   "name": "Rhapsody Malt",
+   "sell": 12
+  },
+  "2924": {
+   "name": "Crocolisk Meat",
+   "sell": 16
+  },
+  "2934": {
+   "name": "Ruined Leather Scraps",
+   "sell": 7
   },
   "2996": {
    "name": "Bolt of Linen Cloth",
@@ -324,6 +632,26 @@
   "2997": {
    "name": "Bolt of Woolen Cloth",
    "sell": 100
+  },
+  "3030": {
+   "name": "Razor Arrow",
+   "sell": 0
+  },
+  "3172": {
+   "name": "Boar Intestines",
+   "sell": 18
+  },
+  "3173": {
+   "name": "Bear Meat",
+   "sell": 15
+  },
+  "3174": {
+   "name": "Spider Ichor",
+   "sell": 16
+  },
+  "3182": {
+   "name": "Spider's Silk",
+   "sell": 387
   },
   "3220": {
    "name": "Blood Sausage",
@@ -340,6 +668,34 @@
   "3241": {
    "name": "Heavy Weightstone",
    "sell": 40
+  },
+  "3355": {
+   "name": "Wild Steelbloom",
+   "sell": 50
+  },
+  "3356": {
+   "name": "Kingsblood",
+   "sell": 30
+  },
+  "3357": {
+   "name": "Liferoot",
+   "sell": 75
+  },
+  "3358": {
+   "name": "Khadgar's Whisker",
+   "sell": 175
+  },
+  "3369": {
+   "name": "Grave Moss",
+   "sell": 25
+  },
+  "3371": {
+   "name": "Empty Vial",
+   "sell": 1
+  },
+  "3372": {
+   "name": "Leaded Vial",
+   "sell": 10
   },
   "3382": {
    "name": "Minor Troll's Blood Elixir",
@@ -380,6 +736,26 @@
   "3391": {
    "name": "Elixir of Ogre Strength",
    "sell": 20
+  },
+  "3393": {
+   "name": "Recipe: Minor Magic Resistance Potion",
+   "sell": 250
+  },
+  "3394": {
+   "name": "Recipe: Potion of Poison Cleansing",
+   "sell": 250
+  },
+  "3395": {
+   "name": "Recipe: Limited Invulnerability Potion",
+   "sell": 250
+  },
+  "3396": {
+   "name": "Recipe: Elixir of Lesser Agility",
+   "sell": 250
+  },
+  "3466": {
+   "name": "Strong Flux",
+   "sell": 500
   },
   "3469": {
    "name": "Copper Chain Boots",
@@ -469,9 +845,33 @@
    "name": "Heavy Wool Bandage",
    "sell": 57
   },
+  "3575": {
+   "name": "Iron Bar",
+   "sell": 200
+  },
   "3577": {
    "name": "Gold Bar",
    "sell": 600
+  },
+  "3608": {
+   "name": "Plans: Mighty Iron Hammer",
+   "sell": 500
+  },
+  "3609": {
+   "name": "Plans: Copper Chain Vest",
+   "sell": 25
+  },
+  "3610": {
+   "name": "Plans: Gemmed Copper Gauntlets",
+   "sell": 50
+  },
+  "3611": {
+   "name": "Plans: Green Iron Boots",
+   "sell": 500
+  },
+  "3612": {
+   "name": "Plans: Green Iron Gauntlets",
+   "sell": 500
   },
   "3662": {
    "name": "Crocolisk Steak",
@@ -493,6 +893,46 @@
    "name": "Gooey Spider Cake",
    "sell": 100
   },
+  "3667": {
+   "name": "Tender Crocolisk Meat",
+   "sell": 25
+  },
+  "3678": {
+   "name": "Recipe: Crocolisk Steak",
+   "sell": 100
+  },
+  "3679": {
+   "name": "Recipe: Blood Sausage",
+   "sell": 100
+  },
+  "3680": {
+   "name": "Recipe: Murloc Fin Soup",
+   "sell": 400
+  },
+  "3681": {
+   "name": "Recipe: Crocolisk Gumbo",
+   "sell": 400
+  },
+  "3682": {
+   "name": "Recipe: Curiously Tasty Omelet",
+   "sell": 400
+  },
+  "3683": {
+   "name": "Recipe: Gooey Spider Cake",
+   "sell": 400
+  },
+  "3685": {
+   "name": "Raptor Egg",
+   "sell": 71
+  },
+  "3712": {
+   "name": "Turtle Meat",
+   "sell": 87
+  },
+  "3713": {
+   "name": "Soothing Spices",
+   "sell": 40
+  },
   "3719": {
    "name": "Hillman's Cloak",
    "sell": 1027
@@ -505,9 +945,41 @@
    "name": "Soothing Turtle Bisque",
    "sell": 300
   },
+  "3731": {
+   "name": "Lion Meat",
+   "sell": 55
+  },
+  "3736": {
+   "name": "Recipe: Tasty Lion Steak",
+   "sell": 500
+  },
+  "3737": {
+   "name": "Recipe: Soothing Turtle Bisque",
+   "sell": 550
+  },
+  "3818": {
+   "name": "Fadeleaf",
+   "sell": 125
+  },
+  "3819": {
+   "name": "Wintersbite",
+   "sell": 100
+  },
+  "3820": {
+   "name": "Stranglekelp",
+   "sell": 100
+  },
+  "3821": {
+   "name": "Goldthorn",
+   "sell": 150
+  },
   "3823": {
    "name": "Lesser Invisibility Potion",
    "sell": 100
+  },
+  "3824": {
+   "name": "Shadow Oil",
+   "sell": 150
   },
   "3825": {
    "name": "Elixir of Lesser Fortitude",
@@ -524,6 +996,18 @@
   "3828": {
    "name": "Draught of Detect Lesser Invisibility",
    "sell": 150
+  },
+  "3829": {
+   "name": "Frost Oil",
+   "sell": 150
+  },
+  "3830": {
+   "name": "Recipe: Elixir of Lesser Fortitude",
+   "sell": 500
+  },
+  "3831": {
+   "name": "Recipe: Troll's Blood Elixir",
+   "sell": 550
   },
   "3835": {
    "name": "Green Iron Bracers",
@@ -597,13 +1081,77 @@
    "name": "Shadow Crescent Axe",
    "sell": 10386
   },
+  "3858": {
+   "name": "Mithril Ore",
+   "sell": 250
+  },
+  "3859": {
+   "name": "Steel Bar",
+   "sell": 60
+  },
+  "3860": {
+   "name": "Mithril Bar",
+   "sell": 400
+  },
+  "3864": {
+   "name": "Citrine",
+   "sell": 800
+  },
+  "3866": {
+   "name": "Plans: Jade Serpentblade",
+   "sell": 1000
+  },
+  "3867": {
+   "name": "Plans: Golden Iron Destroyer",
+   "sell": 950
+  },
+  "3868": {
+   "name": "Plans: Frost Tiger Blade",
+   "sell": 1250
+  },
+  "3869": {
+   "name": "Plans: Shadow Crescent Axe",
+   "sell": 1250
+  },
+  "3870": {
+   "name": "Plans: Green Iron Shoulders",
+   "sell": 750
+  },
+  "3871": {
+   "name": "Plans: Golden Scale Shoulders",
+   "sell": 850
+  },
+  "3872": {
+   "name": "Plans: Golden Scale Leggings",
+   "sell": 800
+  },
+  "3873": {
+   "name": "Plans: Golden Scale Cuirass",
+   "sell": 1100
+  },
+  "3874": {
+   "name": "Plans: Polished Steel Boots",
+   "sell": 1100
+  },
+  "3875": {
+   "name": "Plans: Golden Scale Boots",
+   "sell": 1250
+  },
   "3928": {
    "name": "Superior Healing Potion",
    "sell": 250
   },
+  "4096": {
+   "name": "Coarse Gorilla Hair",
+   "sell": 608
+  },
   "4231": {
    "name": "Cured Light Hide",
    "sell": 110
+  },
+  "4232": {
+   "name": "Medium Hide",
+   "sell": 125
   },
   "4233": {
    "name": "Cured Medium Hide",
@@ -612,6 +1160,10 @@
   "4234": {
    "name": "Heavy Leather",
    "sell": 150
+  },
+  "4235": {
+   "name": "Heavy Hide",
+   "sell": 200
   },
   "4236": {
    "name": "Cured Heavy Hide",
@@ -689,6 +1241,10 @@
    "name": "Barbaric Gloves",
    "sell": 1071
   },
+  "4255": {
+   "name": "Green Leather Armor",
+   "sell": 2366
+  },
   "4256": {
    "name": "Guardian Armor",
    "sell": 3477
@@ -721,6 +1277,50 @@
    "name": "Heavy Armor Kit",
    "sell": 650
   },
+  "4289": {
+   "name": "Salt",
+   "sell": 12
+  },
+  "4291": {
+   "name": "Silken Thread",
+   "sell": 125
+  },
+  "4292": {
+   "name": "Pattern: Green Woolen Bag",
+   "sell": 200
+  },
+  "4293": {
+   "name": "Pattern: Hillman's Leather Vest",
+   "sell": 162
+  },
+  "4294": {
+   "name": "Pattern: Hillman's Belt",
+   "sell": 400
+  },
+  "4296": {
+   "name": "Pattern: Dark Leather Shoulders",
+   "sell": 525
+  },
+  "4297": {
+   "name": "Pattern: Barbaric Gloves",
+   "sell": 500
+  },
+  "4298": {
+   "name": "Pattern: Guardian Belt",
+   "sell": 162
+  },
+  "4299": {
+   "name": "Pattern: Guardian Armor",
+   "sell": 500
+  },
+  "4300": {
+   "name": "Pattern: Guardian Leather Bracers",
+   "sell": 700
+  },
+  "4301": {
+   "name": "Pattern: Barbaric Belt",
+   "sell": 875
+  },
   "4304": {
    "name": "Thick Leather",
    "sell": 300
@@ -728,6 +1328,10 @@
   "4305": {
    "name": "Bolt of Silk Cloth",
    "sell": 600
+  },
+  "4306": {
+   "name": "Silk Cloth",
+   "sell": 150
   },
   "4307": {
    "name": "Heavy Linen Gloves",
@@ -833,9 +1437,25 @@
    "name": "Rich Purple Silk Shirt",
    "sell": 1500
   },
+  "4337": {
+   "name": "Thick Spider's Silk",
+   "sell": 750
+  },
+  "4338": {
+   "name": "Mageweave Cloth",
+   "sell": 250
+  },
   "4339": {
    "name": "Bolt of Mageweave",
    "sell": 1250
+  },
+  "4340": {
+   "name": "Gray Dye",
+   "sell": 87
+  },
+  "4342": {
+   "name": "Purple Dye",
+   "sell": 625
   },
   "4343": {
    "name": "Brown Linen Pants",
@@ -844,6 +1464,54 @@
   "4344": {
    "name": "Brown Linen Shirt",
    "sell": 11
+  },
+  "4345": {
+   "name": "Pattern: Red Woolen Boots",
+   "sell": 100
+  },
+  "4346": {
+   "name": "Pattern: Heavy Woolen Cloak",
+   "sell": 100
+  },
+  "4347": {
+   "name": "Pattern: Reinforced Woolen Shoulders",
+   "sell": 150
+  },
+  "4348": {
+   "name": "Pattern: Phoenix Gloves",
+   "sell": 175
+  },
+  "4349": {
+   "name": "Pattern: Phoenix Pants",
+   "sell": 175
+  },
+  "4350": {
+   "name": "Pattern: Spider Silk Slippers",
+   "sell": 200
+  },
+  "4351": {
+   "name": "Pattern: Shadow Hood",
+   "sell": 225
+  },
+  "4352": {
+   "name": "Pattern: Boots of the Enchanter",
+   "sell": 275
+  },
+  "4353": {
+   "name": "Pattern: Spider Belt",
+   "sell": 300
+  },
+  "4354": {
+   "name": "Pattern: Rich Purple Silk Shirt",
+   "sell": 350
+  },
+  "4355": {
+   "name": "Pattern: Icy Cloak",
+   "sell": 375
+  },
+  "4356": {
+   "name": "Pattern: Star Belt",
+   "sell": 375
   },
   "4357": {
    "name": "Rough Blasting Powder",
@@ -1001,9 +1669,21 @@
    "name": "Large Seaforium Charge",
    "sell": 900
   },
+  "4399": {
+   "name": "Wooden Stock",
+   "sell": 50
+  },
+  "4400": {
+   "name": "Heavy Stock",
+   "sell": 500
+  },
   "4401": {
    "name": "Mechanical Squirrel Box",
    "sell": 100
+  },
+  "4402": {
+   "name": "Small Flame Sac",
+   "sell": 250
   },
   "4403": {
    "name": "Portable Bronze Mortar",
@@ -1021,6 +1701,50 @@
    "name": "Standard Scope",
    "sell": 600
   },
+  "4407": {
+   "name": "Accurate Scope",
+   "sell": 1200
+  },
+  "4408": {
+   "name": "Schematic: Mechanical Squirrel",
+   "sell": 162
+  },
+  "4409": {
+   "name": "Schematic: Small Seaforium Charge",
+   "sell": 200
+  },
+  "4410": {
+   "name": "Schematic: Shadow Goggles",
+   "sell": 250
+  },
+  "4411": {
+   "name": "Schematic: Flame Deflector",
+   "sell": 275
+  },
+  "4412": {
+   "name": "Schematic: Moonsight Rifle",
+   "sell": 375
+  },
+  "4413": {
+   "name": "Schematic: Discombobulator Ray",
+   "sell": 450
+  },
+  "4414": {
+   "name": "Schematic: Portable Bronze Mortar",
+   "sell": 462
+  },
+  "4415": {
+   "name": "Schematic: Craftsman's Monocle",
+   "sell": 550
+  },
+  "4416": {
+   "name": "Schematic: Goblin Land Mine",
+   "sell": 600
+  },
+  "4417": {
+   "name": "Schematic: Large Seaforium Charge",
+   "sell": 675
+  },
   "4455": {
    "name": "Raptor Hide Harness",
    "sell": 3096
@@ -1028,6 +1752,26 @@
   "4456": {
    "name": "Raptor Hide Belt",
    "sell": 1553
+  },
+  "4461": {
+   "name": "Raptor Hide",
+   "sell": 208
+  },
+  "4470": {
+   "name": "Simple Wood",
+   "sell": 9
+  },
+  "4471": {
+   "name": "Flint and Tinder",
+   "sell": 33
+  },
+  "4536": {
+   "name": "Shiny Red Apple",
+   "sell": 1
+  },
+  "4589": {
+   "name": "Long Elegant Feather",
+   "sell": 530
   },
   "4592": {
    "name": "Longjaw Mud Snapper",
@@ -1041,21 +1785,85 @@
    "name": "Rockscale Cod",
    "sell": 6
   },
+  "4603": {
+   "name": "Raw Spotted Yellowtail",
+   "sell": 4
+  },
+  "4611": {
+   "name": "Blue Pearl",
+   "sell": 50
+  },
   "4623": {
    "name": "Lesser Stoneshield Potion",
    "sell": 375
+  },
+  "4624": {
+   "name": "Recipe: Lesser Stoneshield Potion",
+   "sell": 550
+  },
+  "4625": {
+   "name": "Firebloom",
+   "sell": 250
+  },
+  "4655": {
+   "name": "Giant Clam Meat",
+   "sell": 71
   },
   "4852": {
    "name": "Flash Bomb",
    "sell": 300
   },
+  "5051": {
+   "name": "Dig Rat",
+   "sell": 1
+  },
   "5081": {
    "name": "Kodo Hide Bag",
    "sell": 250
   },
+  "5082": {
+   "name": "Thin Kodo Leather",
+   "sell": 25
+  },
+  "5083": {
+   "name": "Pattern: Kodo Hide Bag",
+   "sell": 50
+  },
   "5095": {
    "name": "Rainbow Fin Albacore",
    "sell": 3
+  },
+  "5116": {
+   "name": "Long Tail Feather",
+   "sell": 303
+  },
+  "5373": {
+   "name": "Lucky Charm",
+   "sell": 72
+  },
+  "5465": {
+   "name": "Small Spider Leg",
+   "sell": 3
+  },
+  "5466": {
+   "name": "Scorpid Stinger",
+   "sell": 8
+  },
+  "5467": {
+   "name": "Kodo Meat",
+   "sell": 7
+  },
+  "5468": {
+   "name": "Soft Frenzy Flesh",
+   "sell": 12
+  },
+  "5469": {
+   "name": "Strider Meat",
+   "sell": 9
+  },
+  "5470": {
+   "name": "Thunder Lizard Tail",
+   "sell": 28
   },
   "5472": {
    "name": "Kaldorei Spider Kabob",
@@ -1085,6 +1893,50 @@
    "name": "Crispy Lizard Tail",
    "sell": 125
   },
+  "5482": {
+   "name": "Recipe: Kaldorei Spider Kabob",
+   "sell": 10
+  },
+  "5483": {
+   "name": "Recipe: Scorpid Surprise",
+   "sell": 35
+  },
+  "5484": {
+   "name": "Recipe: Roasted Kodo Meat",
+   "sell": 60
+  },
+  "5485": {
+   "name": "Recipe: Fillet of Frenzy",
+   "sell": 100
+  },
+  "5486": {
+   "name": "Recipe: Strider Stew",
+   "sell": 110
+  },
+  "5487": {
+   "name": "Recipe: Dig Rat Stew",
+   "sell": 200
+  },
+  "5488": {
+   "name": "Recipe: Crispy Lizard Tail",
+   "sell": 100
+  },
+  "5498": {
+   "name": "Small Lustrous Pearl",
+   "sell": 200
+  },
+  "5500": {
+   "name": "Iridescent Pearl",
+   "sell": 750
+  },
+  "5503": {
+   "name": "Clam Meat",
+   "sell": 16
+  },
+  "5504": {
+   "name": "Tangy Clam Meat",
+   "sell": 22
+  },
   "5507": {
    "name": "Ornate Spyglass",
    "sell": 600
@@ -1101,6 +1953,10 @@
    "name": "Goblin Deviled Clams",
    "sell": 95
   },
+  "5528": {
+   "name": "Recipe: Clam Chowder",
+   "sell": 200
+  },
   "5540": {
    "name": "Pearl-handled Dagger",
    "sell": 2107
@@ -1113,6 +1969,14 @@
    "name": "Pearl-clasped Cloak",
    "sell": 370
   },
+  "5543": {
+   "name": "Plans: Iridescent Hammer",
+   "sell": 450
+  },
+  "5578": {
+   "name": "Plans: Silvered Bronze Breastplate",
+   "sell": 300
+  },
   "5631": {
    "name": "Rage Potion",
    "sell": 30
@@ -1124,6 +1988,26 @@
   "5634": {
    "name": "Free Action Potion",
    "sell": 75
+  },
+  "5635": {
+   "name": "Sharp Claw",
+   "sell": 45
+  },
+  "5637": {
+   "name": "Large Fang",
+   "sell": 75
+  },
+  "5640": {
+   "name": "Recipe: Rage Potion",
+   "sell": 25
+  },
+  "5642": {
+   "name": "Recipe: Free Action Potion",
+   "sell": 450
+  },
+  "5643": {
+   "name": "Recipe: Great Rage Potion",
+   "sell": 500
   },
   "5739": {
    "name": "Barbaric Harness",
@@ -1153,6 +2037,34 @@
    "name": "Robes of Arcana",
    "sell": 1807
   },
+  "5771": {
+   "name": "Pattern: Red Linen Bag",
+   "sell": 50
+  },
+  "5772": {
+   "name": "Pattern: Red Woolen Bag",
+   "sell": 125
+  },
+  "5773": {
+   "name": "Pattern: Robes of Arcana",
+   "sell": 250
+  },
+  "5774": {
+   "name": "Pattern: Green Silk Pack",
+   "sell": 275
+  },
+  "5775": {
+   "name": "Pattern: Black Silk Pack",
+   "sell": 350
+  },
+  "5784": {
+   "name": "Slimy Murloc Scale",
+   "sell": 75
+  },
+  "5956": {
+   "name": "Blacksmith Hammer",
+   "sell": 3
+  },
   "5957": {
    "name": "Handstitched Leather Vest",
    "sell": 40
@@ -1181,6 +2093,14 @@
    "name": "Guardian Gloves",
    "sell": 1374
   },
+  "5972": {
+   "name": "Pattern: Fine Leather Pants",
+   "sell": 375
+  },
+  "5974": {
+   "name": "Pattern: Guardian Cloak",
+   "sell": 350
+  },
   "5996": {
    "name": "Draught of Water Breathing",
    "sell": 95
@@ -1197,6 +2117,10 @@
    "name": "Giant Clam Scorcho",
    "sell": 312
   },
+  "6039": {
+   "name": "Recipe: Giant Clam Scorcho",
+   "sell": 1250
+  },
   "6040": {
    "name": "Golden Scale Bracers",
    "sell": 1315
@@ -1212,6 +2136,22 @@
   "6043": {
    "name": "Iron Counterweight",
    "sell": 500
+  },
+  "6044": {
+   "name": "Plans: Iron Shield Spike",
+   "sell": 450
+  },
+  "6045": {
+   "name": "Plans: Iron Counterweight",
+   "sell": 650
+  },
+  "6046": {
+   "name": "Plans: Steel Weapon Chain",
+   "sell": 950
+  },
+  "6048": {
+   "name": "Shadow Protection Potion",
+   "sell": 100
   },
   "6149": {
    "name": "Greater Mana Potion",
@@ -1257,6 +2197,14 @@
    "name": "Green Woolen Robe",
    "sell": 445
   },
+  "6260": {
+   "name": "Blue Dye",
+   "sell": 12
+  },
+  "6261": {
+   "name": "Orange Dye",
+   "sell": 250
+  },
   "6263": {
    "name": "Blue Overalls",
    "sell": 589
@@ -1265,13 +2213,73 @@
    "name": "Greater Adept's Robe",
    "sell": 884
   },
+  "6270": {
+   "name": "Pattern: Blue Linen Vest",
+   "sell": 50
+  },
+  "6271": {
+   "name": "Pattern: Red Linen Vest",
+   "sell": 50
+  },
+  "6272": {
+   "name": "Pattern: Blue Linen Robe",
+   "sell": 75
+  },
+  "6274": {
+   "name": "Pattern: Blue Overalls",
+   "sell": 100
+  },
+  "6275": {
+   "name": "Pattern: Greater Adept's Robe",
+   "sell": 200
+  },
+  "6289": {
+   "name": "Raw Longjaw Mud Snapper",
+   "sell": 1
+  },
   "6290": {
    "name": "Brilliant Smallfish",
    "sell": 1
   },
+  "6291": {
+   "name": "Raw Brilliant Smallfish",
+   "sell": 1
+  },
+  "6303": {
+   "name": "Raw Slitherskin Mackerel",
+   "sell": 1
+  },
+  "6308": {
+   "name": "Raw Bristle Whisker Catfish",
+   "sell": 2
+  },
   "6316": {
    "name": "Loch Frenzy Delight",
    "sell": 3
+  },
+  "6317": {
+   "name": "Raw Loch Frenzy",
+   "sell": 2
+  },
+  "6325": {
+   "name": "Recipe: Brilliant Smallfish",
+   "sell": 10
+  },
+  "6326": {
+   "name": "Recipe: Slitherskin Mackerel",
+   "sell": 10
+  },
+  "6328": {
+   "name": "Recipe: Longjaw Mud Snapper",
+   "sell": 100
+  },
+  "6329": {
+   "name": "Recipe: Loch Frenzy Delight",
+   "sell": 100
+  },
+  "6330": {
+   "name": "Recipe: Bristle Whisker Catfish",
+   "sell": 300
   },
   "6338": {
    "name": "Silver Rod",
@@ -1281,9 +2289,57 @@
    "name": "Runed Silver Rod",
    "sell": 24
   },
+  "6342": {
+   "name": "Formula: Enchant Chest - Minor Intellect",
+   "sell": 75
+  },
+  "6344": {
+   "name": "Formula: Enchant Bracer - Minor Spirit",
+   "sell": 100
+  },
+  "6346": {
+   "name": "Formula: Enchant Chest - Lesser Intellect",
+   "sell": 100
+  },
+  "6347": {
+   "name": "Formula: Enchant Bracer - Minor Strength",
+   "sell": 100
+  },
+  "6348": {
+   "name": "Formula: Enchant Weapon - Minor Beastslayer",
+   "sell": 125
+  },
+  "6349": {
+   "name": "Formula: Enchant 2H Weapon - Lesser Intellect",
+   "sell": 125
+  },
   "6350": {
    "name": "Rough Bronze Boots",
    "sell": 295
+  },
+  "6358": {
+   "name": "Oily Blackmouth",
+   "sell": 4
+  },
+  "6359": {
+   "name": "Firefin Snapper",
+   "sell": 5
+  },
+  "6361": {
+   "name": "Raw Rainbow Fin Albacore",
+   "sell": 2
+  },
+  "6362": {
+   "name": "Raw Rockscale Cod",
+   "sell": 4
+  },
+  "6368": {
+   "name": "Recipe: Rainbow Fin Albacore",
+   "sell": 100
+  },
+  "6369": {
+   "name": "Recipe: Rockscale Cod",
+   "sell": 550
   },
   "6370": {
    "name": "Blackmouth Oil",
@@ -1301,6 +2357,18 @@
    "name": "Elixir of Fire Power",
    "sell": 35
   },
+  "6375": {
+   "name": "Formula: Enchant Bracer - Lesser Spirit",
+   "sell": 250
+  },
+  "6376": {
+   "name": "Formula: Enchant Boots - Minor Stamina",
+   "sell": 250
+  },
+  "6377": {
+   "name": "Formula: Enchant Boots - Minor Agility",
+   "sell": 250
+  },
   "6384": {
    "name": "Stylish Blue Shirt",
    "sell": 250
@@ -1308,6 +2376,14 @@
   "6385": {
    "name": "Stylish Green Shirt",
    "sell": 250
+  },
+  "6390": {
+   "name": "Pattern: Stylish Blue Shirt",
+   "sell": 150
+  },
+  "6391": {
+   "name": "Pattern: Stylish Green Shirt",
+   "sell": 150
   },
   "6450": {
    "name": "Silk Bandage",
@@ -1337,6 +2413,34 @@
    "name": "Deviate Scale Belt",
    "sell": 658
   },
+  "6470": {
+   "name": "Deviate Scale",
+   "sell": 20
+  },
+  "6471": {
+   "name": "Perfect Deviate Scale",
+   "sell": 500
+  },
+  "6474": {
+   "name": "Pattern: Deviate Scale Cloak",
+   "sell": 137
+  },
+  "6475": {
+   "name": "Pattern: Deviate Scale Gloves",
+   "sell": 375
+  },
+  "6476": {
+   "name": "Pattern: Deviate Scale Belt",
+   "sell": 500
+  },
+  "6522": {
+   "name": "Deviate Fish",
+   "sell": 4
+  },
+  "6530": {
+   "name": "Nightcrawlers",
+   "sell": 25
+  },
   "6533": {
    "name": "Aquadynamic Fish Attractor",
    "sell": 62
@@ -1345,13 +2449,29 @@
    "name": "Savory Deviate Delight",
    "sell": 5
   },
+  "6661": {
+   "name": "Recipe: Savory Deviate Delight",
+   "sell": 115
+  },
   "6662": {
    "name": "Elixir of Giant Growth",
    "sell": 95
   },
+  "6663": {
+   "name": "Recipe: Elixir of Giant Growth",
+   "sell": 150
+  },
+  "6672": {
+   "name": "Schematic: Flash Bomb",
+   "sell": 500
+  },
   "6709": {
    "name": "Moonglow Vest",
    "sell": 545
+  },
+  "6710": {
+   "name": "Pattern: Moonglow Vest",
+   "sell": 137
   },
   "6712": {
    "name": "Practice Lock",
@@ -1360,6 +2480,10 @@
   "6714": {
    "name": "Ez-Thro Dynamite",
    "sell": 75
+  },
+  "6716": {
+   "name": "Schematic: EZ-Thro Dynamite",
+   "sell": 200
   },
   "6730": {
    "name": "Ironforge Chain",
@@ -1372,6 +2496,10 @@
   "6733": {
    "name": "Ironforge Gauntlets",
    "sell": 1145
+  },
+  "6735": {
+   "name": "Plans: Ironforge Breastplate",
+   "sell": 150
   },
   "6786": {
    "name": "Simple Dress",
@@ -1397,9 +2525,17 @@
    "name": "Herb Baked Egg",
    "sell": 10
   },
+  "6889": {
+   "name": "Small Egg",
+   "sell": 4
+  },
   "6890": {
    "name": "Smoked Bear Meat",
    "sell": 6
+  },
+  "6892": {
+   "name": "Recipe: Smoked Bear Meat",
+   "sell": 62
   },
   "7026": {
    "name": "Linen Belt",
@@ -1481,29 +2617,85 @@
    "name": "Green Silk Armor",
    "sell": 2398
   },
+  "7067": {
+   "name": "Elemental Earth",
+   "sell": 400
+  },
   "7068": {
    "name": "Elemental Fire",
+   "sell": 400
+  },
+  "7069": {
+   "name": "Elemental Air",
+   "sell": 400
+  },
+  "7070": {
+   "name": "Elemental Water",
    "sell": 400
   },
   "7071": {
    "name": "Iron Buckle",
    "sell": 100
   },
+  "7072": {
+   "name": "Naga Scale",
+   "sell": 150
+  },
+  "7075": {
+   "name": "Core of Earth",
+   "sell": 400
+  },
   "7076": {
    "name": "Essence of Earth",
+   "sell": 400
+  },
+  "7077": {
+   "name": "Heart of Fire",
    "sell": 400
   },
   "7078": {
    "name": "Essence of Fire",
    "sell": 400
   },
+  "7079": {
+   "name": "Globe of Water",
+   "sell": 400
+  },
   "7080": {
    "name": "Essence of Water",
+   "sell": 400
+  },
+  "7081": {
+   "name": "Breath of Wind",
    "sell": 400
   },
   "7082": {
    "name": "Essence of Air",
    "sell": 400
+  },
+  "7084": {
+   "name": "Pattern: Crimson Silk Shoulders",
+   "sell": 350
+  },
+  "7085": {
+   "name": "Pattern: Azure Shoulders",
+   "sell": 350
+  },
+  "7086": {
+   "name": "Pattern: Earthen Silk Belt",
+   "sell": 375
+  },
+  "7090": {
+   "name": "Pattern: Green Silk Armor",
+   "sell": 250
+  },
+  "7091": {
+   "name": "Pattern: Truefaith Gloves",
+   "sell": 250
+  },
+  "7092": {
+   "name": "Pattern: Hands of Darkness",
+   "sell": 250
   },
   "7166": {
    "name": "Copper Dagger",
@@ -1512,6 +2704,14 @@
   "7189": {
    "name": "Goblin Rocket Boots",
    "sell": 4712
+  },
+  "7191": {
+   "name": "Fused Wiring",
+   "sell": 0
+  },
+  "7192": {
+   "name": "Schematic: Goblin Rocket Boots",
+   "sell": 300
   },
   "7276": {
    "name": "Handstitched Leather Cloak",
@@ -1553,6 +2753,26 @@
    "name": "Nimble Leather Gloves",
    "sell": 588
   },
+  "7286": {
+   "name": "Black Whelp Scale",
+   "sell": 25
+  },
+  "7287": {
+   "name": "Red Whelp Scale",
+   "sell": 100
+  },
+  "7288": {
+   "name": "Pattern: Rugged Leather Pants",
+   "sell": 125
+  },
+  "7289": {
+   "name": "Pattern: Black Whelp Cloak",
+   "sell": 162
+  },
+  "7290": {
+   "name": "Pattern: Red Whelp Gloves",
+   "sell": 400
+  },
   "7348": {
    "name": "Fletcher's Gloves",
    "sell": 690
@@ -1568,6 +2788,22 @@
   "7359": {
    "name": "Heavy Earthen Gloves",
    "sell": 978
+  },
+  "7360": {
+   "name": "Pattern: Dark Leather Gloves",
+   "sell": 400
+  },
+  "7361": {
+   "name": "Pattern: Herbalist's Gloves",
+   "sell": 450
+  },
+  "7363": {
+   "name": "Pattern: Pilferer's Gloves",
+   "sell": 525
+  },
+  "7364": {
+   "name": "Pattern: Heavy Earthen Gloves",
+   "sell": 550
   },
   "7371": {
    "name": "Heavy Quiver",
@@ -1609,9 +2845,49 @@
    "name": "Swift Boots",
    "sell": 4253
   },
+  "7392": {
+   "name": "Green Whelp Scale",
+   "sell": 200
+  },
+  "7428": {
+   "name": "Shadowcat Hide",
+   "sell": 250
+  },
+  "7449": {
+   "name": "Pattern: Dusky Leather Leggings",
+   "sell": 625
+  },
+  "7450": {
+   "name": "Pattern: Green Whelp Armor",
+   "sell": 500
+  },
+  "7452": {
+   "name": "Pattern: Dusky Boots",
+   "sell": 875
+  },
+  "7453": {
+   "name": "Pattern: Swift Boots",
+   "sell": 875
+  },
   "7676": {
    "name": "Thistle Tea",
    "sell": 30
+  },
+  "7678": {
+   "name": "Recipe: Thistle Tea",
+   "sell": 50
+  },
+  "7909": {
+   "name": "Aquamarine",
+   "sell": 1000
+  },
+  "7910": {
+   "name": "Star Ruby",
+   "sell": 5000
+  },
+  "7912": {
+   "name": "Solid Stone",
+   "sell": 100
   },
   "7913": {
    "name": "Barbaric Iron Shoulders",
@@ -1777,6 +3053,66 @@
    "name": "Mithril Spurs",
    "sell": 250
   },
+  "7971": {
+   "name": "Black Pearl",
+   "sell": 1000
+  },
+  "7972": {
+   "name": "Ichor of Undeath",
+   "sell": 400
+  },
+  "7975": {
+   "name": "Plans: Heavy Mithril Pants",
+   "sell": 1500
+  },
+  "7976": {
+   "name": "Plans: Mithril Shield Spike",
+   "sell": 2000
+  },
+  "7978": {
+   "name": "Plans: Barbaric Iron Shoulders",
+   "sell": 750
+  },
+  "7979": {
+   "name": "Plans: Barbaric Iron Breastplate",
+   "sell": 750
+  },
+  "7980": {
+   "name": "Plans: Barbaric Iron Helm",
+   "sell": 850
+  },
+  "7981": {
+   "name": "Plans: Barbaric Iron Boots",
+   "sell": 1100
+  },
+  "7982": {
+   "name": "Plans: Barbaric Iron Gloves",
+   "sell": 1100
+  },
+  "7989": {
+   "name": "Plans: Mithril Spurs",
+   "sell": 2500
+  },
+  "7990": {
+   "name": "Plans: Heavy Mithril Helm",
+   "sell": 2500
+  },
+  "7991": {
+   "name": "Plans: Mithril Plate Shoulders",
+   "sell": 2500
+  },
+  "7992": {
+   "name": "Plans: Blue Glittering Axe",
+   "sell": 2000
+  },
+  "7993": {
+   "name": "Plans: Dazzling Mithril Rapier",
+   "sell": 2500
+  },
+  "8028": {
+   "name": "Plans: Runed Mithril Hammer",
+   "sell": 2500
+  },
   "8067": {
    "name": "Crafted Light Shot",
    "sell": 0
@@ -1789,8 +3125,52 @@
    "name": "Crafted Solid Shot",
    "sell": 0
   },
+  "8146": {
+   "name": "Wicked Claw",
+   "sell": 500
+  },
+  "8150": {
+   "name": "Deeprock Salt",
+   "sell": 250
+  },
+  "8151": {
+   "name": "Flask of Mojo",
+   "sell": 250
+  },
+  "8152": {
+   "name": "Flask of Big Mojo",
+   "sell": 500
+  },
+  "8153": {
+   "name": "Wildvine",
+   "sell": 5
+  },
+  "8154": {
+   "name": "Scorpid Scale",
+   "sell": 250
+  },
+  "8165": {
+   "name": "Worn Dragonscale",
+   "sell": 500
+  },
+  "8167": {
+   "name": "Turtle Scale",
+   "sell": 100
+  },
+  "8168": {
+   "name": "Jet Black Feather",
+   "sell": 100
+  },
+  "8169": {
+   "name": "Thick Hide",
+   "sell": 500
+  },
   "8170": {
    "name": "Rugged Leather",
+   "sell": 500
+  },
+  "8171": {
+   "name": "Rugged Hide",
    "sell": 500
   },
   "8172": {
@@ -1897,6 +3277,10 @@
    "name": "Thick Leather Ammo Pouch",
    "sell": 1000
   },
+  "8343": {
+   "name": "Heavy Silken Thread",
+   "sell": 500
+  },
   "8345": {
    "name": "Wolfshead Helm",
    "sell": 7421
@@ -1921,9 +3305,69 @@
    "name": "Mithril Head Trout",
    "sell": 6
   },
+  "8365": {
+   "name": "Raw Mithril Head Trout",
+   "sell": 4
+  },
   "8367": {
    "name": "Dragonscale Breastplate",
    "sell": 18455
+  },
+  "8368": {
+   "name": "Thick Wolfhide",
+   "sell": 1000
+  },
+  "8384": {
+   "name": "Pattern: Comfortable Leather Hat",
+   "sell": 875
+  },
+  "8386": {
+   "name": "Pattern: Big Voodoo Robe",
+   "sell": 1000
+  },
+  "8387": {
+   "name": "Pattern: Big Voodoo Mask",
+   "sell": 1000
+  },
+  "8388": {
+   "name": "Pattern: Nightscape Cloak",
+   "sell": 1250
+  },
+  "8389": {
+   "name": "Pattern: Big Voodoo Pants",
+   "sell": 1250
+  },
+  "8390": {
+   "name": "Pattern: Big Voodoo Cloak",
+   "sell": 1250
+  },
+  "8395": {
+   "name": "Pattern: Tough Scorpid Breastplate",
+   "sell": 1000
+  },
+  "8397": {
+   "name": "Pattern: Tough Scorpid Bracers",
+   "sell": 1000
+  },
+  "8398": {
+   "name": "Pattern: Tough Scorpid Gloves",
+   "sell": 1125
+  },
+  "8399": {
+   "name": "Pattern: Tough Scorpid Boots",
+   "sell": 1250
+  },
+  "8400": {
+   "name": "Pattern: Tough Scorpid Shoulders",
+   "sell": 1250
+  },
+  "8401": {
+   "name": "Pattern: Tough Scorpid Leggings",
+   "sell": 1375
+  },
+  "8402": {
+   "name": "Pattern: Tough Scorpid Helm",
+   "sell": 1375
   },
   "8544": {
    "name": "Mageweave Bandage",
@@ -1935,6 +3379,34 @@
   },
   "8827": {
    "name": "Draught of Water Walking",
+   "sell": 125
+  },
+  "8831": {
+   "name": "Purple Lotus",
+   "sell": 300
+  },
+  "8836": {
+   "name": "Arthas' Tears",
+   "sell": 95
+  },
+  "8838": {
+   "name": "Sungrass",
+   "sell": 60
+  },
+  "8839": {
+   "name": "Blindweed",
+   "sell": 375
+  },
+  "8845": {
+   "name": "Ghost Mushroom",
+   "sell": 375
+  },
+  "8846": {
+   "name": "Gromsblood",
+   "sell": 250
+  },
+  "8925": {
+   "name": "Crystal Vial",
    "sell": 125
   },
   "8949": {
@@ -1952,6 +3424,10 @@
   "8957": {
    "name": "Spinefin Halibut",
    "sell": 200
+  },
+  "8959": {
+   "name": "Raw Spinefin Halibut",
+   "sell": 160
   },
   "9030": {
    "name": "Restorative Potion",
@@ -2009,13 +3485,57 @@
    "name": "Elixir of Greater Strength",
    "sell": 700
   },
+  "9210": {
+   "name": "Ghost Dye",
+   "sell": 750
+  },
+  "9224": {
+   "name": "Potion of Demon Slaying",
+   "sell": 700
+  },
   "9233": {
    "name": "Draught of Detect Demon",
    "sell": 500
   },
+  "9260": {
+   "name": "Volatile Rum",
+   "sell": 400
+  },
+  "9262": {
+   "name": "Black Vitriol",
+   "sell": 1000
+  },
   "9264": {
    "name": "Elixir of Shadow Power",
    "sell": 35
+  },
+  "9293": {
+   "name": "Recipe: Magic Resistance Potion",
+   "sell": 1250
+  },
+  "9294": {
+   "name": "Recipe: Wildvine Potion",
+   "sell": 2000
+  },
+  "9295": {
+   "name": "Recipe: Invisibility Potion",
+   "sell": 2000
+  },
+  "9296": {
+   "name": "Recipe: Gift of Arthas",
+   "sell": 2000
+  },
+  "9297": {
+   "name": "Recipe: Draught of Dream Vision",
+   "sell": 2500
+  },
+  "9301": {
+   "name": "Recipe: Elixir of Shadow Power",
+   "sell": 2500
+  },
+  "9303": {
+   "name": "Recipe: Philosopher's Stone",
+   "sell": 2000
   },
   "9312": {
    "name": "Blue Firework",
@@ -2028,6 +3548,10 @@
   "9366": {
    "name": "Golden Scale Gauntlets",
    "sell": 3689
+  },
+  "9367": {
+   "name": "Plans: Golden Scale Gauntlets",
+   "sell": 1250
   },
   "9998": {
    "name": "Black Mageweave Vest",
@@ -2209,6 +3733,82 @@
    "name": "Orange Mageweave Shirt",
    "sell": 1500
   },
+  "10284": {
+   "name": "Simple Flour",
+   "sell": 50
+  },
+  "10285": {
+   "name": "Shadow Silk",
+   "sell": 1000
+  },
+  "10286": {
+   "name": "Heart of the Wild",
+   "sell": 400
+  },
+  "10290": {
+   "name": "Pink Dye",
+   "sell": 625
+  },
+  "10300": {
+   "name": "Pattern: Red Mageweave Vest",
+   "sell": 1250
+  },
+  "10301": {
+   "name": "Pattern: White Bandit Mask",
+   "sell": 1250
+  },
+  "10302": {
+   "name": "Pattern: Red Mageweave Pants",
+   "sell": 1250
+  },
+  "10311": {
+   "name": "Pattern: Orange Martial Shirt",
+   "sell": 750
+  },
+  "10312": {
+   "name": "Pattern: Red Mageweave Gloves",
+   "sell": 1500
+  },
+  "10314": {
+   "name": "Pattern: Lavender Mageweave Shirt",
+   "sell": 1000
+  },
+  "10315": {
+   "name": "Pattern: Red Mageweave Shoulders",
+   "sell": 1750
+  },
+  "10316": {
+   "name": "Pattern: Colorful Kilt",
+   "sell": 200
+  },
+  "10317": {
+   "name": "Pattern: Pink Mageweave Shirt",
+   "sell": 1000
+  },
+  "10318": {
+   "name": "Pattern: Admiral's Hat",
+   "sell": 1750
+  },
+  "10320": {
+   "name": "Pattern: Red Mageweave Headband",
+   "sell": 1750
+  },
+  "10321": {
+   "name": "Pattern: Tuxedo Shirt",
+   "sell": 1125
+  },
+  "10323": {
+   "name": "Pattern: Tuxedo Pants",
+   "sell": 1125
+  },
+  "10325": {
+   "name": "Pattern: White Wedding Dress",
+   "sell": 2500
+  },
+  "10326": {
+   "name": "Pattern: Tuxedo Jacket",
+   "sell": 1250
+  },
   "10421": {
    "name": "Rough Copper Vest",
    "sell": 32
@@ -2216,6 +3816,14 @@
   "10423": {
    "name": "Silvered Bronze Leggings",
    "sell": 2366
+  },
+  "10424": {
+   "name": "Plans: Silvered Bronze Leggings",
+   "sell": 750
+  },
+  "10463": {
+   "name": "Pattern: Shadoweave Mask",
+   "sell": 1750
   },
   "10498": {
    "name": "Gyromatic Micro-Adjustor",
@@ -2285,6 +3893,10 @@
    "name": "Gnomish Goggles",
    "sell": 3929
   },
+  "10546": {
+   "name": "Deadly Scope",
+   "sell": 1500
+  },
   "10548": {
    "name": "Sniper Scope",
    "sell": 2500
@@ -2337,6 +3949,38 @@
    "name": "Catseye Draught",
    "sell": 150
   },
+  "10601": {
+   "name": "Schematic: Bright-Eye Goggles",
+   "sell": 500
+  },
+  "10603": {
+   "name": "Schematic: Catseye Ultra Goggles",
+   "sell": 825
+  },
+  "10604": {
+   "name": "Schematic: Mithril Heavy-bore Rifle",
+   "sell": 825
+  },
+  "10605": {
+   "name": "Schematic: Spellpower Goggles Xtreme",
+   "sell": 875
+  },
+  "10606": {
+   "name": "Schematic: Parachute Cloak",
+   "sell": 875
+  },
+  "10608": {
+   "name": "Schematic: Sniper Scope",
+   "sell": 950
+  },
+  "10609": {
+   "name": "Schematic: Mithril Mechanical Dragonling",
+   "sell": 1000
+  },
+  "10620": {
+   "name": "Thorium Ore",
+   "sell": 250
+  },
   "10644": {
    "name": "Recipe: Goblin Rocket Fuel",
    "sell": 500
@@ -2348,6 +3992,14 @@
   "10646": {
    "name": "Goblin Sapper Charge",
    "sell": 500
+  },
+  "10647": {
+   "name": "Engineer's Ink",
+   "sell": 500
+  },
+  "10648": {
+   "name": "Blank Parchment",
+   "sell": 125
   },
   "10713": {
    "name": "Plans: Inlaid Mithril Cylinder",
@@ -2389,6 +4041,54 @@
    "name": "Goldthorn Tea",
    "sell": 85
   },
+  "10938": {
+   "name": "Lesser Magic Essence",
+   "sell": 1
+  },
+  "10939": {
+   "name": "Greater Magic Essence",
+   "sell": 1
+  },
+  "10940": {
+   "name": "Strange Dust",
+   "sell": 1
+  },
+  "10978": {
+   "name": "Small Glimmering Shard",
+   "sell": 1
+  },
+  "10998": {
+   "name": "Lesser Astral Essence",
+   "sell": 1
+  },
+  "11038": {
+   "name": "Formula: Enchant 2H Weapon - Lesser Spirit",
+   "sell": 200
+  },
+  "11081": {
+   "name": "Formula: Enchant Shield - Lesser Protection",
+   "sell": 200
+  },
+  "11082": {
+   "name": "Greater Astral Essence",
+   "sell": 1
+  },
+  "11083": {
+   "name": "Soul Dust",
+   "sell": 1
+  },
+  "11084": {
+   "name": "Large Glimmering Shard",
+   "sell": 1
+  },
+  "11098": {
+   "name": "Formula: Enchant Cloak - Lesser Shadow Resistance",
+   "sell": 500
+  },
+  "11101": {
+   "name": "Formula: Enchant Bracer - Lesser Strength",
+   "sell": 625
+  },
   "11128": {
    "name": "Golden Rod",
    "sell": 500
@@ -2397,6 +4097,26 @@
    "name": "Runed Golden Rod",
    "sell": 500
   },
+  "11134": {
+   "name": "Lesser Mystic Essence",
+   "sell": 1
+  },
+  "11135": {
+   "name": "Greater Mystic Essence",
+   "sell": 1
+  },
+  "11137": {
+   "name": "Vision Dust",
+   "sell": 1
+  },
+  "11138": {
+   "name": "Small Glowing Shard",
+   "sell": 1
+  },
+  "11139": {
+   "name": "Large Glowing Shard",
+   "sell": 1
+  },
   "11144": {
    "name": "Truesilver Rod",
    "sell": 1000
@@ -2404,6 +4124,118 @@
   "11145": {
    "name": "Runed Truesilver Rod",
    "sell": 1250
+  },
+  "11150": {
+   "name": "Formula: Enchant Gloves - Mining",
+   "sell": 750
+  },
+  "11151": {
+   "name": "Formula: Enchant Gloves - Herbalism",
+   "sell": 750
+  },
+  "11152": {
+   "name": "Formula: Enchant Gloves - Fishing",
+   "sell": 750
+  },
+  "11164": {
+   "name": "Formula: Enchant Weapon - Lesser Beastslayer",
+   "sell": 750
+  },
+  "11165": {
+   "name": "Formula: Enchant Weapon - Lesser Elemental Slayer",
+   "sell": 750
+  },
+  "11166": {
+   "name": "Formula: Enchant Gloves - Skinning",
+   "sell": 1000
+  },
+  "11167": {
+   "name": "Formula: Enchant Boots - Lesser Spirit",
+   "sell": 1000
+  },
+  "11168": {
+   "name": "Formula: Enchant Shield - Lesser Block",
+   "sell": 1000
+  },
+  "11174": {
+   "name": "Lesser Nether Essence",
+   "sell": 1
+  },
+  "11175": {
+   "name": "Greater Nether Essence",
+   "sell": 1
+  },
+  "11176": {
+   "name": "Dream Dust",
+   "sell": 1
+  },
+  "11177": {
+   "name": "Small Radiant Shard",
+   "sell": 1
+  },
+  "11178": {
+   "name": "Large Radiant Shard",
+   "sell": 1
+  },
+  "11184": {
+   "name": "Blue Power Crystal",
+   "sell": 0
+  },
+  "11185": {
+   "name": "Green Power Crystal",
+   "sell": 0
+  },
+  "11186": {
+   "name": "Red Power Crystal",
+   "sell": 0
+  },
+  "11188": {
+   "name": "Yellow Power Crystal",
+   "sell": 0
+  },
+  "11202": {
+   "name": "Formula: Enchant Shield - Stamina",
+   "sell": 1100
+  },
+  "11203": {
+   "name": "Formula: Enchant Gloves - Advanced Mining",
+   "sell": 1100
+  },
+  "11204": {
+   "name": "Formula: Enchant Bracer - Greater Spirit",
+   "sell": 1100
+  },
+  "11205": {
+   "name": "Formula: Enchant Gloves - Advanced Herbalism",
+   "sell": 1250
+  },
+  "11206": {
+   "name": "Formula: Enchant Cloak - Lesser Agility",
+   "sell": 1250
+  },
+  "11207": {
+   "name": "Formula: Enchant Weapon - Fiery Weapon",
+   "sell": 3000
+  },
+  "11208": {
+   "name": "Formula: Enchant Weapon - Demonslaying",
+   "sell": 1350
+  },
+  "11223": {
+   "name": "Formula: Enchant Bracer - Deflection",
+   "sell": 1450
+  },
+  "11224": {
+   "name": "Formula: Enchant Shield - Frost Resistance",
+   "sell": 1450
+  },
+  "11225": {
+   "name": "Formula: Enchant Bracer - Greater Stamina",
+   "sell": 1550
+  },
+  "11226": {
+   "name": "Formula: Enchant Gloves - Riding Skill",
+   "sell": 1550
   },
   "11287": {
    "name": "Lesser Magic Wand",
@@ -2416,6 +4248,18 @@
   "11289": {
    "name": "Lesser Mystic Wand",
    "sell": 450
+  },
+  "11291": {
+   "name": "Star Wood",
+   "sell": 1125
+  },
+  "11371": {
+   "name": "Dark Iron Bar",
+   "sell": 600
+  },
+  "11382": {
+   "name": "Blood of the Mountain",
+   "sell": 750
   },
   "11590": {
    "name": "Mechanical Repair Kit",
@@ -2433,9 +4277,57 @@
    "name": "Dark Iron Pulverizer",
    "sell": 45760
   },
+  "11610": {
+   "name": "Plans: Dark Iron Pulverizer",
+   "sell": 3000
+  },
+  "11611": {
+   "name": "Plans: Dark Iron Sunderer",
+   "sell": 3000
+  },
+  "11612": {
+   "name": "Plans: Dark Iron Plate",
+   "sell": 3000
+  },
+  "11754": {
+   "name": "Black Diamond",
+   "sell": 0
+  },
+  "11813": {
+   "name": "Formula: Smoking Heart of the Mountain",
+   "sell": 3000
+  },
+  "12037": {
+   "name": "Mystery Meat",
+   "sell": 87
+  },
+  "12162": {
+   "name": "Plans: Hardened Iron Shortsword",
+   "sell": 750
+  },
   "12190": {
    "name": "Dreamless Sleep Potion",
    "sell": 250
+  },
+  "12204": {
+   "name": "Heavy Kodo Meat",
+   "sell": 112
+  },
+  "12205": {
+   "name": "White Spider Meat",
+   "sell": 112
+  },
+  "12206": {
+   "name": "Tender Crab Meat",
+   "sell": 112
+  },
+  "12207": {
+   "name": "Giant Egg",
+   "sell": 150
+  },
+  "12208": {
+   "name": "Tender Wolf Meat",
+   "sell": 150
   },
   "12216": {
    "name": "Spiced Chili Crab",
@@ -2449,9 +4341,21 @@
    "name": "Monster Omelet",
    "sell": 300
   },
+  "12223": {
+   "name": "Meaty Bat Wing",
+   "sell": 4
+  },
   "12224": {
    "name": "Crispy Bat Wing",
    "sell": 10
+  },
+  "12226": {
+   "name": "Recipe: Crispy Bat Wing",
+   "sell": 6
+  },
+  "12239": {
+   "name": "Recipe: Dragonbreath Chili",
+   "sell": 1750
   },
   "12259": {
    "name": "Glinting Steel Dagger",
@@ -2461,9 +4365,33 @@
    "name": "Searing Golden Blade",
    "sell": 8165
   },
+  "12261": {
+   "name": "Plans: Searing Golden Blade",
+   "sell": 950
+  },
+  "12359": {
+   "name": "Thorium Bar",
+   "sell": 600
+  },
   "12360": {
    "name": "Arcanite Bar",
    "sell": 5000
+  },
+  "12361": {
+   "name": "Blue Sapphire",
+   "sell": 7000
+  },
+  "12363": {
+   "name": "Arcane Crystal",
+   "sell": 2000
+  },
+  "12364": {
+   "name": "Huge Emerald",
+   "sell": 10000
+  },
+  "12365": {
+   "name": "Dense Stone",
+   "sell": 250
   },
   "12404": {
    "name": "Dense Sharpening Stone",
@@ -2517,6 +4445,10 @@
    "name": "Radiant Leggings",
    "sell": 25330
   },
+  "12607": {
+   "name": "Brilliant Chromatic Scale",
+   "sell": 8048
+  },
   "12624": {
    "name": "Wildthorn Mail",
    "sell": 20642
@@ -2564,6 +4496,98 @@
   "12655": {
    "name": "Enchanted Thorium Bar",
    "sell": 500
+  },
+  "12662": {
+   "name": "Demonic Rune",
+   "sell": 600
+  },
+  "12682": {
+   "name": "Plans: Thorium Armor",
+   "sell": 3000
+  },
+  "12683": {
+   "name": "Plans: Thorium Belt",
+   "sell": 3000
+  },
+  "12684": {
+   "name": "Plans: Thorium Bracers",
+   "sell": 3000
+  },
+  "12685": {
+   "name": "Plans: Radiant Belt",
+   "sell": 3000
+  },
+  "12689": {
+   "name": "Plans: Radiant Breastplate",
+   "sell": 3500
+  },
+  "12691": {
+   "name": "Pattern: Wildthorn Mail",
+   "sell": 4000
+  },
+  "12692": {
+   "name": "Plans: Thorium Shield Spike",
+   "sell": 4000
+  },
+  "12693": {
+   "name": "Plans: Thorium Boots",
+   "sell": 5000
+  },
+  "12694": {
+   "name": "Plans: Thorium Helm",
+   "sell": 5000
+  },
+  "12695": {
+   "name": "Plans: Radiant Gloves",
+   "sell": 5000
+  },
+  "12697": {
+   "name": "Plans: Radiant Boots",
+   "sell": 5500
+  },
+  "12698": {
+   "name": "Plans: Dawnbringer Shoulders",
+   "sell": 5500
+  },
+  "12702": {
+   "name": "Plans: Radiant Circlet",
+   "sell": 6250
+  },
+  "12703": {
+   "name": "Pattern: Storm Gauntlets",
+   "sell": 10000
+  },
+  "12704": {
+   "name": "Plans: Thorium Leggings",
+   "sell": 7500
+  },
+  "12711": {
+   "name": "Plans: Whitesoul Helm",
+   "sell": 10000
+  },
+  "12713": {
+   "name": "Plans: Radiant Leggings",
+   "sell": 10000
+  },
+  "12716": {
+   "name": "Pattern: Helm of the Great Chief",
+   "sell": 15000
+  },
+  "12717": {
+   "name": "Plans: Lionheart Helm",
+   "sell": 15000
+  },
+  "12720": {
+   "name": "Plans: Stronghold Gauntlets",
+   "sell": 20000
+  },
+  "12728": {
+   "name": "Pattern: Invulnerable Mail",
+   "sell": 20000
+  },
+  "12753": {
+   "name": "Skin of Shadow",
+   "sell": 0
   },
   "12764": {
    "name": "Thorium Greatsword",
@@ -2633,6 +4657,14 @@
    "name": "Annihilator",
    "sell": 57150
   },
+  "12799": {
+   "name": "Large Opal",
+   "sell": 7000
+  },
+  "12800": {
+   "name": "Azerothian Diamond",
+   "sell": 10000
+  },
   "12802": {
    "name": "Darkspear",
    "sell": 62625
@@ -2641,13 +4673,97 @@
    "name": "Living Essence",
    "sell": 500
   },
+  "12804": {
+   "name": "Powerful Mojo",
+   "sell": 2000
+  },
   "12808": {
    "name": "Essence of Undeath",
    "sell": 1000
   },
+  "12809": {
+   "name": "Guardian Stone",
+   "sell": 10000
+  },
   "12810": {
    "name": "Enchanted Leather",
    "sell": 500
+  },
+  "12811": {
+   "name": "Righteous Orb",
+   "sell": 20000
+  },
+  "12821": {
+   "name": "Plans: Dawn's Edge",
+   "sell": 4000
+  },
+  "12824": {
+   "name": "Plans: Enchanted Battlehammer",
+   "sell": 5000
+  },
+  "12825": {
+   "name": "Plans: Blazing Rapier",
+   "sell": 5000
+  },
+  "12827": {
+   "name": "Plans: Serenity",
+   "sell": 5000
+  },
+  "12828": {
+   "name": "Plans: Volcanic Hammer",
+   "sell": 5500
+  },
+  "12830": {
+   "name": "Plans: Corruption",
+   "sell": 5500
+  },
+  "12833": {
+   "name": "Plans: Hammer of the Titans",
+   "sell": 20000
+  },
+  "12834": {
+   "name": "Plans: Arcanite Champion",
+   "sell": 20000
+  },
+  "12835": {
+   "name": "Plans: Annihilator",
+   "sell": 20000
+  },
+  "12836": {
+   "name": "Plans: Frostguard",
+   "sell": 20000
+  },
+  "12837": {
+   "name": "Plans: Masterwork Stormhammer",
+   "sell": 20000
+  },
+  "12838": {
+   "name": "Plans: Arcanite Reaper",
+   "sell": 20000
+  },
+  "12839": {
+   "name": "Plans: Heartseeker",
+   "sell": 20000
+  },
+  "12938": {
+   "name": "Blood of Heroes",
+   "sell": 0
+  },
+  "13287": {
+   "name": "Pattern: Raptor Hide Harness",
+   "sell": 625
+  },
+  "13288": {
+   "name": "Pattern: Raptor Hide Belt",
+   "sell": 625
+  },
+  "13311": {
+   "name": "Schematic: Mechanical Dragonling",
+   "sell": 2500
+  },
+  "13422": {
+   "name": "Stonescale Eel",
+   "sell": 10
   },
   "13423": {
    "name": "Stonescale Oil",
@@ -2717,6 +4833,86 @@
    "name": "Purification Potion",
    "sell": 750
   },
+  "13463": {
+   "name": "Dreamfoil",
+   "sell": 100
+  },
+  "13464": {
+   "name": "Golden Sansam",
+   "sell": 100
+  },
+  "13465": {
+   "name": "Mountain Silversage",
+   "sell": 150
+  },
+  "13466": {
+   "name": "Plaguebloom",
+   "sell": 250
+  },
+  "13467": {
+   "name": "Icecap",
+   "sell": 250
+  },
+  "13468": {
+   "name": "Black Lotus",
+   "sell": 1000
+  },
+  "13476": {
+   "name": "Recipe: Mighty Rage Potion",
+   "sell": 3000
+  },
+  "13477": {
+   "name": "Recipe: Superior Mana Potion",
+   "sell": 3000
+  },
+  "13479": {
+   "name": "Recipe: Elixir of the Sages",
+   "sell": 3500
+  },
+  "13481": {
+   "name": "Recipe: Elixir of Brute Force",
+   "sell": 3750
+  },
+  "13490": {
+   "name": "Recipe: Greater Stoneshield Potion",
+   "sell": 4000
+  },
+  "13491": {
+   "name": "Recipe: Elixir of the Mongoose",
+   "sell": 4000
+  },
+  "13492": {
+   "name": "Recipe: Purification Potion",
+   "sell": 5000
+  },
+  "13493": {
+   "name": "Recipe: Greater Arcane Elixir",
+   "sell": 5000
+  },
+  "13494": {
+   "name": "Recipe: Greater Fire Protection Potion",
+   "sell": 6000
+  },
+  "13495": {
+   "name": "Recipe: Greater Frost Protection Potion",
+   "sell": 6000
+  },
+  "13496": {
+   "name": "Recipe: Greater Nature Protection Potion",
+   "sell": 6000
+  },
+  "13497": {
+   "name": "Recipe: Greater Arcane Protection Potion",
+   "sell": 6000
+  },
+  "13499": {
+   "name": "Recipe: Greater Shadow Protection Potion",
+   "sell": 6000
+  },
+  "13500": {
+   "name": "Recipe: Greater Holy Protection Potion",
+   "sell": 6000
+  },
   "13506": {
    "name": "Flask of Petrification",
    "sell": 5000
@@ -2736,6 +4932,50 @@
   "13513": {
    "name": "Flask of Chromatic Resistance",
    "sell": 5000
+  },
+  "13518": {
+   "name": "Recipe: Flask of Petrification",
+   "sell": 10000
+  },
+  "13519": {
+   "name": "Recipe: Flask of the Titans",
+   "sell": 10000
+  },
+  "13520": {
+   "name": "Recipe: Flask of Distilled Wisdom",
+   "sell": 10000
+  },
+  "13521": {
+   "name": "Recipe: Flask of Supreme Power",
+   "sell": 10000
+  },
+  "13522": {
+   "name": "Recipe: Flask of Chromatic Resistance",
+   "sell": 10000
+  },
+  "13754": {
+   "name": "Raw Glossy Mightfish",
+   "sell": 6
+  },
+  "13755": {
+   "name": "Raw Winter Squid",
+   "sell": 7
+  },
+  "13756": {
+   "name": "Raw Summer Bass",
+   "sell": 9
+  },
+  "13758": {
+   "name": "Raw Redgill",
+   "sell": 4
+  },
+  "13759": {
+   "name": "Raw Nightfin Snapper",
+   "sell": 10
+  },
+  "13760": {
+   "name": "Raw Sunscale Salmon",
+   "sell": 10
   },
   "13856": {
    "name": "Runecloth Belt",
@@ -2773,6 +5013,22 @@
    "name": "Frostweave Pants",
    "sell": 13436
   },
+  "13888": {
+   "name": "Darkclaw Lobster",
+   "sell": 12
+  },
+  "13889": {
+   "name": "Raw Whitescale Salmon",
+   "sell": 5
+  },
+  "13893": {
+   "name": "Large Raw Mightfish",
+   "sell": 15
+  },
+  "13926": {
+   "name": "Golden Pearl",
+   "sell": 10000
+  },
   "13927": {
    "name": "Cooked Glossy Mightfish",
    "sell": 8
@@ -2809,6 +5065,46 @@
    "name": "Baked Salmon",
    "sell": 10
   },
+  "13939": {
+   "name": "Recipe: Spotted Yellowtail",
+   "sell": 4000
+  },
+  "13940": {
+   "name": "Recipe: Cooked Glossy Mightfish",
+   "sell": 4000
+  },
+  "13941": {
+   "name": "Recipe: Filet of Redgill",
+   "sell": 4000
+  },
+  "13942": {
+   "name": "Recipe: Grilled Squid",
+   "sell": 4000
+  },
+  "13943": {
+   "name": "Recipe: Hot Smoked Bass",
+   "sell": 4000
+  },
+  "13945": {
+   "name": "Recipe: Nightfin Soup",
+   "sell": 5000
+  },
+  "13946": {
+   "name": "Recipe: Poached Sunscale Salmon",
+   "sell": 5000
+  },
+  "13947": {
+   "name": "Recipe: Lobster Stew",
+   "sell": 5000
+  },
+  "13948": {
+   "name": "Recipe: Mightfish Steak",
+   "sell": 5000
+  },
+  "13949": {
+   "name": "Recipe: Baked Salmon",
+   "sell": 5000
+  },
   "14042": {
    "name": "Cindercloth Vest",
    "sell": 10561
@@ -2828,6 +5124,10 @@
   "14046": {
    "name": "Runecloth Bag",
    "sell": 5000
+  },
+  "14047": {
+   "name": "Runecloth",
+   "sell": 400
   },
   "14048": {
    "name": "Bolt of Runecloth",
@@ -2933,6 +5233,182 @@
    "name": "Bottomless Bag",
    "sell": 40000
   },
+  "14227": {
+   "name": "Ironweb Spider Silk",
+   "sell": 2500
+  },
+  "14256": {
+   "name": "Felcloth",
+   "sell": 2000
+  },
+  "14341": {
+   "name": "Rune Thread",
+   "sell": 1250
+  },
+  "14342": {
+   "name": "Mooncloth",
+   "sell": 4000
+  },
+  "14343": {
+   "name": "Small Brilliant Shard",
+   "sell": 1
+  },
+  "14344": {
+   "name": "Large Brilliant Shard",
+   "sell": 1
+  },
+  "14466": {
+   "name": "Pattern: Frostweave Tunic",
+   "sell": 3000
+  },
+  "14467": {
+   "name": "Pattern: Frostweave Robe",
+   "sell": 3000
+  },
+  "14468": {
+   "name": "Pattern: Runecloth Bag",
+   "sell": 3000
+  },
+  "14470": {
+   "name": "Pattern: Runecloth Tunic",
+   "sell": 3000
+  },
+  "14471": {
+   "name": "Pattern: Cindercloth Vest",
+   "sell": 3000
+  },
+  "14473": {
+   "name": "Pattern: Ghostweave Belt",
+   "sell": 3000
+  },
+  "14474": {
+   "name": "Pattern: Frostweave Gloves",
+   "sell": 3000
+  },
+  "14476": {
+   "name": "Pattern: Cindercloth Gloves",
+   "sell": 3500
+  },
+  "14477": {
+   "name": "Pattern: Ghostweave Gloves",
+   "sell": 3500
+  },
+  "14478": {
+   "name": "Pattern: Brightcloth Robe",
+   "sell": 3500
+  },
+  "14479": {
+   "name": "Pattern: Brightcloth Gloves",
+   "sell": 3500
+  },
+  "14480": {
+   "name": "Pattern: Ghostweave Vest",
+   "sell": 4000
+  },
+  "14482": {
+   "name": "Pattern: Cindercloth Cloak",
+   "sell": 4000
+  },
+  "14484": {
+   "name": "Pattern: Brightcloth Cloak",
+   "sell": 4000
+  },
+  "14485": {
+   "name": "Pattern: Wizardweave Leggings",
+   "sell": 4000
+  },
+  "14489": {
+   "name": "Pattern: Frostweave Pants",
+   "sell": 5000
+  },
+  "14490": {
+   "name": "Pattern: Cindercloth Pants",
+   "sell": 5000
+  },
+  "14491": {
+   "name": "Pattern: Runecloth Pants",
+   "sell": 5000
+  },
+  "14492": {
+   "name": "Pattern: Felcloth Boots",
+   "sell": 5000
+  },
+  "14494": {
+   "name": "Pattern: Brightcloth Pants",
+   "sell": 5500
+  },
+  "14495": {
+   "name": "Pattern: Ghostweave Pants",
+   "sell": 5500
+  },
+  "14496": {
+   "name": "Pattern: Felcloth Hood",
+   "sell": 5500
+  },
+  "14497": {
+   "name": "Pattern: Mooncloth Leggings",
+   "sell": 5500
+  },
+  "14498": {
+   "name": "Pattern: Runecloth Headband",
+   "sell": 6250
+  },
+  "14499": {
+   "name": "Pattern: Mooncloth Bag",
+   "sell": 7500
+  },
+  "14500": {
+   "name": "Pattern: Wizardweave Robe",
+   "sell": 7500
+  },
+  "14501": {
+   "name": "Pattern: Mooncloth Vest",
+   "sell": 7500
+  },
+  "14504": {
+   "name": "Pattern: Runecloth Shoulders",
+   "sell": 10000
+  },
+  "14505": {
+   "name": "Pattern: Wizardweave Turban",
+   "sell": 10000
+  },
+  "14506": {
+   "name": "Pattern: Felcloth Robe",
+   "sell": 10000
+  },
+  "14507": {
+   "name": "Pattern: Mooncloth Shoulders",
+   "sell": 10000
+  },
+  "14508": {
+   "name": "Pattern: Felcloth Shoulders",
+   "sell": 15000
+  },
+  "14509": {
+   "name": "Pattern: Mooncloth Circlet",
+   "sell": 15000
+  },
+  "14510": {
+   "name": "Pattern: Bottomless Bag",
+   "sell": 15000
+  },
+  "14511": {
+   "name": "Pattern: Gloves of Spell Mastery",
+   "sell": 15000
+  },
+  "14512": {
+   "name": "Pattern: Truefaith Vestments",
+   "sell": 15000
+  },
+  "14513": {
+   "name": "Pattern: Robe of the Archmage",
+   "sell": 15000
+  },
+  "14514": {
+   "name": "Pattern: Robe of the Void",
+   "sell": 15000
+  },
   "14529": {
    "name": "Runecloth Bandage",
    "sell": 500
@@ -2940,6 +5416,14 @@
   "14530": {
    "name": "Heavy Runecloth Bandage",
    "sell": 1000
+  },
+  "14635": {
+   "name": "Pattern: Gem-studded Leather Belt",
+   "sell": 750
+  },
+  "14639": {
+   "name": "Schematic: Minor Recombobulator",
+   "sell": 375
   },
   "15045": {
    "name": "Green Dragonscale Breastplate",
@@ -3125,9 +5609,229 @@
    "name": "Cured Rugged Hide",
    "sell": 500
   },
+  "15408": {
+   "name": "Heavy Scorpid Scale",
+   "sell": 500
+  },
+  "15409": {
+   "name": "Refined Deeprock Salt",
+   "sell": 1000
+  },
+  "15410": {
+   "name": "Scale of Onyxia",
+   "sell": 5000
+  },
+  "15412": {
+   "name": "Green Dragonscale",
+   "sell": 500
+  },
+  "15414": {
+   "name": "Red Dragonscale",
+   "sell": 1500
+  },
+  "15415": {
+   "name": "Blue Dragonscale",
+   "sell": 500
+  },
+  "15416": {
+   "name": "Black Dragonscale",
+   "sell": 1000
+  },
+  "15417": {
+   "name": "Devilsaur Leather",
+   "sell": 500
+  },
+  "15419": {
+   "name": "Warbear Leather",
+   "sell": 600
+  },
+  "15420": {
+   "name": "Ironfeather",
+   "sell": 100
+  },
+  "15422": {
+   "name": "Frostsaber Leather",
+   "sell": 500
+  },
+  "15423": {
+   "name": "Chimera Leather",
+   "sell": 500
+  },
   "15564": {
    "name": "Rugged Armor Kit",
    "sell": 1000
+  },
+  "15726": {
+   "name": "Pattern: Green Dragonscale Breastplate",
+   "sell": 3000
+  },
+  "15727": {
+   "name": "Pattern: Heavy Scorpid Vest",
+   "sell": 3000
+  },
+  "15728": {
+   "name": "Pattern: Wicked Leather Bracers",
+   "sell": 3000
+  },
+  "15731": {
+   "name": "Pattern: Runic Leather Gauntlets",
+   "sell": 3500
+  },
+  "15732": {
+   "name": "Pattern: Volcanic Leggings",
+   "sell": 3500
+  },
+  "15733": {
+   "name": "Pattern: Green Dragonscale Leggings",
+   "sell": 3500
+  },
+  "15734": {
+   "name": "Pattern: Living Shoulders",
+   "sell": 3500
+  },
+  "15735": {
+   "name": "Pattern: Ironfeather Shoulders",
+   "sell": 3500
+  },
+  "15737": {
+   "name": "Pattern: Chimeric Boots",
+   "sell": 4000
+  },
+  "15738": {
+   "name": "Pattern: Heavy Scorpid Gauntlets",
+   "sell": 4000
+  },
+  "15739": {
+   "name": "Pattern: Runic Leather Bracers",
+   "sell": 4000
+  },
+  "15741": {
+   "name": "Pattern: Stormshroud Pants",
+   "sell": 4000
+  },
+  "15742": {
+   "name": "Pattern: Warbear Harness",
+   "sell": 4000
+  },
+  "15743": {
+   "name": "Pattern: Heavy Scorpid Belt",
+   "sell": 5000
+  },
+  "15744": {
+   "name": "Pattern: Wicked Leather Headband",
+   "sell": 5000
+  },
+  "15745": {
+   "name": "Pattern: Runic Leather Belt",
+   "sell": 5000
+  },
+  "15746": {
+   "name": "Pattern: Chimeric Leggings",
+   "sell": 5000
+  },
+  "15747": {
+   "name": "Pattern: Frostsaber Leggings",
+   "sell": 5000
+  },
+  "15748": {
+   "name": "Pattern: Heavy Scorpid Leggings",
+   "sell": 5000
+  },
+  "15749": {
+   "name": "Pattern: Volcanic Breastplate",
+   "sell": 5000
+  },
+  "15751": {
+   "name": "Pattern: Blue Dragonscale Breastplate",
+   "sell": 5000
+  },
+  "15752": {
+   "name": "Pattern: Living Leggings",
+   "sell": 5000
+  },
+  "15753": {
+   "name": "Pattern: Stormshroud Armor",
+   "sell": 5000
+  },
+  "15755": {
+   "name": "Pattern: Chimeric Vest",
+   "sell": 5500
+  },
+  "15757": {
+   "name": "Pattern: Wicked Leather Pants",
+   "sell": 5500
+  },
+  "15758": {
+   "name": "Pattern: Devilsaur Gauntlets",
+   "sell": 5500
+  },
+  "15759": {
+   "name": "Pattern: Black Dragonscale Breastplate",
+   "sell": 5500
+  },
+  "15760": {
+   "name": "Pattern: Ironfeather Breastplate",
+   "sell": 5500
+  },
+  "15761": {
+   "name": "Pattern: Frostsaber Gloves",
+   "sell": 6250
+  },
+  "15763": {
+   "name": "Pattern: Blue Dragonscale Shoulders",
+   "sell": 6250
+  },
+  "15764": {
+   "name": "Pattern: Stormshroud Shoulders",
+   "sell": 6250
+  },
+  "15765": {
+   "name": "Pattern: Runic Leather Pants",
+   "sell": 7500
+  },
+  "15768": {
+   "name": "Pattern: Wicked Leather Belt",
+   "sell": 7500
+  },
+  "15770": {
+   "name": "Pattern: Black Dragonscale Shoulders",
+   "sell": 7500
+  },
+  "15771": {
+   "name": "Pattern: Living Breastplate",
+   "sell": 7500
+  },
+  "15772": {
+   "name": "Pattern: Devilsaur Leggings",
+   "sell": 7500
+  },
+  "15773": {
+   "name": "Pattern: Wicked Leather Armor",
+   "sell": 10000
+  },
+  "15774": {
+   "name": "Pattern: Heavy Scorpid Shoulders",
+   "sell": 10000
+  },
+  "15775": {
+   "name": "Pattern: Volcanic Shoulders",
+   "sell": 10000
+  },
+  "15776": {
+   "name": "Pattern: Runic Leather Armor",
+   "sell": 10000
+  },
+  "15777": {
+   "name": "Pattern: Runic Leather Shoulders",
+   "sell": 15000
+  },
+  "15779": {
+   "name": "Pattern: Frostsaber Tunic",
+   "sell": 15000
+  },
+  "15781": {
+   "name": "Pattern: Black Dragonscale Leggings",
+   "sell": 15000
   },
   "15802": {
    "name": "Mooncloth Boots",
@@ -3181,6 +5885,10 @@
    "name": "Spellpower Goggles Xtreme Plus",
    "sell": 9002
   },
+  "16000": {
+   "name": "Thorium Tube",
+   "sell": 3750
+  },
   "16004": {
    "name": "Dark Iron Rifle",
    "sell": 29152
@@ -3188,6 +5896,10 @@
   "16005": {
    "name": "Dark Iron Bomb",
    "sell": 1250
+  },
+  "16006": {
+   "name": "Delicate Arcanite Converter",
+   "sell": 10000
   },
   "16007": {
    "name": "Flawless Arcanite Rifle",
@@ -3209,13 +5921,209 @@
    "name": "Arcane Bomb",
    "sell": 4000
   },
+  "16041": {
+   "name": "Schematic: Thorium Grenade",
+   "sell": 3000
+  },
+  "16042": {
+   "name": "Schematic: Thorium Widget",
+   "sell": 3000
+  },
+  "16043": {
+   "name": "Schematic: Thorium Rifle",
+   "sell": 3000
+  },
+  "16044": {
+   "name": "Schematic: Lifelike Mechanical Toad",
+   "sell": 4000
+  },
+  "16045": {
+   "name": "Schematic: Spellpower Goggles Xtreme Plus",
+   "sell": 4000
+  },
+  "16048": {
+   "name": "Schematic: Dark Iron Rifle",
+   "sell": 4000
+  },
+  "16049": {
+   "name": "Schematic: Dark Iron Bomb",
+   "sell": 5000
+  },
+  "16051": {
+   "name": "Schematic: Thorium Shells",
+   "sell": 5000
+  },
+  "16052": {
+   "name": "Schematic: Voice Amplification Modulator",
+   "sell": 5000
+  },
+  "16053": {
+   "name": "Schematic: Master Engineer's Goggles",
+   "sell": 5000
+  },
+  "16054": {
+   "name": "Schematic: Arcanite Dragonling",
+   "sell": 6000
+  },
+  "16055": {
+   "name": "Schematic: Arcane Bomb",
+   "sell": 6000
+  },
+  "16056": {
+   "name": "Schematic: Flawless Arcanite Rifle",
+   "sell": 6000
+  },
+  "16110": {
+   "name": "Recipe: Monster Omelet",
+   "sell": 3000
+  },
+  "16111": {
+   "name": "Recipe: Spiced Chili Crab",
+   "sell": 3000
+  },
+  "16202": {
+   "name": "Lesser Eternal Essence",
+   "sell": 1
+  },
+  "16203": {
+   "name": "Greater Eternal Essence",
+   "sell": 1
+  },
+  "16204": {
+   "name": "Illusion Dust",
+   "sell": 1
+  },
   "16206": {
    "name": "Arcanite Rod",
    "sell": 1000
   },
+  "16207": {
+   "name": "Runed Arcanite Rod",
+   "sell": 1250
+  },
+  "16214": {
+   "name": "Formula: Enchant Bracer - Greater Intellect",
+   "sell": 3000
+  },
+  "16215": {
+   "name": "Formula: Enchant Boots - Greater Stamina",
+   "sell": 3000
+  },
+  "16216": {
+   "name": "Formula: Enchant Cloak - Greater Resistance",
+   "sell": 3000
+  },
+  "16218": {
+   "name": "Formula: Enchant Bracer - Superior Spirit",
+   "sell": 3500
+  },
+  "16219": {
+   "name": "Formula: Enchant Gloves - Greater Agility",
+   "sell": 3500
+  },
+  "16220": {
+   "name": "Formula: Enchant Boots - Spirit",
+   "sell": 4000
+  },
+  "16221": {
+   "name": "Formula: Enchant Chest - Major Stamina",
+   "sell": 4000
+  },
+  "16222": {
+   "name": "Formula: Enchant Shield - Superior Spirit",
+   "sell": 5000
+  },
+  "16223": {
+   "name": "Formula: Enchant Weapon - Icy Chill",
+   "sell": 5000
+  },
+  "16224": {
+   "name": "Formula: Enchant Cloak - Superior Defense",
+   "sell": 5000
+  },
+  "16242": {
+   "name": "Formula: Enchant Chest - Major Intellect",
+   "sell": 5500
+  },
+  "16244": {
+   "name": "Formula: Enchant Gloves - Greater Strength",
+   "sell": 6000
+  },
+  "16245": {
+   "name": "Formula: Enchant Boots - Greater Agility",
+   "sell": 6000
+  },
+  "16246": {
+   "name": "Formula: Enchant Bracer - Superior Strength",
+   "sell": 6000
+  },
+  "16247": {
+   "name": "Formula: Enchant 2H Weapon - Superior Impact",
+   "sell": 6000
+  },
+  "16248": {
+   "name": "Formula: Enchant Weapon - Unholy Weapon",
+   "sell": 6000
+  },
+  "16249": {
+   "name": "Formula: Enchant 2H Weapon - Major Intellect",
+   "sell": 7500
+  },
+  "16250": {
+   "name": "Formula: Enchant Weapon - Superior Striking",
+   "sell": 7500
+  },
+  "16251": {
+   "name": "Formula: Enchant Bracer - Superior Stamina",
+   "sell": 7500
+  },
+  "16252": {
+   "name": "Formula: Enchant Weapon - Crusader",
+   "sell": 7500
+  },
+  "16253": {
+   "name": "Formula: Enchant Chest - Greater Stats",
+   "sell": 7500
+  },
+  "16254": {
+   "name": "Formula: Enchant Weapon - Lifestealing",
+   "sell": 7500
+  },
+  "16255": {
+   "name": "Formula: Enchant 2H Weapon - Major Spirit",
+   "sell": 7500
+  },
+  "17010": {
+   "name": "Fiery Core",
+   "sell": 2000
+  },
+  "17011": {
+   "name": "Lava Core",
+   "sell": 2000
+  },
+  "17012": {
+   "name": "Core Leather",
+   "sell": 1000
+  },
+  "17034": {
+   "name": "Maple Seed",
+   "sell": 50
+  },
+  "17035": {
+   "name": "Stranglethorn Seed",
+   "sell": 100
+  },
   "17193": {
    "name": "Sulfuron Hammer",
    "sell": 122311
+  },
+  "17194": {
+   "name": "Holiday Spices",
+   "sell": 0
+  },
+  "17196": {
+   "name": "Holiday Spirits",
+   "sell": 12
   },
   "17197": {
    "name": "Gingerbread Cookie",
@@ -3225,6 +6133,22 @@
    "name": "Egg Nog",
    "sell": 9
   },
+  "17200": {
+   "name": "Recipe: Gingerbread Cookie",
+   "sell": 6
+  },
+  "17201": {
+   "name": "Recipe: Egg Nog",
+   "sell": 60
+  },
+  "17202": {
+   "name": "Snowball",
+   "sell": 0
+  },
+  "17203": {
+   "name": "Sulfuron Ingot",
+   "sell": 100000
+  },
   "17222": {
    "name": "Spider Sausage",
    "sell": 300
@@ -3233,20 +6157,44 @@
    "name": "Edge of Winter",
    "sell": 9178
   },
+  "17706": {
+   "name": "Plans: Edge of Winter",
+   "sell": 950
+  },
   "17708": {
    "name": "Elixir of Frost Power",
    "sell": 35
+  },
+  "17709": {
+   "name": "Recipe: Elixir of Frost Power",
+   "sell": 500
   },
   "17716": {
    "name": "Snowmaster 9000",
    "sell": 7500
   },
+  "17720": {
+   "name": "Schematic: Snowmaster 9000",
+   "sell": 600
+  },
   "17721": {
    "name": "Gloves of the Greatfather",
    "sell": 2268
   },
+  "17722": {
+   "name": "Pattern: Gloves of the Greatfather",
+   "sell": 700
+  },
   "17723": {
    "name": "Green Holiday Shirt",
+   "sell": 750
+  },
+  "17724": {
+   "name": "Pattern: Green Holiday Shirt",
+   "sell": 375
+  },
+  "17725": {
+   "name": "Formula: Enchant Weapon - Winter's Might",
    "sell": 750
   },
   "17967": {
@@ -3257,25 +6205,65 @@
    "name": "Tender Wolf Steak",
    "sell": 300
   },
+  "18046": {
+   "name": "Recipe: Tender Wolf Steak",
+   "sell": 3000
+  },
+  "18168": {
+   "name": "Force Reactive Disk",
+   "sell": 56416
+  },
   "18232": {
    "name": "Field Repair Bot 74A",
    "sell": 10000
+  },
+  "18235": {
+   "name": "Schematic: Field Repair Bot 74A",
+   "sell": 25000
   },
   "18238": {
    "name": "Shadowskin Gloves",
    "sell": 3321
   },
+  "18239": {
+   "name": "Pattern: Shadowskin Gloves",
+   "sell": 875
+  },
+  "18240": {
+   "name": "Ogre Tannin",
+   "sell": 0
+  },
+  "18251": {
+   "name": "Core Armor Kit",
+   "sell": 5000
+  },
   "18253": {
    "name": "Major Rejuvenation Potion",
    "sell": 15
+  },
+  "18256": {
+   "name": "Imbued Vial",
+   "sell": 1500
+  },
+  "18257": {
+   "name": "Recipe: Major Rejuvenation Potion",
+   "sell": 50000
   },
   "18258": {
    "name": "Gordok Ogre Suit",
    "sell": 0
   },
+  "18262": {
+   "name": "Elemental Sharpening Stone",
+   "sell": 1250
+  },
   "18263": {
    "name": "Flarecore Wraps",
    "sell": 16911
+  },
+  "18265": {
+   "name": "Pattern: Flarecore Wraps",
+   "sell": 30000
   },
   "18294": {
    "name": "Draught of Greater Water Breathing",
@@ -3285,9 +6273,17 @@
    "name": "Belt of the Archmage",
    "sell": 14744
   },
+  "18414": {
+   "name": "Pattern: Belt of the Archmage",
+   "sell": 30000
+  },
   "18486": {
    "name": "Mooncloth Robe",
    "sell": 21683
+  },
+  "18487": {
+   "name": "Pattern: Mooncloth Robe",
+   "sell": 10000
   },
   "18509": {
    "name": "Chromatic Cloak",
@@ -3301,12 +6297,36 @@
    "name": "Shifting Cloak",
    "sell": 20971
   },
+  "18512": {
+   "name": "Larval Acid",
+   "sell": 4000
+  },
+  "18517": {
+   "name": "Pattern: Chromatic Cloak",
+   "sell": 40000
+  },
+  "18518": {
+   "name": "Pattern: Hide of the Wild",
+   "sell": 40000
+  },
+  "18519": {
+   "name": "Pattern: Shifting Cloak",
+   "sell": 40000
+  },
   "18587": {
    "name": "Goblin Jumper Cables XL",
    "sell": 2000
   },
+  "18592": {
+   "name": "Plans: Sulfuron Hammer",
+   "sell": 20000
+  },
   "18594": {
    "name": "Powerful Seaforium Charge",
+   "sell": 3000
+  },
+  "18631": {
+   "name": "Truesilver Transformer",
    "sell": 3000
   },
   "18634": {
@@ -3333,17 +6353,61 @@
    "name": "Gnomish Alarm-O-Bot",
    "sell": 1500
   },
+  "18647": {
+   "name": "Schematic: Red Firework",
+   "sell": 450
+  },
+  "18649": {
+   "name": "Schematic: Blue Firework",
+   "sell": 450
+  },
+  "18652": {
+   "name": "Schematic: Gyrofreeze Ice Reflector",
+   "sell": 3000
+  },
+  "18653": {
+   "name": "Schematic: Goblin Jumper Cables XL",
+   "sell": 4000
+  },
+  "18655": {
+   "name": "Schematic: Major Recombobulator",
+   "sell": 4000
+  },
+  "18656": {
+   "name": "Schematic: Powerful Seaforium Charge",
+   "sell": 4000
+  },
+  "18657": {
+   "name": "Schematic: Hyper-Radiant Flame Reflector",
+   "sell": 5000
+  },
+  "18658": {
+   "name": "Schematic: Ultra-Flash Shadow Reflector",
+   "sell": 6000
+  },
   "18660": {
    "name": "World Enlarger",
    "sell": 7500
+  },
+  "18661": {
+   "name": "Schematic: World Enlarger",
+   "sell": 3000
   },
   "18662": {
    "name": "Heavy Leather Ball",
    "sell": 5
   },
+  "18731": {
+   "name": "Pattern: Heavy Leather Ball",
+   "sell": 500
+  },
   "18948": {
    "name": "Barbaric Bracers",
    "sell": 1589
+  },
+  "18949": {
+   "name": "Pattern: Barbaric Bracers",
+   "sell": 500
   },
   "18984": {
    "name": "Dimensional Ripper - Everlook",
@@ -3357,9 +6421,21 @@
    "name": "Powerful Anti-Venom",
    "sell": 500
   },
+  "19441": {
+   "name": "Huge Venom Sac",
+   "sell": 1500
+  },
+  "19726": {
+   "name": "Bloodvine",
+   "sell": 500
+  },
   "19931": {
    "name": "Gurubashi Mojo Madness",
    "sell": 0
+  },
+  "19943": {
+   "name": "Massive Mojo",
+   "sell": 2000
   },
   "20002": {
    "name": "Greater Dreamless Sleep Potion",
@@ -3368,6 +6444,10 @@
   "20074": {
    "name": "Heavy Crocolisk Stew",
    "sell": 300
+  },
+  "20075": {
+   "name": "Recipe: Heavy Crocolisk Stew",
+   "sell": 500
   },
   "20295": {
    "name": "Blue Dragonscale Leggings",
@@ -3380,6 +6460,14 @@
   "20380": {
    "name": "Dreamscale Breastplate",
    "sell": 57958
+  },
+  "20381": {
+   "name": "Dreamscale",
+   "sell": 5000
+  },
+  "20424": {
+   "name": "Sandworm Meat",
+   "sell": 175
   },
   "20452": {
    "name": "Smoked Desert Dumplings",
@@ -3409,6 +6497,22 @@
    "name": "Spitfire Bracers",
    "sell": 17139
   },
+  "20498": {
+   "name": "Silithid Chitin",
+   "sell": 1000
+  },
+  "20500": {
+   "name": "Light Silithid Carapace",
+   "sell": 2000
+  },
+  "20501": {
+   "name": "Heavy Silithid Carapace",
+   "sell": 2000
+  },
+  "20520": {
+   "name": "Dark Rune",
+   "sell": 2000
+  },
   "20537": {
    "name": "Runed Stygian Boots",
    "sell": 17736
@@ -3420,6 +6524,18 @@
   "20539": {
    "name": "Runed Stygian Belt",
    "sell": 11908
+  },
+  "20546": {
+   "name": "Pattern: Runed Stygian Leggings",
+   "sell": 10000
+  },
+  "20547": {
+   "name": "Pattern: Runed Stygian Boots",
+   "sell": 10000
+  },
+  "20548": {
+   "name": "Pattern: Runed Stygian Belt",
+   "sell": 10000
   },
   "20549": {
    "name": "Darkrune Gauntlets",
@@ -3433,9 +6549,29 @@
    "name": "Darkrune Helm",
    "sell": 17352
   },
+  "20553": {
+   "name": "Plans: Darkrune Gauntlets",
+   "sell": 15000
+  },
+  "20554": {
+   "name": "Plans: Darkrune Breastplate",
+   "sell": 15000
+  },
+  "20555": {
+   "name": "Plans: Darkrune Helm",
+   "sell": 15000
+  },
   "20575": {
    "name": "Black Whelp Tunic",
    "sell": 743
+  },
+  "20576": {
+   "name": "Pattern: Black Whelp Tunic",
+   "sell": 350
+  },
+  "20725": {
+   "name": "Nexus Crystal",
+   "sell": 1
   },
   "20744": {
    "name": "Minor Wizard Oil",
@@ -3457,17 +6593,117 @@
    "name": "Wizard Oil",
    "sell": 1000
   },
+  "20752": {
+   "name": "Formula: Minor Mana Oil",
+   "sell": 750
+  },
+  "20753": {
+   "name": "Formula: Lesser Wizard Oil",
+   "sell": 1000
+  },
+  "20754": {
+   "name": "Formula: Lesser Mana Oil",
+   "sell": 2500
+  },
+  "20755": {
+   "name": "Formula: Wizard Oil",
+   "sell": 5000
+  },
+  "20758": {
+   "name": "Formula: Minor Wizard Oil",
+   "sell": 125
+  },
+  "20867": {
+   "name": "Onyx Idol",
+   "sell": 0
+  },
+  "20868": {
+   "name": "Lambent Idol",
+   "sell": 0
+  },
+  "20870": {
+   "name": "Jasper Idol",
+   "sell": 0
+  },
+  "20871": {
+   "name": "Obsidian Idol",
+   "sell": 0
+  },
+  "20872": {
+   "name": "Vermillion Idol",
+   "sell": 0
+  },
+  "20873": {
+   "name": "Alabaster Idol",
+   "sell": 0
+  },
+  "20874": {
+   "name": "Idol of the Sun",
+   "sell": 0
+  },
+  "20875": {
+   "name": "Idol of Night",
+   "sell": 0
+  },
+  "20876": {
+   "name": "Idol of Death",
+   "sell": 0
+  },
+  "20877": {
+   "name": "Idol of the Sage",
+   "sell": 0
+  },
+  "20878": {
+   "name": "Idol of Rebirth",
+   "sell": 0
+  },
+  "20879": {
+   "name": "Idol of Life",
+   "sell": 0
+  },
+  "20881": {
+   "name": "Idol of Strife",
+   "sell": 0
+  },
+  "20882": {
+   "name": "Idol of War",
+   "sell": 0
+  },
   "21023": {
    "name": "Dirge's Kickin' Chimaerok Chops",
    "sell": 250
+  },
+  "21024": {
+   "name": "Chimaerok Tenderloin",
+   "sell": 0
+  },
+  "21025": {
+   "name": "Recipe: Dirge's Kickin' Chimaerok Chops",
+   "sell": 1250
+  },
+  "21071": {
+   "name": "Raw Sagefish",
+   "sell": 25
   },
   "21072": {
    "name": "Smoked Sagefish",
    "sell": 40
   },
+  "21099": {
+   "name": "Recipe: Smoked Sagefish",
+   "sell": 125
+  },
+  "21153": {
+   "name": "Raw Greater Sagefish",
+   "sell": 125
+  },
   "21217": {
    "name": "Sagefish Delight",
    "sell": 125
+  },
+  "21219": {
+   "name": "Recipe: Sagefish Delight",
+   "sell": 1250
   },
   "21277": {
    "name": "Tranquil Mechanical Yeti",
@@ -3489,9 +6725,25 @@
    "name": "Core Felcloth Bag",
    "sell": 80000
   },
+  "21358": {
+   "name": "Pattern: Soul Pouch",
+   "sell": 3000
+  },
+  "21371": {
+   "name": "Pattern: Core Felcloth Bag",
+   "sell": 20000
+  },
   "21546": {
    "name": "Elixir of Holy Power",
    "sell": 35
+  },
+  "21547": {
+   "name": "Recipe: Elixir of Holy Power",
+   "sell": 2500
+  },
+  "21548": {
+   "name": "Pattern: Stormshroud Gloves",
+   "sell": 15000
   },
   "21570": {
    "name": "Cluster Launcher",
@@ -3513,6 +6765,22 @@
    "name": "Heavy Obsidian Belt",
    "sell": 14282
   },
+  "22202": {
+   "name": "Small Obsidian Shard",
+   "sell": 2500
+  },
+  "22203": {
+   "name": "Large Obsidian Shard",
+   "sell": 5000
+  },
+  "22220": {
+   "name": "Plans: Black Grasp of the Destroyer",
+   "sell": 12500
+  },
+  "22222": {
+   "name": "Plans: Thick Obsidian Breastplate",
+   "sell": 20000
+  },
   "22246": {
    "name": "Enchanted Mageweave Pouch",
    "sell": 2500
@@ -3525,6 +6793,18 @@
    "name": "Big Bag of Enchantment",
    "sell": 30000
   },
+  "22307": {
+   "name": "Pattern: Enchanted Mageweave Pouch",
+   "sell": 1500
+  },
+  "22308": {
+   "name": "Pattern: Enchanted Runecloth Bag",
+   "sell": 5000
+  },
+  "22309": {
+   "name": "Pattern: Big Bag of Enchantment",
+   "sell": 12500
+  },
   "22383": {
    "name": "Sageblade",
    "sell": 84291
@@ -3536,6 +6816,18 @@
   "22385": {
    "name": "Titanic Leggings",
    "sell": 25276
+  },
+  "22388": {
+   "name": "Plans: Titanic Leggings",
+   "sell": 15000
+  },
+  "22389": {
+   "name": "Plans: Sageblade",
+   "sell": 20000
+  },
+  "22390": {
+   "name": "Plans: Persuader",
+   "sell": 20000
   },
   "22652": {
    "name": "Glacial Vest",
@@ -3577,6 +6869,10 @@
    "name": "Icy Scale Gauntlets",
    "sell": 50712
   },
+  "22682": {
+   "name": "Frozen Rune",
+   "sell": 20000
+  },
   "22759": {
    "name": "Bramblewood Helm",
    "sell": 29190
@@ -3589,6 +6885,10 @@
    "name": "Bramblewood Belt",
    "sell": 19607
   },
+  "23567": {
+   "name": "DEPRECATED ITEM",
+   "sell": 0
+  },
   "23684": {
    "name": "Crystal Infused Bandage",
    "sell": 1500
@@ -3597,13 +6897,37 @@
    "name": "Shredder Autosalvage Unit",
    "sell": 0
   },
+  "210178": {
+   "name": "Schematic: Shredder Autosalvage Unit",
+   "sell": 3000
+  },
   "210708": {
    "name": "Elixir of Coalesced Regret",
    "sell": 40
   },
+  "210709": {
+   "name": "Recipe: Elixir of Coalesced Regret",
+   "sell": 25
+  },
   "211845": {
    "name": "Blackfathom Sharpening Stone",
    "sell": 125
+  },
+  "213369": {
+   "name": "Faintly Glowing Leather",
+   "sell": 280
+  },
+  "213371": {
+   "name": "Crate of Tainted Gniodine Solution",
+   "sell": 0
+  },
+  "213379": {
+   "name": "Hyperconductive Arcano-Filament",
+   "sell": 280
+  },
+  "213383": {
+   "name": "Polished Truesilver Gears",
+   "sell": 0
   },
   "215365": {
    "name": "Invoker's Mantle",
@@ -3613,13 +6937,93 @@
    "name": "Invoker's Cord",
    "sell": 864
   },
+  "215369": {
+   "name": "Pattern: Invoker's Cord",
+   "sell": 175
+  },
+  "215370": {
+   "name": "Pattern: Invoker's Mantle",
+   "sell": 175
+  },
+  "215430": {
+   "name": "Gnomeregan Fallout",
+   "sell": 250
+  },
+  "217244": {
+   "name": "Pattern: Crimson Silk Robe",
+   "sell": 1250
+  },
+  "217249": {
+   "name": "Pattern: Earthen Silk Belt",
+   "sell": 375
+  },
+  "217251": {
+   "name": "Pattern: Crimson Silk Shoulders",
+   "sell": 350
+  },
+  "217254": {
+   "name": "Pattern: Boots of the Enchanter",
+   "sell": 275
+  },
+  "217258": {
+   "name": "Pattern: Enchanter's Cowl",
+   "sell": 250
+  },
+  "217260": {
+   "name": "Pattern: Big Voodoo Mask",
+   "sell": 1000
+  },
+  "217262": {
+   "name": "Pattern: Big Voodoo Robe",
+   "sell": 1000
+  },
+  "217264": {
+   "name": "Pattern: Guardian Leather Bracers",
+   "sell": 700
+  },
+  "217266": {
+   "name": "Pattern: Guardian Belt",
+   "sell": 162
+  },
   "217270": {
    "name": "Turtle Scale Gloves",
    "sell": 3477
   },
+  "217271": {
+   "name": "Pattern: Turtle Scale Gloves",
+   "sell": 875
+  },
   "217273": {
    "name": "Golden Scale Gauntlets",
    "sell": 3689
+  },
+  "217274": {
+   "name": "Plans: Golden Scale Gauntlets",
+   "sell": 1250
+  },
+  "217276": {
+   "name": "Plans: Golden Scale Boots",
+   "sell": 1250
+  },
+  "217278": {
+   "name": "Plans: Golden Scale Cuirass",
+   "sell": 1100
+  },
+  "217280": {
+   "name": "Plans: Golden Scale Coif",
+   "sell": 1100
+  },
+  "217282": {
+   "name": "Plans: Moonsteel Broadsword",
+   "sell": 1100
+  },
+  "217284": {
+   "name": "Plans: Golden Scale Shoulders",
+   "sell": 850
+  },
+  "217286": {
+   "name": "Plans: Golden Scale Leggings",
+   "sell": 800
   },
   "217287": {
    "name": "Greater Mystic Wand",
@@ -3633,13 +7037,157 @@
    "name": "Scroll of Spatial Mending",
    "sell": 150
   },
+  "223163": {
+   "name": "Formula: Scroll of Spatial Mending",
+   "sell": 1280
+  },
+  "227727": {
+   "name": "Plans: Sulfuron Hammer",
+   "sell": 20000
+  },
   "227844": {
    "name": "Leather-Reinforced Runecloth Bag",
    "sell": 40000
   },
+  "227898": {
+   "name": "Pattern: Honed Blue Dragonscale Breastplate",
+   "sell": 5000
+  },
+  "227899": {
+   "name": "Pattern: Honed Blue Dragonscale Shoulders",
+   "sell": 6250
+  },
+  "227900": {
+   "name": "Pattern: Living Green Dragonscale Leggings",
+   "sell": 3500
+  },
+  "227901": {
+   "name": "Plans: Tempered Dark Iron Plate",
+   "sell": 3000
+  },
+  "227902": {
+   "name": "Pattern: Hardened Black Dragonscale Breastplate",
+   "sell": 5500
+  },
+  "227903": {
+   "name": "Pattern: Hardened Black Dragonscale Leggings",
+   "sell": 15000
+  },
+  "227904": {
+   "name": "Pattern: Hardened Black Dragonscale Shoulders",
+   "sell": 7500
+  },
+  "227905": {
+   "name": "Plans: Skyrider's Masterwork Stormhammer",
+   "sell": 20000
+  },
+  "227906": {
+   "name": "Pattern: Masterwork Volcanic Breastplate",
+   "sell": 5000
+  },
+  "227907": {
+   "name": "Pattern: Masterwork Volcanic Shoulders",
+   "sell": 10000
+  },
+  "227908": {
+   "name": "Pattern: Masterwork Volcanic Leggings",
+   "sell": 3500
+  },
+  "227910": {
+   "name": "Pattern: Brilliant Chromatic Cloak",
+   "sell": 40000
+  },
+  "228114": {
+   "name": "Plans: Refined Arcanite Reaper",
+   "sell": 20000
+  },
+  "228117": {
+   "name": "Plans: Refined Arcanite Champion",
+   "sell": 20000
+  },
+  "228118": {
+   "name": "Plans: Stronger-hold Gauntlets",
+   "sell": 20000
+  },
+  "228119": {
+   "name": "Pattern: Devilcore Gauntlets",
+   "sell": 5500
+  },
+  "228120": {
+   "name": "Pattern: Devilcore Leggings",
+   "sell": 7500
+  },
+  "228121": {
+   "name": "Pattern: Leather-Reinforced Runecloth Bag",
+   "sell": 0
+  },
+  "228250": {
+   "name": "Plans: Stronger-hold Gauntlets",
+   "sell": 20000
+  },
+  "228251": {
+   "name": "Pattern: Living Green Dragonscale Gauntlets",
+   "sell": 3500
+  },
+  "228276": {
+   "name": "Pattern: Mastercrafted Shifting Cloak",
+   "sell": 40000
+  },
+  "228303": {
+   "name": "Pattern: Incandescent Mooncloth Robe",
+   "sell": 10000
+  },
+  "228309": {
+   "name": "Pattern: Living Green Dragonscale Breastplate",
+   "sell": 3000
+  },
+  "228310": {
+   "name": "Plans: Hardened Frostguard",
+   "sell": 20000
+  },
+  "228311": {
+   "name": "Plans: Finely-Enchanted Battlehammer",
+   "sell": 5000
+  },
+  "228312": {
+   "name": "Plans: Invincible Mail",
+   "sell": 20000
+  },
+  "228313": {
+   "name": "Plans: Tempest Gauntlets",
+   "sell": 10000
+  },
+  "228314": {
+   "name": "Plans: Warcrest of the Great Chief",
+   "sell": 15000
+  },
+  "228315": {
+   "name": "Plans: Sageblade of the Archmagus",
+   "sell": 20000
+  },
+  "228316": {
+   "name": "Pattern: Incandescent Mooncloth Vest",
+   "sell": 7500
+  },
+  "228317": {
+   "name": "Pattern: Incandescent Mooncloth Circlet",
+   "sell": 15000
+  },
+  "228318": {
+   "name": "Pattern: Incandescent Mooncloth Leggings",
+   "sell": 5500
+  },
+  "228477": {
+   "name": "Pattern: Embroidered Belt of the Archmage",
+   "sell": 30000
+  },
   "228978": {
    "name": "Enchanted Sigil: Flowing Waters",
    "sell": 0
+  },
+  "228993": {
+   "name": "Pattern: Bottomless Bag",
+   "sell": 15000
   },
   "232433": {
    "name": "Dense Runecloth Bandage",
@@ -3649,9 +7197,149 @@
    "name": "Darkclaw Bisque",
    "sell": 100
   },
+  "232437": {
+   "name": "Recipe: Darkclaw Bisque",
+   "sell": 5000
+  },
   "232438": {
    "name": "Smoked Redgill",
    "sell": 5
+  },
+  "232443": {
+   "name": "Recipe: Smoked Redgill",
+   "sell": 4000
+  },
+  "234012": {
+   "name": "Hive Thistle",
+   "sell": 15
+  },
+  "238298": {
+   "name": "Pattern: Scarlet Augur's Hood",
+   "sell": 0
+  },
+  "238299": {
+   "name": "Pattern: Scarlet Augur's Mantle",
+   "sell": 0
+  },
+  "238300": {
+   "name": "Pattern: Scarlet Augur's Vestments",
+   "sell": 0
+  },
+  "238301": {
+   "name": "Pattern: Scarlet Augur's Cuffs",
+   "sell": 0
+  },
+  "238302": {
+   "name": "Pattern: Scarlet Augur's Mitts",
+   "sell": 0
+  },
+  "238303": {
+   "name": "Pattern: Scarlet Augur's Strap",
+   "sell": 0
+  },
+  "238304": {
+   "name": "Pattern: Scarlet Augur's Leggings",
+   "sell": 0
+  },
+  "238305": {
+   "name": "Pattern: Scarlet Augur's Soles",
+   "sell": 0
+  },
+  "238306": {
+   "name": "Pattern: Scarlet Infiltrator's Bandana",
+   "sell": 0
+  },
+  "238307": {
+   "name": "Pattern: Scarlet Infiltrator's Shoulderpads",
+   "sell": 0
+  },
+  "238308": {
+   "name": "Pattern: Scarlet Infiltrator's Vest",
+   "sell": 0
+  },
+  "238309": {
+   "name": "Pattern: Scarlet Infiltrator's Bracers",
+   "sell": 0
+  },
+  "238310": {
+   "name": "Pattern: Scarlet Infiltrator's Gloves",
+   "sell": 0
+  },
+  "238311": {
+   "name": "Pattern: Scarlet Infiltrator's Belt",
+   "sell": 0
+  },
+  "238312": {
+   "name": "Pattern: Scarlet Infiltrator's Trousers",
+   "sell": 0
+  },
+  "238313": {
+   "name": "Pattern: Scarlet Infiltrator's Shoes",
+   "sell": 0
+  },
+  "238314": {
+   "name": "Pattern: Scarlet Huntsman's Coif",
+   "sell": 0
+  },
+  "238315": {
+   "name": "Pattern: Scarlet Huntsman's Pauldrons",
+   "sell": 0
+  },
+  "238316": {
+   "name": "Pattern: Scarlet Huntsman's Chain",
+   "sell": 0
+  },
+  "238317": {
+   "name": "Pattern: Scarlet Huntsman's Wristguards",
+   "sell": 0
+  },
+  "238318": {
+   "name": "Pattern: Scarlet Huntsman's Handguards",
+   "sell": 0
+  },
+  "238319": {
+   "name": "Pattern: Scarlet Huntsman's Clasp",
+   "sell": 0
+  },
+  "238320": {
+   "name": "Pattern: Scarlet Huntsman's Legguards",
+   "sell": 0
+  },
+  "238321": {
+   "name": "Pattern: Scarlet Huntsman's Boots",
+   "sell": 0
+  },
+  "238322": {
+   "name": "Plans: Scarlet Soldier's Helmet",
+   "sell": 0
+  },
+  "238323": {
+   "name": "Plans: Scarlet Soldier's Spaulders",
+   "sell": 0
+  },
+  "238324": {
+   "name": "Plans: Scarlet Soldier's Chestplate",
+   "sell": 0
+  },
+  "238325": {
+   "name": "Plans: Scarlet Soldier's Protectors",
+   "sell": 0
+  },
+  "238326": {
+   "name": "Plans: Scarlet Soldier's Grips",
+   "sell": 0
+  },
+  "238327": {
+   "name": "Plans: Scarlet Soldier's Waistguard",
+   "sell": 0
+  },
+  "238328": {
+   "name": "Plans: Scarlet Soldier's Legplates",
+   "sell": 0
+  },
+  "238329": {
+   "name": "Plans: Scarlet Soldier's Stompers",
+   "sell": 0
   },
   "247239": {
    "name": "Lesser Discolored Healing Potion",
@@ -3685,6 +7373,30 @@
    "name": "Novice's Practice Wand",
    "sell": 5
   },
+  "248819": {
+   "name": "Fel Crystal",
+   "sell": 3000
+  },
+  "248824": {
+   "name": "Fel Hide",
+   "sell": 750
+  },
+  "248825": {
+   "name": "Fel Leather",
+   "sell": 750
+  },
+  "249274": {
+   "name": "Stranglevine",
+   "sell": 250
+  },
+  "249391": {
+   "name": "Pyrite",
+   "sell": 100
+  },
+  "249399": {
+   "name": "Frilled Lichen",
+   "sell": 30
+  },
   "249409": {
    "name": "Cerulean Dye",
    "sell": 75
@@ -3692,6 +7404,26 @@
   "249410": {
    "name": "Sulfuric Acid",
    "sell": 125
+  },
+  "249424": {
+   "name": "Rosecap",
+   "sell": 95
+  },
+  "249425": {
+   "name": "Bauxite",
+   "sell": 250
+  },
+  "249427": {
+   "name": "Pristine Leather",
+   "sell": 125
+  },
+  "249428": {
+   "name": "Pristine Hide",
+   "sell": 250
+  },
+  "249429": {
+   "name": "Pristine Scale",
+   "sell": 375
   },
   "249430": {
    "name": "Magenta Dye",
@@ -3704,6 +7436,10 @@
   "249432": {
    "name": "Sandpaper",
    "sell": 250
+  },
+  "249726": {
+   "name": "Azerothium Bar",
+   "sell": 3000
   },
   "250327": {
    "name": "Potion of Predatory Senses",
@@ -3740,6 +7476,42 @@
   "250354": {
    "name": "Elixir of Intellect",
    "sell": 75
+  },
+  "250363": {
+   "name": "Recipe: Potion of Predatory Senses",
+   "sell": 0
+  },
+  "250366": {
+   "name": "Recipe: Minor Cleric's Elixir",
+   "sell": 0
+  },
+  "250368": {
+   "name": "Recipe: Cleric's Elixir",
+   "sell": 0
+  },
+  "250370": {
+   "name": "Recipe: Elixir of Fortitude",
+   "sell": 0
+  },
+  "250375": {
+   "name": "Recipe: Minor Mageblood Elixir",
+   "sell": 0
+  },
+  "250380": {
+   "name": "Recipe: Elixir of Minor Spirit",
+   "sell": 0
+  },
+  "250382": {
+   "name": "Recipe: Elixir of Spirit",
+   "sell": 0
+  },
+  "250385": {
+   "name": "Recipe: Elixir of Strength",
+   "sell": 0
+  },
+  "250389": {
+   "name": "Recipe: Elixir of Intellect",
+   "sell": 0
   },
   "250581": {
    "name": "Officer's Wristguards",
@@ -3793,13 +7565,61 @@
    "name": "Superior Mender's Potion",
    "sell": 1
   },
+  "250976": {
+   "name": "Recipe: Minor Spellblasting Potion",
+   "sell": 100
+  },
+  "250977": {
+   "name": "Recipe: Lesser Spellblasting Potion",
+   "sell": 0
+  },
+  "250980": {
+   "name": "Recipe: Superior Spellblasting Potion",
+   "sell": 0
+  },
+  "250982": {
+   "name": "Recipe: Minor Frenzy Potion",
+   "sell": 0
+  },
+  "250983": {
+   "name": "Recipe: Lesser Frenzy Potion",
+   "sell": 0
+  },
+  "250986": {
+   "name": "Recipe: Superior Frenzy Potion",
+   "sell": 0
+  },
+  "250988": {
+   "name": "Recipe: Minor Mender's Potion",
+   "sell": 0
+  },
+  "250989": {
+   "name": "Recipe: Lesser Mender's Potion",
+   "sell": 0
+  },
+  "250992": {
+   "name": "Recipe: Superior Mender's Potion",
+   "sell": 0
+  },
   "251290": {
    "name": "Legionite Bar",
    "sell": 5000
   },
+  "251291": {
+   "name": "Heavy Thorium Bar",
+   "sell": 1500
+  },
+  "251524": {
+   "name": "Whimsyfin",
+   "sell": 4
+  },
   "251525": {
    "name": "Savory Whimsyfin Delight",
    "sell": 5
+  },
+  "251526": {
+   "name": "Recipe: Savory Whimsyfin Delight",
+   "sell": 115
   },
   "252424": {
    "name": "Black Whelp Slippers",
@@ -4181,245 +8001,885 @@
    "name": "Pristine Scorpid Leggings",
    "sell": 0
   },
+  "252761": {
+   "name": "Pattern: Black Whelp Slippers",
+   "sell": 125
+  },
+  "252762": {
+   "name": "Pattern: Dark Leather Boots",
+   "sell": 125
+  },
+  "252763": {
+   "name": "Pattern: Murloc Scale Shoes",
+   "sell": 125
+  },
+  "252764": {
+   "name": "Pattern: Moonglow Boots",
+   "sell": 125
+  },
+  "252771": {
+   "name": "Pattern: Brawler's Leather Armor",
+   "sell": 350
+  },
+  "252772": {
+   "name": "Pattern: Trapper's Leather Armor",
+   "sell": 350
+  },
+  "252773": {
+   "name": "Pattern: Defender's Leather Armor",
+   "sell": 350
+  },
+  "252774": {
+   "name": "Pattern: Totemic Leather Armor",
+   "sell": 350
+  },
+  "252775": {
+   "name": "Pattern: Stormrider's Leather Armor",
+   "sell": 350
+  },
+  "252776": {
+   "name": "Pattern: Wisdom's Leather Armor",
+   "sell": 350
+  },
+  "252783": {
+   "name": "Pattern: Mystic Medium Armor Kit",
+   "sell": 125
+  },
+  "252784": {
+   "name": "Pattern: Forceful Medium Armor Kit",
+   "sell": 125
+  },
+  "252792": {
+   "name": "Pattern: Brawler's Leather Pants",
+   "sell": 400
+  },
+  "252793": {
+   "name": "Pattern: Trapper's Leather Pants",
+   "sell": 400
+  },
+  "252794": {
+   "name": "Pattern: Defender's Leather Pants",
+   "sell": 400
+  },
+  "252795": {
+   "name": "Pattern: Totemic Leather Pants",
+   "sell": 400
+  },
+  "252796": {
+   "name": "Pattern: Stormrider's Leather Pants",
+   "sell": 400
+  },
+  "252797": {
+   "name": "Pattern: Wisdom's Leather Pants",
+   "sell": 400
+  },
+  "252804": {
+   "name": "Pattern: Hillman's Leather Boots",
+   "sell": 500
+  },
+  "252811": {
+   "name": "Pattern: Mystic Heavy Armor Kit",
+   "sell": 500
+  },
+  "252812": {
+   "name": "Pattern: Forceful Heavy Armor Kit",
+   "sell": 500
+  },
+  "252814": {
+   "name": "Pattern: Brawler's Leather Helm",
+   "sell": 500
+  },
+  "252815": {
+   "name": "Pattern: Trapper's Leather Helm",
+   "sell": 500
+  },
+  "252816": {
+   "name": "Pattern: Defender's Leather Helm",
+   "sell": 500
+  },
+  "252817": {
+   "name": "Pattern: Totemic Leather Helm",
+   "sell": 500
+  },
+  "252818": {
+   "name": "Pattern: Stormrider's Leather Helm",
+   "sell": 500
+  },
+  "252819": {
+   "name": "Pattern: Wisdom's Leather Helm",
+   "sell": 500
+  },
+  "252826": {
+   "name": "Pattern: Prowler's Leather Belt",
+   "sell": 500
+  },
+  "252827": {
+   "name": "Pattern: Skulker's Leather Belt",
+   "sell": 500
+  },
+  "252828": {
+   "name": "Pattern: Stalker's Leather Belt",
+   "sell": 500
+  },
+  "252829": {
+   "name": "Pattern: Warden's Leather Belt",
+   "sell": 500
+  },
+  "252830": {
+   "name": "Pattern: Skirmisher's Leather Belt",
+   "sell": 500
+  },
+  "252831": {
+   "name": "Pattern: Skycaller's Leather Belt",
+   "sell": 500
+  },
+  "252832": {
+   "name": "Pattern: Mender's Leather Belt",
+   "sell": 500
+  },
+  "252843": {
+   "name": "Pattern: Prowler's Leather Shoes",
+   "sell": 1125
+  },
+  "252844": {
+   "name": "Pattern: Skulker's Leather Shoes",
+   "sell": 1125
+  },
+  "252845": {
+   "name": "Pattern: Warden's Leather Shoes",
+   "sell": 1125
+  },
+  "252846": {
+   "name": "Pattern: Skycaller's Leather Shoes",
+   "sell": 1125
+  },
+  "252847": {
+   "name": "Pattern: Mender's Leather Shoes",
+   "sell": 1125
+  },
+  "252858": {
+   "name": "Pattern: Tooled Leather Belt",
+   "sell": 3000
+  },
+  "252859": {
+   "name": "Pattern: Blue Suede Shoes",
+   "sell": 3000
+  },
+  "252865": {
+   "name": "Pattern: Tooled Leather Boots",
+   "sell": 3000
+  },
+  "252866": {
+   "name": "Pattern: Blue Suede Gloves",
+   "sell": 3000
+  },
+  "252867": {
+   "name": "Pattern: Prowler's Leather Gauntlets",
+   "sell": 4000
+  },
+  "252868": {
+   "name": "Pattern: Skulker's Leather Gauntlets",
+   "sell": 4000
+  },
+  "252869": {
+   "name": "Pattern: Warden's Leather Gauntlets",
+   "sell": 4000
+  },
+  "252870": {
+   "name": "Pattern: Skycaller's Leather Gauntlets",
+   "sell": 4000
+  },
+  "252871": {
+   "name": "Pattern: Mender's Leather Gauntlets",
+   "sell": 4000
+  },
+  "252878": {
+   "name": "Pattern: Blue Suede Pants",
+   "sell": 5000
+  },
+  "252879": {
+   "name": "Pattern: Wicked Leather Boots",
+   "sell": 5000
+  },
+  "252880": {
+   "name": "Pattern: Tooled Leather Gauntlets",
+   "sell": 5000
+  },
+  "252881": {
+   "name": "Pattern: Blue Suede Shoulders",
+   "sell": 5000
+  },
+  "252882": {
+   "name": "Pattern: Tooled Leather Crown",
+   "sell": 5500
+  },
+  "252884": {
+   "name": "Pattern: Wicked Leather Shoulders",
+   "sell": 6250
+  },
+  "252885": {
+   "name": "Pattern: Tooled Leather Bracers",
+   "sell": 6250
+  },
+  "252886": {
+   "name": "Pattern: Blue Suede Belt",
+   "sell": 6250
+  },
+  "252887": {
+   "name": "Pattern: Tooled Leather Epaulets",
+   "sell": 7500
+  },
+  "252888": {
+   "name": "Pattern: Blue Suede Bracers",
+   "sell": 7500
+  },
+  "252889": {
+   "name": "Pattern: Tooled Leather Pants",
+   "sell": 7500
+  },
+  "252890": {
+   "name": "Pattern: Blue Suede Hat",
+   "sell": 7500
+  },
+  "252891": {
+   "name": "Pattern: Living Crown",
+   "sell": 7500
+  },
+  "252892": {
+   "name": "Pattern: Dawn Armor",
+   "sell": 7500
+  },
+  "252893": {
+   "name": "Pattern: Timbermaw Tunic",
+   "sell": 7500
+  },
+  "252894": {
+   "name": "Pattern: Warbear Helm",
+   "sell": 7500
+  },
+  "252895": {
+   "name": "Pattern: Ironfeather Leggings",
+   "sell": 7500
+  },
+  "252896": {
+   "name": "Pattern: Stalker's Mail Boots",
+   "sell": 1125
+  },
+  "252897": {
+   "name": "Pattern: Skycaller's Mail Boots",
+   "sell": 1125
+  },
+  "252898": {
+   "name": "Pattern: Skirmisher's Mail Boots",
+   "sell": 1125
+  },
+  "252899": {
+   "name": "Pattern: Mender's Mail Boots",
+   "sell": 1125
+  },
+  "252908": {
+   "name": "Pattern: Supple Scorpid Boots",
+   "sell": 3000
+  },
+  "252909": {
+   "name": "Pattern: Charged Scorpid Belt",
+   "sell": 3000
+  },
+  "252914": {
+   "name": "Pattern: Supple Scorpid Leggings",
+   "sell": 3000
+  },
+  "252915": {
+   "name": "Pattern: Charged Scorpid Helm",
+   "sell": 3000
+  },
+  "252916": {
+   "name": "Pattern: Supple Scorpid Bracers",
+   "sell": 4000
+  },
+  "252917": {
+   "name": "Pattern: Charged Scorpid Shoulders",
+   "sell": 4000
+  },
+  "252918": {
+   "name": "Pattern: Stalker's Mail Gauntlets",
+   "sell": 4000
+  },
+  "252919": {
+   "name": "Pattern: Skycaller's Mail Gauntlets",
+   "sell": 4000
+  },
+  "252920": {
+   "name": "Pattern: Skirmisher's Mail Gauntlets",
+   "sell": 4000
+  },
+  "252921": {
+   "name": "Pattern: Mender's Mail Gauntlets",
+   "sell": 4000
+  },
+  "252926": {
+   "name": "Pattern: Supple Scorpid Shoulders",
+   "sell": 5000
+  },
+  "252927": {
+   "name": "Pattern: Charged Scorpid Bracers",
+   "sell": 5000
+  },
+  "252928": {
+   "name": "Pattern: Heavy Scorpid Boots",
+   "sell": 5000
+  },
+  "252929": {
+   "name": "Pattern: Supple Scorpid Belt",
+   "sell": 5000
+  },
+  "252930": {
+   "name": "Pattern: Charged Scorpid Gauntlets",
+   "sell": 5000
+  },
+  "252931": {
+   "name": "Pattern: Supple Scorpid Helm",
+   "sell": 5000
+  },
+  "252932": {
+   "name": "Pattern: Charged Scorpid Vest",
+   "sell": 5000
+  },
+  "252934": {
+   "name": "Pattern: Charged Scorpid Leggings",
+   "sell": 6250
+  },
+  "252935": {
+   "name": "Pattern: Supple Scorpid Sabatons",
+   "sell": 7500
+  },
+  "252936": {
+   "name": "Pattern: Charged Scorpid Boots",
+   "sell": 7500
+  },
+  "252937": {
+   "name": "Pattern: Red Dragonscale Leggings",
+   "sell": 7500
+  },
+  "252938": {
+   "name": "Pattern: Blue Dragonscale Helm",
+   "sell": 7500
+  },
+  "252939": {
+   "name": "Pattern: Black Dragonscale Helm",
+   "sell": 7500
+  },
+  "252940": {
+   "name": "Pattern: Pristine Scorpid Leggings",
+   "sell": 7500
+  },
+  "252942": {
+   "name": "Pattern: Forceful Rugged Armor Kit",
+   "sell": 1375
+  },
   "253664": {
    "name": "Linen Reagent Bag",
    "sell": 200
+  },
+  "253665": {
+   "name": "Pattern: Linen Reagent Bag",
+   "sell": 30
   },
   "253667": {
    "name": "Woolen Reagent Bag",
    "sell": 1250
   },
+  "253668": {
+   "name": "Pattern: Woolen Reagent Bag",
+   "sell": 50
+  },
   "253885": {
    "name": "Novice Arcanist's Sash",
    "sell": 174
+  },
+  "253886": {
+   "name": "Pattern: Novice Arcanist's Sash",
+   "sell": 50
   },
   "253887": {
    "name": "Novice Ardent's Sash",
    "sell": 176
   },
+  "253888": {
+   "name": "Pattern: Novice Ardent's Sash",
+   "sell": 50
+  },
   "253901": {
    "name": "Filigreed Pristine Gown",
    "sell": 354
+  },
+  "253902": {
+   "name": "Pattern: Filigreed Pristine Gown",
+   "sell": 100
   },
   "253903": {
    "name": "Filigreed Silky Gown",
    "sell": 342
   },
+  "253904": {
+   "name": "Pattern: Filigreed Silky Gown",
+   "sell": 100
+  },
   "253905": {
    "name": "Filigreed Flame Gown",
    "sell": 345
+  },
+  "253906": {
+   "name": "Pattern: Filigreed Flame Gown",
+   "sell": 100
   },
   "253907": {
    "name": "Filigreed Shadow Gown",
    "sell": 347
   },
+  "253908": {
+   "name": "Pattern: Filigreed Shadow Gown",
+   "sell": 100
+  },
   "253909": {
    "name": "Filigreed Pearly Gown",
    "sell": 353
+  },
+  "253910": {
+   "name": "Pattern: Filigreed Pearly Gown",
+   "sell": 100
   },
   "253911": {
    "name": "Filigreed Shining Gown",
    "sell": 332
   },
+  "253912": {
+   "name": "Pattern: Filigreed Shining Gown",
+   "sell": 100
+  },
   "253937": {
    "name": "Filigreed Pristine Leggings",
    "sell": 658
+  },
+  "253938": {
+   "name": "Pattern: Filigreed Pristine Leggings",
+   "sell": 175
   },
   "253939": {
    "name": "Filigreed Silky Leggings",
    "sell": 650
   },
+  "253940": {
+   "name": "Pattern: Filigreed Silky Leggings",
+   "sell": 175
+  },
   "253941": {
    "name": "Filigreed Flame Leggings",
    "sell": 674
+  },
+  "253942": {
+   "name": "Pattern: Filigreed Flame Leggings",
+   "sell": 175
   },
   "253943": {
    "name": "Filigreed Shadow Leggings",
    "sell": 659
   },
+  "253944": {
+   "name": "Pattern: Filigreed Shadow Leggings",
+   "sell": 175
+  },
   "253945": {
    "name": "Filigreed Pearly Leggings",
    "sell": 684
+  },
+  "253946": {
+   "name": "Pattern: Filigreed Pearly Leggings",
+   "sell": 175
   },
   "253947": {
    "name": "Filigreed Shining Leggings",
    "sell": 682
   },
+  "253948": {
+   "name": "Pattern: Filigreed Shining Leggings",
+   "sell": 175
+  },
   "253975": {
    "name": "Filigreed Pristine Circlet",
    "sell": 803
+  },
+  "253976": {
+   "name": "Pattern: Filigreed Pristine Circlet",
+   "sell": 250
   },
   "253977": {
    "name": "Filigreed Silky Circlet",
    "sell": 792
   },
+  "253978": {
+   "name": "Pattern: Filigreed Silky Circlet",
+   "sell": 250
+  },
   "253979": {
    "name": "Filigreed Flame Circlet",
    "sell": 806
+  },
+  "253980": {
+   "name": "Pattern: Filigreed Flame Circlet",
+   "sell": 250
   },
   "253981": {
    "name": "Filigreed Shadow Circlet",
    "sell": 837
   },
+  "253982": {
+   "name": "Pattern: Filigreed Shadow Circlet",
+   "sell": 250
+  },
   "253983": {
    "name": "Filigreed Pearly Circlet",
    "sell": 848
+  },
+  "253984": {
+   "name": "Pattern: Filigreed Pearly Circlet",
+   "sell": 250
   },
   "253985": {
    "name": "Filigreed Shining Circlet",
    "sell": 788
   },
+  "253986": {
+   "name": "Pattern: Filigreed Shining Circlet",
+   "sell": 250
+  },
   "253999": {
    "name": "Earthen Leggings",
    "sell": 2990
+  },
+  "254000": {
+   "name": "Pattern: Earthen Leggings",
+   "sell": 275
   },
   "254001": {
    "name": "Gilded Slippers",
    "sell": 1356
   },
+  "254002": {
+   "name": "Pattern: Gilded Slippers",
+   "sell": 275
+  },
   "254003": {
    "name": "Frothing Slippers",
    "sell": 1365
+  },
+  "254004": {
+   "name": "Pattern: Frothing Slippers",
+   "sell": 275
   },
   "254005": {
    "name": "Fiery Slippers",
    "sell": 1244
   },
+  "254006": {
+   "name": "Pattern: Fiery Slippers",
+   "sell": 275
+  },
   "254007": {
    "name": "Black Slippers",
    "sell": 1254
+  },
+  "254008": {
+   "name": "Pattern: Black Slippers",
+   "sell": 275
   },
   "254009": {
    "name": "Golden Slippers",
    "sell": 1263
   },
+  "254010": {
+   "name": "Pattern: Golden Slippers",
+   "sell": 275
+  },
   "254011": {
    "name": "Radiant Slippers",
    "sell": 1273
+  },
+  "254012": {
+   "name": "Pattern: Radiant Slippers",
+   "sell": 275
   },
   "254013": {
    "name": "Earthen Silk Slippers",
    "sell": 2351
   },
+  "254014": {
+   "name": "Pattern: Earthen Silk Slippers",
+   "sell": 295
+  },
   "254015": {
    "name": "Earthen Silk Hood",
    "sell": 2675
+  },
+  "254016": {
+   "name": "Pattern: Earthen Silk Hood",
+   "sell": 315
   },
   "254017": {
    "name": "Earthen Silk Gloves",
    "sell": 2095
   },
+  "254018": {
+   "name": "Pattern: Earthen Silk Gloves",
+   "sell": 355
+  },
   "254019": {
    "name": "Earthen Silk Cuffs",
    "sell": 2279
+  },
+  "254020": {
+   "name": "Pattern: Earthen Silk Cuffs",
+   "sell": 375
   },
   "254021": {
    "name": "Gilded Handwraps",
    "sell": 2754
   },
+  "254022": {
+   "name": "Pattern: Gilded Handwraps",
+   "sell": 375
+  },
   "254033": {
    "name": "Earthen Silk Shoulders",
    "sell": 3613
+  },
+  "254034": {
+   "name": "Pattern: Earthen Silk Shoulders",
+   "sell": 375
   },
   "254037": {
    "name": "Gilded Cord",
    "sell": 1995
   },
+  "254038": {
+   "name": "Pattern: Gilded Cord",
+   "sell": 1500
+  },
   "254039": {
    "name": "Frothing Cord",
    "sell": 2009
+  },
+  "254040": {
+   "name": "Pattern: Frothing Cord",
+   "sell": 1500
   },
   "254041": {
    "name": "Fiery Cord",
    "sell": 2023
   },
+  "254042": {
+   "name": "Pattern: Fiery Cord",
+   "sell": 1500
+  },
   "254043": {
    "name": "Black Cord",
    "sell": 2038
+  },
+  "254044": {
+   "name": "Pattern: Black Cord",
+   "sell": 1500
   },
   "254045": {
    "name": "Golden Cord",
    "sell": 1857
   },
+  "254046": {
+   "name": "Pattern: Golden Cord",
+   "sell": 1500
+  },
   "254047": {
    "name": "Radiant Cord",
    "sell": 1923
+  },
+  "254048": {
+   "name": "Pattern: Radiant Cord",
+   "sell": 1500
   },
   "254073": {
    "name": "Ghostweave Cord",
    "sell": 5359
   },
+  "254074": {
+   "name": "Pattern: Ghostweave Cord",
+   "sell": 3000
+  },
   "254075": {
    "name": "Earthenweave Gloves",
    "sell": 5398
+  },
+  "254076": {
+   "name": "Pattern: Earthenweave Gloves",
+   "sell": 3000
   },
   "254077": {
    "name": "Earthenweave Cord",
    "sell": 5437
   },
+  "254078": {
+   "name": "Pattern: Earthenweave Cord",
+   "sell": 3000
+  },
   "254093": {
    "name": "Earthenweave Boots",
    "sell": 9030
+  },
+  "254094": {
+   "name": "Pattern: Earthenweave Boots",
+   "sell": 3500
   },
   "254095": {
    "name": "Gilded Gloves",
    "sell": 3958
   },
+  "254096": {
+   "name": "Pattern: Gilded Gloves",
+   "sell": 4000
+  },
   "254097": {
    "name": "Frothing Gloves",
    "sell": 3606
+  },
+  "254098": {
+   "name": "Pattern: Frothing Gloves",
+   "sell": 4000
   },
   "254099": {
    "name": "Fiery Gloves",
    "sell": 3634
   },
+  "254100": {
+   "name": "Pattern: Fiery Gloves",
+   "sell": 4000
+  },
   "254101": {
    "name": "Black Gloves",
    "sell": 3662
+  },
+  "254102": {
+   "name": "Pattern: Black Gloves",
+   "sell": 4000
   },
   "254103": {
    "name": "Golden Gloves",
    "sell": 3690
   },
+  "254104": {
+   "name": "Pattern: Golden Gloves",
+   "sell": 4000
+  },
   "254105": {
    "name": "Radiant Gloves",
    "sell": 3717
+  },
+  "254106": {
+   "name": "Pattern: Radiant Gloves",
+   "sell": 4000
   },
   "254119": {
    "name": "Earthenweave Mantle",
    "sell": 10205
   },
+  "254120": {
+   "name": "Pattern: Earthenweave Mantle",
+   "sell": 5000
+  },
   "254121": {
    "name": "Earthenweave Vest",
    "sell": 15262
+  },
+  "254122": {
+   "name": "Pattern: Earthenweave Vest",
+   "sell": 6250
   },
   "254125": {
    "name": "Earthenweave Leggings",
    "sell": 14756
   },
+  "254126": {
+   "name": "Pattern: Earthenweave Leggings",
+   "sell": 6250
+  },
   "254127": {
    "name": "Ghostweave Mantle",
    "sell": 12020
+  },
+  "254128": {
+   "name": "Pattern: Ghostweave Mantle",
+   "sell": 6250
   },
   "254129": {
    "name": "Ghostweave Boots",
    "sell": 12714
   },
+  "254130": {
+   "name": "Pattern: Ghostweave Boots",
+   "sell": 7500
+  },
   "254131": {
    "name": "Earthenweave Cuffs",
    "sell": 8536
+  },
+  "254132": {
+   "name": "Pattern: Earthenweave Cuffs",
+   "sell": 7500
   },
   "254135": {
    "name": "Ghostweave Hood",
    "sell": 13637
   },
+  "254136": {
+   "name": "Pattern: Ghostweave Hood",
+   "sell": 7500
+  },
   "254137": {
    "name": "Earthenweave Crown",
    "sell": 12426
   },
+  "254138": {
+   "name": "Pattern: Earthenweave Crown",
+   "sell": 7500
+  },
   "254139": {
    "name": "Bottomless Reagent Bag",
    "sell": 200
+  },
+  "254140": {
+   "name": "Pattern: Bottomless Reagent Bag",
+   "sell": 7500
+  },
+  "254681": {
+   "name": "Pattern: Stormcloth Pants",
+   "sell": 1375
+  },
+  "254683": {
+   "name": "Pattern: Stormcloth Vest",
+   "sell": 1500
+  },
+  "254684": {
+   "name": "Pattern: Stormcloth Headband",
+   "sell": 1875
+  },
+  "254685": {
+   "name": "Pattern: Stormcloth Shoulders",
+   "sell": 2000
+  },
+  "254686": {
+   "name": "Pattern: Stormcloth Boots",
+   "sell": 2125
+  },
+  "255645": {
+   "name": "Swollen Venom Sac",
+   "sell": 370
   },
   "255715": {
    "name": "Potent Anti-Venom",
@@ -4577,9 +9037,161 @@
    "name": "Skywall Souffle",
    "sell": 100
   },
+  "263511": {
+   "name": "Recipe: Skywall Souffle",
+   "sell": 50
+  },
   "263512": {
    "name": "Pincer Bites",
    "sell": 100
+  },
+  "263513": {
+   "name": "Recipe: Pincer Bites",
+   "sell": 50
+  },
+  "264201": {
+   "name": "Schematic: SAF-T Tabs",
+   "sell": 125
+  },
+  "264202": {
+   "name": "Schematic: SAF-T Dynamite",
+   "sell": 125
+  },
+  "264203": {
+   "name": "Schematic: SAF-T Copper Bomb",
+   "sell": 275
+  },
+  "264204": {
+   "name": "Schematic: EZ-Thro Wrap",
+   "sell": 500
+  },
+  "264205": {
+   "name": "Schematic: EZ-Thro Copper Bomb XL",
+   "sell": 650
+  },
+  "264206": {
+   "name": "Schematic: No Slip SAF-T Padding",
+   "sell": 725
+  },
+  "264207": {
+   "name": "Schematic: SAF-T Bronze Bomb",
+   "sell": 375
+  },
+  "264208": {
+   "name": "Schematic: SAF-T Jumbo Dynamite",
+   "sell": 450
+  },
+  "264209": {
+   "name": "Schematic: SAF-T Bell",
+   "sell": 875
+  },
+  "264210": {
+   "name": "Schematic: Shafety Sheep",
+   "sell": 500
+  },
+  "264211": {
+   "name": "Schematic: EZ-Thro Fireproof Fuse",
+   "sell": 950
+  },
+  "264212": {
+   "name": "Schematic: EZ-Thro Bronze Mortar",
+   "sell": 600
+  },
+  "264213": {
+   "name": "Schematic: EZ-Thro Grenade",
+   "sell": 675
+  },
+  "264214": {
+   "name": "Schematic: SAF-T Casing",
+   "sell": 800
+  },
+  "264215": {
+   "name": "Schematic: SAF-T Bomb",
+   "sell": 800
+  },
+  "264218": {
+   "name": "Schematic: EZ-Thro Tru-Trigger",
+   "sell": 950
+  },
+  "264219": {
+   "name": "Schematic: Tru-Trigger Frag Bomb",
+   "sell": 950
+  },
+  "264223": {
+   "name": "Schematic: SAF-T Tube",
+   "sell": 4000
+  },
+  "264224": {
+   "name": "Schematic: SAF-T Clever Dynamite",
+   "sell": 4000
+  },
+  "264225": {
+   "name": "Schematic: EZ-Thro Shell",
+   "sell": 5000
+  },
+  "264226": {
+   "name": "Schematic: EZ-Thro Thorium Grenade",
+   "sell": 5000
+  },
+  "264227": {
+   "name": "Schematic: EZ-Thro Dark Bomb",
+   "sell": 6000
+  },
+  "264228": {
+   "name": "Schematic: EZ-Thro Mana Bomb",
+   "sell": 6000
+  },
+  "264229": {
+   "name": "Schematic: EZ-Thro Field Transporter: Gadgetzan",
+   "sell": 6000
+  },
+  "264230": {
+   "name": "Schematic: SAF-T Emergency Ripper: Everlook",
+   "sell": 6000
+  },
+  "264231": {
+   "name": "Schematic: EZ and SAF Field Transporter: Mt. Hyjal",
+   "sell": 6000
+  },
+  "264238": {
+   "name": "Schematic: SAF-T Nitro Boosts",
+   "sell": 6000
+  },
+  "264239": {
+   "name": "Schematic: EZ-Thro Magnetic Displacer",
+   "sell": 6000
+  },
+  "264240": {
+   "name": "Schematic: SAF-T Teleport",
+   "sell": 6000
+  },
+  "272941": {
+   "name": "Thick Logs",
+   "sell": 50000
+  },
+  "273125": {
+   "name": "Lich's Index Finger",
+   "sell": 25000
+  },
+  "273127": {
+   "name": "Golem Heart",
+   "sell": 25000
+  },
+  "273128": {
+   "name": "Maker's Spark",
+   "sell": 25000
+  },
+  "273129": {
+   "name": "Essence of Anarchy",
+   "sell": 25000
+  },
+  "273130": {
+   "name": "Undeath Engine",
+   "sell": 25000
+  },
+  "273131": {
+   "name": "Bottled Screams",
+   "sell": 25000
   },
   "279940": {
    "name": "Toxin Study",
@@ -4692,6 +9304,14 @@
   "284869": {
    "name": "Unsanctified Grenade",
    "sell": 1500
+  },
+  "284870": {
+   "name": "Schematic: Unsanctified Grenade",
+   "sell": 3000
+  },
+  "289560": {
+   "name": "Formula: Enchant Boots - Speed",
+   "sell": 1550
   }
  }
 }

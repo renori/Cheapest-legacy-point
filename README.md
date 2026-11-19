@@ -55,8 +55,8 @@ A cost strip follows, then three views:
   * Each step shows its colour and skill-up chance at the start and end (for example
     *Orange 100% → Green 26%*).
   * **Cost breakdown** opens each step's materials: per craft and in total, the AH listing, what you
-    pay and where, and what a vendor pays for it. It also shows the item made, with its AH listing,
-    vendor price and any sell-back credit.
+    pay and where, and **what a vendor pays you** for it. It also shows the item made, with its AH
+    listing, what a vendor pays you for it, and any sell-back credit.
   * Rank rows (*Train Journeyman*, *Learn Expert*, *Quest for Artisan*) appear where you hit each cap,
     with the skill and character level they need.
   * Every trainer step has a **Where to train** list for your auction house's faction: trainer name,
@@ -148,7 +148,7 @@ intermediates (so the estimate errs high), the items you enchant, and the AH ord
 | File | What | Source | Refresh with |
 |------|------|--------|--------------|
 | `data/recipes/*.json` | Every craft: reagents, product, skill colours, tools | WoW Forever client tables via [wago.tools](https://wago.tools) | `python -m cheapest_skillup.gamedata` |
-| `data/vendor_sell.json`, `data/item_names.json` | Vendor sell prices, item names | same | same |
+| `data/vendor_sell.json`, `data/item_names.json` | What a vendor pays you for every item the recipes use or make; item names | same | same |
 | `data/foreverdb.json` | How each recipe is learned, trainer fees seen in Forever, rank fees, trainer locations, NPC names | [ForeverDB.net](https://foreverdb.net) addon data | `python -m cheapest_skillup.foreverdb` |
 | `data/foreverdb_api.json` | Per recipe: vendors and their prices, trainers per faction, fees, learn levels (numbers and ids only) | [ForeverDB API](https://foreverdb.net/developers) | `python -m cheapest_skillup.foreverdb_api` (needs a key) |
 | `data/trainer_classic.json` | Classic trainer fees and learn levels, used where nothing better is known | [CMaNGOS classic-db](https://github.com/cmangos/classic-db) | `python -m cheapest_skillup.classic_trainers <dump>` |

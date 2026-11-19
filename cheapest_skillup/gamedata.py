@@ -178,8 +178,8 @@ def build_data(t: dict[str, list[dict[str, str]]]) -> tuple[dict[str, dict], dic
         professions[key] = {"name": title, "recipes": recipes}
 
     names = {i: items[i]["Display_lang"] for i in sorted(used_items) if i in items}
-    products = {e["makes"]["item"] for p in professions.values() for e in p["recipes"] if "makes" in e}
-    sell = {i: {"name": items[i]["Display_lang"], "sell": _i(items[i]["SellPrice"])} for i in sorted(products) if i in items}
+    # What a vendor pays you for each item the recipes use or make (0 = vendors won't buy it).
+    sell = {i: {"name": items[i]["Display_lang"], "sell": _i(items[i]["SellPrice"])} for i in sorted(used_items) if i in items}
     return professions, sell, names
 
 
@@ -228,7 +228,7 @@ def main(argv: list[str] | None = None) -> int:
                      + "\n  }\n}\n", encoding="utf-8")
 
     (DATA_DIR / "vendor_sell.json").write_text(json.dumps(
-        {"note": f"Vendor sell prices (copper) of crafted items, from build {build}.",
+        {"note": f"What a vendor pays you (copper) for each item the recipes use or make, from build {build}.",
          "items": {str(k): v for k, v in sell.items()}}, indent=1) + "\n", encoding="utf-8")
     (DATA_DIR / "item_names.json").write_text(json.dumps(
         {"note": f"Item names from build {build}.", "items": {str(k): v for k, v in names.items()}}, indent=1) + "\n", encoding="utf-8")
