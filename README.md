@@ -72,6 +72,9 @@ JavaScript and Python planners on the same data and fails if their routes or tot
 **Overview.** A bar chart with one bar per profession, running from your current skill to 300. Each bar
 is split into milestone blocks, shaded light to dark: 1–75 Apprentice, 75–150 Journeyman, 150–225
 Expert and 225–300 Artisan. Each block's width is what that stretch costs.
+* **Up to 75 / 150 / 225 / 300** draws each bar only as far as that milestone, scaled to the gold it
+  costs to get there, so you can compare professions at 150 as easily as at 300. The number on the right
+  is the cost to that milestone (and to your own target, if it differs).
 * *Same scale* compares professions on one axis; *Full width* shows each profession's own split.
 * A line marks your target, and textured blocks lie beyond it.
 * Set your skill and target per profession, or click a block to make its end your target.

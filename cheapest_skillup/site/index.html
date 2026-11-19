@@ -71,6 +71,8 @@ h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .5px; color: va
 
 /* Overview chart */
 .chart-head { display: flex; flex-wrap: wrap; gap: 10px 20px; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.chart-ctl { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; }
+.ctl-lbl { font-size: 12px; color: var(--muted); align-self: center; margin-right: 2px; }
 .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--muted); }
 .legend span { display: inline-flex; align-items: center; gap: 6px; }
 .legend i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
@@ -257,7 +259,9 @@ function moneyText(c) {  // plain text, for bar labels
   const g = Math.floor(c / 10000), s = Math.floor(c / 100) % 100, cp = c % 100;
   return sign + (g >= 100 ? `${g.toLocaleString()}g` : g ? `${g}g ${s}s` : s ? `${s}s ${cp}c` : `${cp}c`);
 }
-const barSum = d => segments(d, {from: d.from}).reduce((a, s) => a + s.cost, 0);
+// Blocks drawn for "Up to" milestone UPTO: the stretches ending at or before it.
+const shownSegments = (d, st) => segments(d, st).filter(s => s.to <= UPTO);
+const barSum = d => shownSegments(d, {from: d.from}).reduce((a, s) => a + s.cost, 0);
 
 /* Wowhead links */
 const wh = (type, id, text) => id ? `<a class="wh" href="https://www.wowhead.com/${SETTINGS.wh}/${type}=${id}" target="_blank" rel="noopener">${esc(text)}</a>` : esc(text);
@@ -266,6 +270,7 @@ let OPT, SETTINGS;
 let PROFS = store.get("profs") || {};
 let VIEW = store.get("view") || "route";
 let SCALE = store.get("scale") || "shared";
+let UPTO = [75, 150, 225, 300].includes(store.get("upto")) ? store.get("upto") : 300;  // bars run to this skill
 let refreshNext = false;
 
 function profState(key) {
@@ -418,16 +423,22 @@ async function renderOverview() {
   $("#main").innerHTML = `<div class="panel">
     <div class="chart-head">
       <div class="legend" aria-label="Legend">${TIERS.map((t, i) => `<span><i style="background:var(--m${i + 1})"></i>${i ? TIERS[i - 1].cap : 1}–${t.cap} ${t.name}</span>`).join("")}</div>
-      <div class="chips" role="group" aria-label="Bar width">
-        <button type="button" class="chip" data-scale="shared" aria-pressed="${SCALE === "shared"}">Same scale</button>
-        <button type="button" class="chip" data-scale="full" aria-pressed="${SCALE === "full"}">Full width</button>
+      <div class="chart-ctl">
+        <div class="chips" role="group" aria-label="Bars run up to skill">
+          <span class="ctl-lbl">Up to</span>${OPT.milestones.map(m => `<button type="button" class="chip" data-upto="${m}" aria-pressed="${UPTO === m}">${m}</button>`).join("")}
+        </div>
+        <div class="chips" role="group" aria-label="Bar width">
+          <button type="button" class="chip" data-scale="shared" aria-pressed="${SCALE === "shared"}">Same scale</button>
+          <button type="button" class="chip" data-scale="full" aria-pressed="${SCALE === "full"}">Full width</button>
+        </div>
       </div>
     </div>
-    <div class="meta">Cost from your skill to 300, split by milestone (materials, recipes, trainer fees and ranks). The line marks your target; textured blocks lie beyond it. Click a block to make its end your target; click a name to open its route.</div>
+    <div class="meta">Gold cost from your skill to ${UPTO}, split by milestone (materials, recipes, trainer fees and ranks). The line marks your target; textured blocks lie beyond it. Click a block to make its end your target; click a name to open its route.</div>
     <div id="rows"></div>
     <details class="note"><summary>Show as a table</summary><div id="table" class="table-wrap"></div></details>
   </div>`;
   document.querySelectorAll("[data-scale]").forEach(b => b.onclick = () => { SCALE = b.dataset.scale; store.set("scale", SCALE); renderOverview(); });
+  document.querySelectorAll("[data-upto]").forEach(b => b.onclick = () => { UPTO = +b.dataset.upto; store.set("upto", UPTO); renderOverview(); });
   const rows = $("#rows");
   const results = await Promise.all(profs.map(async p => {
     const st = profState(p.key);
@@ -478,9 +489,14 @@ function segments(d, st) {
 }
 
 function drawBar({p, st, div, d}, max) {
-  const segs = segments(d, st);
-  const total300 = d.milestones.at(-1)?.total_copper || 0;
+  const segs = shownSegments(d, st);
+  const toUpto = d.milestones.find(m => m.to === UPTO);
   const sum = segs.reduce((a, s) => a + s.cost, 0);
+  if (!segs.length) {
+    $(".bar-cell", div).innerHTML = `<span class="src">Already past ${UPTO} (your skill is ${st.from}).</span>`;
+    $(".ptotal", div).innerHTML = "";
+    return;
+  }
   // The bar's length is its share of the scale; inside it, blocks split the length by cost (never overflowing).
   const length = SCALE === "full" ? 100 : Math.max(sum / max * 100, 0.5);
   const toTarget = d.milestones.find(m => m.to === st.to);
@@ -511,9 +527,9 @@ function drawBar({p, st, div, d}, max) {
     el.onclick = pick;
     el.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(); } };
   });
-  $(".ptotal", div).innerHTML = toTarget
-    ? `<div class="big">${money(toTarget.total_copper)}</div><div class="src">to ${st.to}</div>${st.to !== 300 ? `<div class="src">300: ${money(total300)}</div>` : ""}`
-    : `<div class="src">300: ${money(total300)}</div>`;
+  // The big number matches the bar: the cost to the chosen milestone. Your own target, if different, below it.
+  $(".ptotal", div).innerHTML = (toUpto ? `<div class="big">${money(toUpto.total_copper)}</div><div class="src">to ${UPTO}</div>` : "")
+    + (toTarget && st.to !== UPTO ? `<div class="src">target ${st.to}: ${money(toTarget.total_copper)}</div>` : "");
 }
 
 function drawTable(results) {
