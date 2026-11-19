@@ -84,8 +84,9 @@ h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .5px; color: va
 .star[aria-pressed=true] { color: var(--gold); }
 .pctl { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); margin-top: 4px; flex-wrap: wrap; }
 .bar { display: flex; gap: 2px; height: 28px; align-items: stretch; }
-.seg { border-radius: 4px; position: relative; cursor: pointer; display: flex; align-items: center; padding: 0 6px; font-size: 12px; font-weight: 600; white-space: nowrap; overflow: visible; min-width: 3px; }
-.seg span { pointer-events: none; }
+.seg { border-radius: 4px; position: relative; cursor: pointer; display: flex; align-items: center; padding: 0; font-size: 12px; font-weight: 600; white-space: nowrap; overflow: visible; min-width: 4px; }
+.seg span { pointer-events: none; padding: 0 6px; }
+.seg.profit { min-width: 4px; }
 .seg.past { background-image: repeating-linear-gradient(45deg, color-mix(in srgb, var(--panel) 55%, transparent) 0 3px, transparent 3px 7px); }
 .bar { position: relative; }
 .target-mark { position: absolute; top: -4px; bottom: -4px; width: 2px; background: var(--ink); border-radius: 1px; pointer-events: none; }
@@ -252,9 +253,12 @@ function money(c) {
 }
 function moneyText(c) {  // plain text, for bar labels
   c = Math.round(c);
+  const sign = c < 0 ? "−" : "";
+  c = Math.abs(c);
   const g = Math.floor(c / 10000), s = Math.floor(c / 100) % 100, cp = c % 100;
-  return g >= 100 ? `${g.toLocaleString()}g` : g ? `${g}g ${s}s` : s ? `${s}s ${cp}c` : `${cp}c`;
+  return sign + (g >= 100 ? `${g.toLocaleString()}g` : g ? `${g}g ${s}s` : s ? `${s}s ${cp}c` : `${cp}c`);
 }
+const barSum = d => segments(d, {from: d.from}).reduce((a, s) => a + s.cost, 0);
 
 /* Wowhead links */
 const wh = (type, id, text) => id ? `<a class="wh" href="https://www.wowhead.com/${SETTINGS.wh}/${type}=${id}" target="_blank" rel="noopener">${esc(text)}</a>` : esc(text);
@@ -380,7 +384,8 @@ async function renderOverview() {
     }
   }));
   const ok = results.filter(Boolean);
-  const max = Math.max(1, ...ok.map(r => r.d.milestones.at(-1)?.total_copper || 0));
+  // Same scale: every bar against the longest bar (the sum of its drawn blocks).
+  const max = Math.max(1, ...ok.map(r => barSum(r.d)));
   for (const r of ok) drawBar(r, max);
   drawTable(ok);
 }
@@ -405,7 +410,9 @@ function segments(d, st) {
   const goals = d.milestones;
   let prevTo = st.from, prevCost = 0;
   return goals.map(g => {
-    const seg = {from: prevTo, to: g.to, cost: Math.max(0, g.total_copper - prevCost), cum: g.total_copper, reached: g.reached, tier: tierOf(g.to)};
+    // net can be negative (selling makes that stretch a profit); cost is what the block's width shows.
+    const net = g.total_copper - prevCost;
+    const seg = {from: prevTo, to: g.to, net, cost: Math.max(0, net), cum: g.total_copper, reached: g.reached, tier: tierOf(g.to)};
     prevTo = g.to; prevCost = g.total_copper;
     return seg;
   });
@@ -414,12 +421,14 @@ function segments(d, st) {
 function drawBar({p, st, div, d}, max) {
   const segs = segments(d, st);
   const total300 = d.milestones.at(-1)?.total_copper || 0;
-  const scaleTo = SCALE === "full" ? Math.max(total300, 1) : max;
+  const sum = segs.reduce((a, s) => a + s.cost, 0);
+  // The bar's length is its share of the scale; inside it, blocks split the length by cost (never overflowing).
+  const length = SCALE === "full" ? 100 : Math.max(sum / max * 100, 0.5);
   const toTarget = d.milestones.find(m => m.to === st.to);
   const cell = $(".bar-cell", div);
-  cell.innerHTML = `<div class="bar" role="img" aria-label="${esc(p.name)}: ${segs.map(s => `${s.from} to ${s.to} ${moneyText(s.cost)}`).join(", ")}">` +
-    segs.map((s, i) => `<div class="seg ${s.from >= st.to ? "past" : ""}" tabindex="0" data-i="${i}"
-      style="flex:0 0 ${(s.cost / scaleTo * 100).toFixed(3)}%;background:var(--m${s.tier + 1});color:var(--m${s.tier + 1}-ink)"><span>${moneyText(s.cost)}</span></div>`).join("") +
+  cell.innerHTML = `<div class="bar" style="width:${length.toFixed(3)}%" role="img" aria-label="${esc(p.name)}: ${segs.map(s => `${s.from} to ${s.to} ${moneyText(s.net)}`).join(", ")}">` +
+    segs.map((s, i) => `<div class="seg ${s.from >= st.to ? "past" : ""} ${s.net < 0 ? "profit" : ""}" tabindex="0" data-i="${i}"
+      style="flex:${sum ? s.cost : 1} 1 0px;background:var(--m${s.tier + 1});color:var(--m${s.tier + 1}-ink)"><span>${moneyText(s.net)}</span></div>`).join("") +
     `</div>`;
   // Marker at your target (where the textured, beyond-target blocks start).
   const past = cell.querySelector(".seg.past");
@@ -434,7 +443,7 @@ function drawBar({p, st, div, d}, max) {
   cell.querySelectorAll(".seg").forEach(el => { const sp = el.querySelector("span"); if (sp.offsetWidth + 10 > el.clientWidth) sp.remove(); });
   cell.querySelectorAll(".seg").forEach(el => {
     const s = segs[+el.dataset.i];
-    const tip = () => `<b>${esc(p.name)} ${s.from} → ${s.to}</b><br>${TIERS[s.tier].name} stretch: ${money(s.cost)}<br>From ${st.from}: ${money(s.cum)}${s.reached < s.to ? `<br>Stuck at ${s.reached}` : ""}<br><span style="opacity:.8">Click to set target ${s.to}</span>`;
+    const tip = () => `<b>${esc(p.name)} ${s.from} → ${s.to}</b><br>${TIERS[s.tier].name} stretch: ${money(s.net)}${s.net < 0 ? " (a profit from selling what you craft)" : ""}<br>From ${st.from}: ${money(s.cum)}${s.reached < s.to ? `<br>Stuck at ${s.reached}` : ""}<br><span style="opacity:.8">Click to set target ${s.to}</span>`;
     el.onmousemove = e => showTip(tip(), e.clientX, e.clientY);
     el.onmouseleave = hideTip;
     el.onfocus = () => { const r = el.getBoundingClientRect(); showTip(tip(), r.left, r.bottom); };
