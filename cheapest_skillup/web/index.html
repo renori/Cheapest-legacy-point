@@ -142,6 +142,11 @@ details.cost[open] { background: var(--panel-2); border: 1px solid var(--line); 
 .unseen { font-size: 11px; color: var(--muted); }
 .cost-body { background: var(--panel-2); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; font-size: 13px; }
 tr.bd-row td { border-bottom: 1px solid var(--line); }
+/* The details panel never widens the route table: it takes the table's width and scrolls inside itself. */
+tr.bd-row > td:last-child { max-width: 0; width: 100%; }
+.cost-body .table-wrap { overflow-x: auto; }
+table.mini td.mat { min-width: 160px; white-space: normal; }
+table.mini td.mat .src { white-space: normal; }
 tr.step { cursor: pointer; }
 table.mini.totals { width: auto; min-width: 320px; margin-left: auto; }
 table.mini.totals td { border-bottom: 0; padding: 2px 6px; }
@@ -157,6 +162,10 @@ ul.plain { margin: 0; padding-left: 18px; }
 @media (max-width: 600px) {
   table.t th, table.t td { padding: 6px 4px; font-size: 13px; }
   table.t .lc { display: none; }
+  .chance { white-space: normal; }
+  table.mini.totals { min-width: 0; width: 100%; }
+  table.t td { overflow-wrap: anywhere; }
+  table.t td.num { overflow-wrap: normal; }
   .strip { gap: 8px 18px; }
 }
 </style>
@@ -610,9 +619,9 @@ function costBreakdown(s, p, learn = "") {
   let h = `<div class="cost-body">${learn}
     <div class="src">${qty(crafts)} expected crafts for ${s.to - s.from} points (${(crafts / (s.to - s.from)).toFixed(2)} per point)</div>
     <div class="table-wrap"><table class="mini"><thead><tr><th>Material</th><th class="num">Per craft</th><th class="num">Total</th><th class="num">Listed (AH)</th><th class="num">You pay</th><th class="num">Vendor pays you</th><th class="num">Cost per craft</th><th class="num">Cost</th></tr></thead><tbody>` +
-    s.materials.map(m => `<tr><td>${wh("item", m.item_id, m.name)}</td><td class="num">${qty(m.per_craft)}</td><td class="num">${qty(m.total)}</td>
+    s.materials.map(m => `<tr><td class="mat">${wh("item", m.item_id, m.name)}${madeFrom(m)}</td><td class="num">${qty(m.per_craft)}</td><td class="num">${qty(m.total)}</td>
       <td class="num">${m.ah_copper == null ? '<span class="src">not listed</span>' : money(m.ah_copper)}</td>
-      <td class="num">${money(m.unit_copper)} <span class="src">${m.made_from.length ? "you craft it" : SOURCE_TEXT[m.source] || esc(m.source)}</span>${madeFrom(m)}</td>
+      <td class="num">${money(m.unit_copper)} <span class="src">${m.made_from.length ? "you craft it" : SOURCE_TEXT[m.source] || esc(m.source)}</span></td>
       <td class="num">${m.vendor_sell_copper ? money(m.vendor_sell_copper) : '<span class="src" title="Vendors won\'t buy it">—</span>'}</td>
       <td class="num">${money((m.unit_copper ?? 0) * m.per_craft)}</td>
       <td class="num">${money((m.unit_copper ?? 0) * m.total)}</td></tr>`).join("") +
