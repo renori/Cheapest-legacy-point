@@ -103,8 +103,8 @@ def extract(recipe: dict, npcs: dict) -> dict:
     for side, lst in (src.get("vendors") or {}).items():
         rows = []
         for n in lst:
-            if not isinstance(n, dict) or n.get("costs"):
-                continue  # costs besides gold (Merchant's Favor...): not something we can price
+            if not isinstance(n, dict) or n.get("costs") or n.get("limitedStock"):
+                continue  # costs besides gold (Merchant's Favor...) or limited supply: not a dependable source
             npc, price = _npc(n, npcs), _num(n.get("pricePerItem") or n.get("price"))
             if npc is not None and price is not None:
                 rows.append([npc, int(round(price))])

@@ -32,6 +32,10 @@ SMOOTH_MIN = 3
 SMOOTH_COPPER = 100
 SMOOTH_PCT = 0.005
 SMOOTH_PASSES = 4
+# Choosing recipes: a craft's effort is worth this much copper, and selling what you craft can make a
+# craft free but never "better than free" - otherwise the route would grind a profitable recipe at a
+# tiny skill-up chance. Reported costs stay the real ones.
+CRAFT_EFFORT = 5
 
 
 @dataclass
@@ -73,6 +77,7 @@ class Plan:
     learn_costs: list[tuple[Recipe, int | None]] = field(default_factory=list)  # (recipe, copper or None=unknown)
     ranks: list[tuple[Rank, int | None]] = field(default_factory=list)  # ranks to get on the way, with their cost
     bought: dict[str, str] = field(default_factory=dict)  # recipe name -> "vendor" | "ah" (recipe items)
+    made_from: dict[str, list] = field(default_factory=dict)  # intermediate recipe -> its materials per unit
 
     @property
     def learn_total(self) -> float:
@@ -104,8 +109,11 @@ class Optimizer:
         sell_back: str | None = None,  # None, "vendor" or "ah"
         exclude: frozenset[int] = frozenset(),  # id() of recipes to leave out
         side: str | None = None,  # "a" or "h": your faction, for vendor recipes
+        craft_intermediates: bool = True,  # craft bars, bolts... yourself when that's cheaper than buying
     ):
         self.side = side
+        self.craft_intermediates = craft_intermediates
+        self.made_from: dict[str, list] = {}  # intermediate recipe -> [(item, qty per unit, cost each, maker)]
         self.bought: dict[int, str] = {}  # id(recipe) -> "vendor" | "ah" for recipe items
         if sell_back not in (None, "vendor", "ah"):
             raise ValueError(f"sell_back must be None, 'vendor' or 'ah', not {sell_back!r}")
@@ -155,7 +163,7 @@ class Optimizer:
         if key in self._busy:
             return best  # crafting loop (A from B from A): just buy
         self._busy.add(key)
-        for r in self._makers.get(item, []):
+        for r in self._makers.get(item, []) if self.craft_intermediates else []:
             if r.orange > skill:
                 continue
             c = self.reagent_cost(r, skill) / r.makes_qty
@@ -191,8 +199,14 @@ class Optimizer:
         return self.reagent_cost(r, skill) - self.credit(r)
 
     def point_cost(self, r: Recipe, skill: int) -> float:
+        """Expected copper for one point with `r` at `skill` (can be negative when selling makes a profit)."""
         p = r.skillup_chance(skill)
         return self.craft_cost(r, skill) / p if p > 0 else INF
+
+    def choice_cost(self, r: Recipe, skill: int) -> float:
+        """What the route minimises: cost per point, profit capped at zero, plus effort per craft."""
+        p = r.skillup_chance(skill)
+        return (max(self.craft_cost(r, skill), 0) + CRAFT_EFFORT) / p if p > 0 else INF
 
     # -- planning ------------------------------------------------------------
 
@@ -200,7 +214,7 @@ class Optimizer:
         """Cheapest recipe for each point from `start` (stops early if nothing can skill up)."""
         chosen: list[Recipe] = []
         for skill in range(start, target):
-            options = [(self.point_cost(r, skill), r) for r in self.recipes if r.orange <= skill < r.grey]
+            options = [(self.choice_cost(r, skill), r) for r in self.recipes if r.orange <= skill < r.grey]
             cost, best = min(options, key=lambda o: o[0], default=(INF, None))
             if best is None or cost == INF:
                 break
@@ -210,7 +224,7 @@ class Optimizer:
     def smooth(self, start: int, chosen: list[Recipe]) -> list[Recipe]:
         """Fold short runs (A A B A A) into a neighbouring recipe when that costs next to nothing more."""
         chosen = list(chosen)
-        materials = sum(self.point_cost(r, start + i) for i, r in enumerate(chosen))
+        materials = sum(self.choice_cost(r, start + i) for i, r in enumerate(chosen))
         tolerance = max(SMOOTH_COPPER, SMOOTH_PCT * materials)
         for _ in range(SMOOTH_PASSES):
             runs, i = [], 0
@@ -224,13 +238,13 @@ class Optimizer:
             for k, (i, j) in enumerate(runs):
                 if j - i >= SMOOTH_MIN or len(runs) == 1:
                     continue
-                current = sum(self.point_cost(chosen[x], start + x) for x in range(i, j))
+                current = sum(self.choice_cost(chosen[x], start + x) for x in range(i, j))
                 best = None
                 for n in (k - 1, k + 1):
                     if not 0 <= n < len(runs):
                         continue
                     alt = chosen[runs[n][0]]
-                    extra = sum(self.point_cost(alt, start + x) for x in range(i, j)) - current
+                    extra = sum(self.choice_cost(alt, start + x) for x in range(i, j)) - current
                     if extra <= tolerance and (best is None or extra < best[0]):
                         best = (extra, alt)
                 if best:
@@ -257,6 +271,8 @@ class Optimizer:
                 s.credit += credit
             else:
                 mats = [(item, qty, *self.unit_cost(item, skill)) for item, qty in best.reagents.items()]
+                self.made_from.update({m.name: [(i, q / m.makes_qty, *self.unit_cost(i, skill)) for i, q in m.reagents.items()]
+                                       for _, _, _, m in mats if m is not None})
                 steps.append(Step(best, skill, skill + 1, 1 / p, cost, credit, mats))
         skill = start + len(chosen)
 
@@ -322,6 +338,7 @@ def cheapest_plan(
     allowed_sources: set[str] = frozenset({"trainer", "vendor", "recipe"}),
     sell_back: str | None = None,
     side: str | None = None,
+    craft_intermediates: bool = True,
 ) -> Plan:
     """Plan including what it costs to learn the recipes.
 
@@ -334,9 +351,10 @@ def cheapest_plan(
     kept: set[int] = set()
 
     def run() -> tuple[Plan, Optimizer]:
-        opt = Optimizer(profession, prices, allowed_sources, sell_back, frozenset(exclude), side)
+        opt = Optimizer(profession, prices, allowed_sources, sell_back, frozenset(exclude), side, craft_intermediates)
         plan = opt.plan(start, target)
         plan.bought = {r.name: opt.bought[id(r)] for r, _ in plan.learn_costs if id(r) in opt.bought}
+        plan.made_from = opt.made_from
         return plan, opt
 
     best, opt = run()

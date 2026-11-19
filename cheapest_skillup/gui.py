@@ -63,6 +63,8 @@ def _settings(q: dict[str, list[str]]) -> tuple:
             k, v = pair.split("=", 1)
             overrides.append((int(k), int(v)))
     sources = tuple(sorted(s for s in get("sources", "trainer,vendor,recipe").split(",") if s))
+    if get("craft", "1") == "0":
+        sources += ("buy-intermediates",)
     return (get("game", "forever"), get("region", "us"), get("realm", "pvp-horde"), price, sources,
             None if sell_back == "none" else sell_back, tuple(sorted(overrides)))
 
@@ -73,7 +75,7 @@ def _pricebook(settings: tuple, refresh: bool):
     with _lock:
         hit = _books.get(key)
         if refresh or not hit or time.time() - hit[2] > CACHE_TTL_SECONDS:
-            prices, updated = load_pricebook(game, region, realm, load_vendor_prices(), price, refresh=refresh,
+            prices, updated = load_pricebook(game, region, realm, load_vendor_prices(side=side_of(realm)), price, refresh=refresh,
                                              overrides=dict(overrides), vendor_sell=load_vendor_sell(),
                                              names=load_item_names())
             hit = (prices, updated, time.time())
@@ -104,7 +106,8 @@ def _plan(settings: tuple, prof: str, start: int, target: int, prices, updated) 
     key = (settings, prof, start, target)
     if key not in _plans:
         _, _, realm, _, sources, sell_back, _ = settings
-        plan = cheapest_plan(load_profession(prof), prices, start, target, set(sources), sell_back, side_of(realm))
+        plan = cheapest_plan(load_profession(prof), prices, start, target, set(sources) - {"buy-intermediates"},
+                             sell_back, side_of(realm), craft_intermediates="buy-intermediates" not in sources)
         vendor_names = {**load_item_names(), **load_vendor_names()}
         if len(_plans) >= PLAN_CACHE:
             _plans.pop(next(iter(_plans)))

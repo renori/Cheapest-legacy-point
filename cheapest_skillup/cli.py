@@ -223,7 +223,13 @@ def plan_to_dict(plan: Plan, prices: PriceBook, vendor_names: dict[int, str], si
                             "total": round(qty * s.expected_crafts, 2),
                             "unit_copper": None if each == float("inf") else round(each),
                             "source": f"craft: {maker.name}" if maker else prices.quote(item).source,
-                            "ah_copper": prices.ah_price(item), "vendor_sell_copper": prices.vendor_sell.get(item)}
+                            "ah_copper": prices.ah_price(item), "vendor_sell_copper": prices.vendor_sell.get(item),
+                            "vendor_buy_copper": prices.vendor_prices.get(item),
+                            "made_from": [] if not maker else [
+                                {"item_id": i, "name": item_name(i, prices, vendor_names), "qty": round(q, 3),
+                                 "unit_copper": None if c == float("inf") else round(c, 2),
+                                 "source": f"craft: {m2.name}" if m2 else prices.quote(i).source}
+                                for i, q, c, m2 in plan.made_from.get(maker.name, [])]}
                            for item, qty, each, maker in s.mats],
              "product": None if not s.recipe.makes else {
                  "item_id": s.recipe.makes, "name": item_name(s.recipe.makes, prices, vendor_names),
@@ -260,6 +266,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--sell-back", nargs="?", const="vendor", choices=("vendor", "ah"), default=None,
                     help="subtract what you get for selling what you craft: 'vendor' (default) uses vendor sell "
                          "prices from data/vendor_sell.json, 'ah' uses the AH price after the 5%% cut")
+    ap.add_argument("--buy-intermediates", action="store_true",
+                    help="buy intermediate materials (bars, bolts, powders...) instead of crafting them when cheaper")
     ap.add_argument("--price-override", action="append", default=[], metavar="ITEM=COPPER", help="force a price, e.g. 2589=20 (repeatable)")
     ap.add_argument("--refresh", action="store_true", help="ignore the 3-hour download cache")
     ap.add_argument("--json", action="store_true", help="print JSON instead of a report")
@@ -274,7 +282,7 @@ def main(argv: list[str] | None = None) -> int:
         k, _, v = o.partition("=")
         overrides[int(k)] = int(v)
 
-    vendor_prices = load_vendor_prices()
+    vendor_prices = load_vendor_prices(side=side_of(args.realm))
     vendor_names = {**load_item_names(), **load_vendor_names()}
     try:
         prices, updated = load_pricebook(args.game, args.region, args.realm, vendor_prices, args.price, refresh=args.refresh,
@@ -288,7 +296,8 @@ def main(argv: list[str] | None = None) -> int:
     results = []
     for key in chosen:
         prof = load_profession(key)
-        plan = cheapest_plan(prof, prices, args.start, args.target, sources, args.sell_back, side_of(args.realm))
+        plan = cheapest_plan(prof, prices, args.start, args.target, sources, args.sell_back, side_of(args.realm),
+                             craft_intermediates=not args.buy_intermediates)
         results.append(plan)
 
     if args.json:

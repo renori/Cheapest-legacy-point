@@ -337,9 +337,23 @@ def available_professions(data_dir: Path = DATA_DIR) -> list[str]:
     return sorted(p.stem for p in (data_dir / "recipes").glob("*.json"))
 
 
-def load_vendor_prices(data_dir: Path = DATA_DIR) -> dict[int, int]:
+def load_vendor_prices(data_dir: Path = DATA_DIR, side: str | None = None) -> dict[int, float]:
+    """What a vendor charges you for one of each item you can buy from a vendor in unlimited supply.
+
+    From ForeverDB's vendor data: per item (price / stack), cheapest vendor on your side or neutral,
+    ignoring limited-supply stock. Items it doesn't list fall back to data/vendor_items.json."""
     d = json.loads((data_dir / "vendor_items.json").read_text(encoding="utf-8"))
-    return {int(k): v["price"] for k, v in d["items"].items()}
+    out: dict[int, float] = {int(k): v["price"] for k, v in d["items"].items()}
+    free = _foreverdb_file(data_dir / "foreverdb.json")
+    sides = {int(k): v for k, v in free.get("npc_sides", {}).items()}
+    for item, rows in free.get("vendor_stock", {}).items():
+        item = int(item)
+        out.pop(item, None)  # listed by ForeverDB: its data decides
+        prices = [price / max(1, stack) for npc, price, stack, limited in rows
+                  if not limited and price > 0 and (side is None or sides.get(npc, "b") in ("b", side))]
+        if prices:
+            out[item] = min(prices)
+    return out
 
 
 def load_vendor_names(data_dir: Path = DATA_DIR) -> dict[int, str]:

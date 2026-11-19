@@ -89,13 +89,23 @@ class Planning(unittest.TestCase):
         for s in hat_steps:
             self.assertAlmostEqual(s.credit, 10 * s.expected_crafts)
             self.assertAlmostEqual(s.cost, 45 * s.expected_crafts - s.credit)  # 45c of mats per hat
-        # The credit makes hats worth switching to one point earlier (35c/point beats bolts at 15).
-        self.assertEqual(hat_steps[0].start, 15)
+        # With the credit and 5c of effort per craft, hats (40c/point) beat bolts (25c/0.6 = 41.7c) from 14.
+        self.assertEqual(hat_steps[0].start, 14)
         self.assertLess(plan.total_cost, plain.total_cost)
         self.assertEqual(plan.no_sell_price, {2})  # bolts were crafted and sold, no vendor price
         # Vendor mode never uses the AH price (80c for hats).
         self.assertEqual(book().sell_value(3, "vendor"), 0)
         self.assertEqual(book().sell_value(3, "ah"), 76)
+
+    def test_profit_does_not_make_the_route_grind_low_chances(self):
+        # Selling makes "Cheap" a 40c profit per craft, but past 40 it barely skills up; "Plain" costs 3c a craft.
+        cheap = Recipe("Cheap", 1, 10, 30, 50, {1: 1}, makes=3)
+        plain = Recipe("Plain", 30, 100, 100, 101, {9: 1}, makes=None)
+        b = book(vendor_sell={3: 50})
+        plan = Optimizer(Profession("t", "T", [cheap, plain]), b, sell_back="vendor").plan(1, 60)
+        by_name = {s.recipe.name: s for s in plan.steps}
+        self.assertLess(by_name["Cheap"].end, 50)  # switches before Cheap goes near-grey
+        self.assertLess(plan.total_cost, 0)  # the reported cost still includes the profit
 
     def test_bad_sell_back_mode(self):
         with self.assertRaises(ValueError):

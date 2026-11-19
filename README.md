@@ -109,9 +109,13 @@ Prices are downloaded from `https://public-data.tradeskillmaster.com` and cached
 For each reagent, the tool uses the cheapest of these:
 
 1. The auction-house price, or the region market value if nothing is listed.
-2. The vendor price from `data/vendor_items.json`. A vendor-sold item is bought on the AH only if it's
-   at least 10% cheaper there.
-3. Crafting it yourself with a recipe from the same profession (for example, Bolt of Linen Cloth).
+2. The vendor price: the cheapest vendor on your faction or a neutral one, per item (a stack of 5 Empty
+   Vials for 20c is 4c each), from ForeverDB's vendor data. **Stock a vendor has only in limited supply
+   is never used**, for materials or for vendor recipes. A vendor-sold item is bought on the AH only if
+   it's at least 10% cheaper there.
+3. Crafting it yourself, when that's cheaper (for example, Rough Blasting Powder from Rough Stone at 6c
+   against 14c on the AH). The cost breakdown shows what a crafted material is made from. Untick
+   *Craft intermediates myself* (`--buy-intermediates`) to buy them instead.
 
 ## How the route is chosen
 
@@ -123,7 +127,10 @@ Skill-up chance at skill `s` (the WoW formula):
 | Yellow → green | yellow to grey | `(grey − s) / (grey − yellow)`, falling in a straight line |
 | Grey | grey and above | 0% |
 
-A point therefore takes `1 / chance` crafts on average and costs `craft cost / chance`. For example,
+A point therefore takes `1 / chance` crafts on average and costs `craft cost / chance`. When choosing
+recipes, a craft that makes a profit when sold counts as free, never better than free, and each craft
+carries 5c of effort. That way the route doesn't grind a profitable recipe at a 3% chance. Reported costs
+stay the real ones, profit included. For example,
 Linen Belt is 100% until 50, 50% at 67 and 26% at 76, which is why a route moves on to another recipe
 once the current one gets dear per point. The cheapest recipe is picked for every point.
 

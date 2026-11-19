@@ -182,6 +182,10 @@ ul.plain { margin: 0; padding-left: 18px; }
         <option value="ah">Sell on the AH (after cut and deposit)</option>
       </select>
 
+      <label class="f" style="display:flex;gap:8px;align-items:center;text-transform:none;letter-spacing:0;font-size:14px;font-weight:400;color:var(--ink)">
+        <input type="checkbox" id="craft" checked> Craft intermediates myself</label>
+      <div class="hint">Bars, bolts, powders… are crafted when that's cheaper than buying them. Untick to buy them instead.</div>
+
       <label class="f" for="overrides">Price overrides</label>
       <input id="overrides" type="text" placeholder="e.g. 2589=0, 2592=100">
       <div class="hint">itemId=copper. Use 0 for mats you already have.</div>
@@ -254,7 +258,7 @@ const nextMilestone = from => OPT.milestones.find(m => m > from) || OPT.max_skil
 async function api(path, extra) {
   const q = new URLSearchParams({
     region: SETTINGS.region, realm: SETTINGS.realm, price: SETTINGS.price, sources: SETTINGS.sources.join(","),
-    sell_back: SETTINGS.sell_back, overrides: SETTINGS.overrides, ...extra,
+    sell_back: SETTINGS.sell_back, overrides: SETTINGS.overrides, craft: SETTINGS.craft, ...extra,
   });
   if (refreshNext) { q.set("refresh", "1"); refreshNext = false; }
   const r = await fetch(`/api/${path}?${q}`);
@@ -284,6 +288,7 @@ function readSettings() {
     region: $("#region").value, realm: $("#realm").value, price: $("#price").value,
     sources: [...$("#sources").querySelectorAll(".chip[aria-pressed=true]")].map(b => b.dataset.value),
     sell_back: $("#sellback").value, overrides: $("#overrides").value.replace(/\s+/g, ""), wh: $("#wh").value,
+    craft: $("#craft").checked ? "1" : "0",
   };
   store.set("settings", SETTINGS);
 }
@@ -300,9 +305,10 @@ async function init() {
   $("#sellback").value = ["none", "vendor", "ah"].includes(d.sell_back) ? d.sell_back : "none";
   $("#overrides").value = d.overrides || "";
   $("#wh").value = ["forever", "classic"].includes(d.wh) ? d.wh : "forever";
+  $("#craft").checked = d.craft !== "0";
   readSettings();
   $("#form").onsubmit = e => { e.preventDefault(); readSettings(); refreshNext = true; route(); };
-  for (const el of ["#region", "#realm", "#price", "#sellback", "#overrides", "#wh"]) $(el).onchange = () => { readSettings(); route(); };
+  for (const el of ["#region", "#realm", "#price", "#sellback", "#overrides", "#wh", "#craft"]) $(el).onchange = () => { readSettings(); route(); };
   window.addEventListener("hashchange", route);
   route();
 }
@@ -563,6 +569,14 @@ function chanceHtml(s) {
   return `<div class="chance" title="Orange until ${s.skill[1]}, yellow until ${s.skill[2]}, green until ${s.skill[3]}">${same ? a : `${a} → ${b}`}</div>`;
 }
 
+const SOURCE_TEXT = {minBuyout: "AH min buyout", marketValue: "AH market value", recent: "AH recent", historical: "AH historical",
+                     "region marketValue": "region AH value", vendor: "from a vendor", override: "your price"};
+
+function madeFrom(m) {
+  if (!m.made_from.length) return "";
+  return `<div class="src">from ${m.made_from.map(x => `${qty(x.qty)} × ${wh("item", x.item_id, x.name)} @ ${money(x.unit_copper)}`).join(" + ")}${m.ah_copper != null ? ` · cheaper than the AH's ${money(m.ah_copper)}` : ""}</div>`;
+}
+
 function costBreakdown(s, p) {
   const crafts = s.expected_crafts;
   const matTotal = s.materials.reduce((a, m) => a + (m.unit_copper ?? 0) * m.total, 0);
@@ -571,7 +585,7 @@ function costBreakdown(s, p) {
     <div class="table-wrap"><table class="mini"><thead><tr><th>Material</th><th class="num">Per craft</th><th class="num">Total</th><th class="num">Listed (AH)</th><th class="num">You pay</th><th class="num">Vendor pays you</th><th class="num">Cost</th></tr></thead><tbody>` +
     s.materials.map(m => `<tr><td>${wh("item", m.item_id, m.name)}</td><td class="num">${qty(m.per_craft)}</td><td class="num">${qty(m.total)}</td>
       <td class="num">${m.ah_copper == null ? '<span class="src">not listed</span>' : money(m.ah_copper)}</td>
-      <td class="num">${money(m.unit_copper)} <span class="src">${esc(m.source)}</span></td>
+      <td class="num">${money(m.unit_copper)} <span class="src">${m.made_from.length ? "you craft it" : SOURCE_TEXT[m.source] || esc(m.source)}</span>${madeFrom(m)}</td>
       <td class="num">${m.vendor_sell_copper ? money(m.vendor_sell_copper) : '<span class="src" title="Vendors won\'t buy it">—</span>'}</td>
       <td class="num">${money((m.unit_copper ?? 0) * m.total)}</td></tr>`).join("") +
     `<tr class="sum"><td colspan="6">Materials</td><td class="num">${money(matTotal)}</td></tr></tbody></table></div>`;

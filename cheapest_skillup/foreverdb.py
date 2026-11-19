@@ -124,6 +124,27 @@ def parse_trainers_lua(text: str) -> tuple[dict[str, dict[str, list[int]]], dict
     return rank_tr, recipe_tr, npcs
 
 
+def parse_vendor_stock(text: str) -> tuple[dict[int, list[list[int]]], dict[int, str]]:
+    """From ForeverDB's Data/NPCs.lua: {item: [[npc, price, stack, limited]]} and {npc: "a"/"h"/"b"}.
+
+    price is for one purchase of `stack` items; limited = 1 when the vendor has limited supply."""
+    sides: dict[int, str] = {}
+    i = text.find("ns.npcs")
+    if i >= 0:
+        end = text.find("\nns.", i + 5)
+        for m in re.finditer(r'\[(\d+)\]=\{"(?:[^"\\]|\\.)*","(?:[^"\\]|\\.)*",\d+,[-\d.]+,[-\d.]+,"(\w*)"',
+                             text[i:end if end > 0 else None]):
+            sides[int(m.group(1))] = {"A": "a", "H": "h"}.get(m.group(2), "b")
+    stock: dict[int, list[list[int]]] = {}
+    j = text.find("ns.sold =")
+    if j >= 0:
+        end = text.find("\nns.", j + 5)
+        for m in re.finditer(r'\[(\d+)\]=\{([\d,]*)\}', text[j:end if end > 0 else None]):
+            nums = [int(x) for x in m.group(2).split(",") if x]
+            stock[int(m.group(1))] = [nums[k:k + 4] for k in range(0, len(nums) - 3, 4)]
+    return stock, sides
+
+
 def parse_ranks_lua(text: str) -> dict[str, list[dict]]:
     """{profession: [{name, cap, skill, level, cost}]} from ForeverDB Helper's Data/Professions.lua."""
     out: dict[str, list[dict]] = {}
@@ -155,6 +176,8 @@ def main(argv: list[str] | None = None) -> int:
     recipe_tr: dict = {}
     npcs: dict = {}
     npc_names: dict = {}
+    vendor_stock: dict = {}
+    npc_sides: dict = {}
     try:
         with zipfile.ZipFile(io.BytesIO(_get(f"{SITE}/{manifest['addon']['url']}"))) as z:
             helper = z.read(RANK_FILE).decode("utf-8")
@@ -166,6 +189,7 @@ def main(argv: list[str] | None = None) -> int:
         rank_tr, recipe_tr, npcs = parse_trainers_lua(helper)
         npc_names = {int(m.group(1)): [m.group(2), m.group(3)] for m in re.finditer(
             r'\[(\d+)\]=\{"((?:[^"\\]|\\.)*)","((?:[^"\\]|\\.)*)",\d+,', npc_text)}
+        vendor_stock, npc_sides = parse_vendor_stock(npc_text)
     except (KeyError, zipfile.BadZipFile) as e:
         print(f"No rank data in the ForeverDB addon ({e}); rank fees fall back to Classic.", file=sys.stderr)
     for key, rs in ranks.items():
@@ -186,6 +210,8 @@ def main(argv: list[str] | None = None) -> int:
         "ranks": ranks,
         "trainers": {str(k): v for k, v in sorted(npcs.items())},
         "npc_names": {str(k): v for k, v in sorted(npc_names.items())},
+        "npc_sides": {str(k): v for k, v in sorted(npc_sides.items())},
+        "vendor_stock": {str(k): v for k, v in sorted(vendor_stock.items())},
         "recipe_trainers": {str(k): v for k, v in sorted(recipe_tr.items())},
         "spells": {str(k): v for k, v in sorted(spells.items())},
     }
