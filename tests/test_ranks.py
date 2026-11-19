@@ -4,21 +4,7 @@ import unittest
 from pathlib import Path
 
 from cheapest_skillup.foreverdb import parse_ranks_lua, parse_trainers_lua
-from cheapest_skillup.optimizer import Optimizer, cheapest_plan
-from cheapest_skillup.prices import PriceBook, parse_csv
-from cheapest_skillup.recipes import Profession, Rank, Recipe, load_ranks
-
-REALM = """itemId,name,marketValue,minBuyout,recent,historical,updatedAt
-1,Cloth,10,10,10,10,x
-2,Thread,10,10,10,10,x
-3,Hat,500,500,500,500,x
-16084,Expert First Aid - Under Wraps,9000,9000,9000,9000,x
-"""
-
-
-def book(**kw):
-    return PriceBook(parse_csv(REALM), {}, {2: 10, 16084: 10000}, **kw)
-
+from cheapest_skillup.recipes import Profession, Rank, load_ranks
 
 def ranks():
     return [Rank("Apprentice", 75, 0, 5, 10), Rank("Journeyman", 150, 50, 10, 500),
@@ -35,20 +21,6 @@ class Ranks(unittest.TestCase):
         self.assertEqual(names(120, 225), ["Expert"])
         self.assertEqual(names(120, 300), ["Expert", "Artisan"])
 
-    def test_rank_fees_in_grand_total(self):
-        r = Recipe("Hat", 1, 300, 300, 301, {1: 1})
-        plan = cheapest_plan(Profession("t", "T", [r], ranks=ranks()), book(), 120, 300)
-        self.assertEqual([k.name for k, _ in plan.ranks], ["Expert", "Artisan"])
-        self.assertEqual(plan.ranks_total, 55000)
-        self.assertAlmostEqual(plan.grand_total, plan.total_cost + 55000)
-
-    def test_skill_book_rank_priced_like_an_item(self):
-        rk = Rank("Expert", 225, 125, 0, None, None, "book", 16084)
-        opt = Optimizer(Profession("t", "T", [], ranks=[rk]), book())
-        self.assertEqual(opt.rank_cost(rk), 10000)  # a vendor sells the book: its 1g, not a cheaper AH listing
-        quest = Rank("Artisan", 300, 200, 0, 0, None, "quest")
-        self.assertEqual(opt.rank_cost(quest), 0)
-
     def test_load_ranks_priority_and_special_ranks(self):
         with tempfile.TemporaryDirectory() as d:
             Path(d, "trainer_classic.json").write_text(json.dumps({"ranks": {"first_aid": [
@@ -60,32 +32,6 @@ class Ranks(unittest.TestCase):
             self.assertEqual((rs[150].cost, rs[150].cost_from), (500, "classic"))
             self.assertEqual((rs[225].how, rs[225].item), ("book", 16084))
             self.assertEqual((rs[300].how, rs[300].cost), ("quest", 0))
-
-
-class Planner(unittest.TestCase):
-    def test_vendor_items_always_bought_from_the_vendor(self):
-        self.assertEqual(book().quote(2).source, "vendor")  # same price on the AH
-        cheap = PriceBook(parse_csv(REALM.replace("2,Thread,10,10,10,10", "2,Thread,5,5,5,5")), {}, {2: 10})
-        self.assertEqual((cheap.quote(2).source, cheap.quote(2).price), ("vendor", 10))  # half price on the AH: still vendor
-        not_vendor = PriceBook(parse_csv(REALM), {}, {})
-        self.assertEqual(not_vendor.quote(2).source, "minBuyout")  # no vendor sells it: the AH
-
-    def test_ah_sell_back_counts_cut_and_deposit(self):
-        b = book(vendor_sell={3: 100})
-        self.assertEqual(b.sell_value(3, "ah"), 500 * 0.95 - 100 * 0.05 * 12)  # 24h deposit = 60% of vendor price
-
-    def test_smoothing_folds_short_runs(self):
-        # B is a hair cheaper for 2 points in the middle of A's range: not worth switching recipes.
-        a = Recipe("A", 1, 100, 100, 101, {1: 10})
-        b = Recipe("B", 40, 100, 100, 101, {1: 10})
-        opt = Optimizer(Profession("t", "T", [a, b]), book())
-        chosen = [a] * 39 + [b] * 2 + [a] * 9
-        self.assertEqual(opt.smooth(1, chosen), [a] * 50)
-
-    def test_low_chance_flag(self):
-        r = Recipe("Grey-ish", 1, 1, 50, 60, {1: 1})
-        plan = Optimizer(Profession("t", "T", [r]), book()).plan(55, 59)
-        self.assertTrue(plan.steps[0].low_chance)
 
 
 HELPER = '''["first-aid"]=[=[return {ranks={{r="Apprentice",max=75,sk=0,lv=0,cost=100,tr={a={5150},h={3373}}}},a={steps={{s=3275,a=1,b=40,n="Linen Bandage",L={how="tf",tr={5150,2326}}}}},h={steps={{s=3275,a=1,b=40,n="Linen Bandage",L={how="tf",tr={3373}}}}}}]=],

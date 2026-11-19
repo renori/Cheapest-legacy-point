@@ -182,12 +182,14 @@ ul.plain { margin: 0; padding-left: 18px; }
 <div class="layout">
   <aside class="panel">
     <form id="form">
-      <label class="f" for="region">Auction house</label>
+      <label class="f" for="ruleset">Region &amp; ruleset</label>
       <div class="row">
         <select id="region" aria-label="Region" style="flex:0 0 76px"></select>
-        <select id="realm" aria-label="Auction house"></select>
+        <select id="ruleset" aria-label="Ruleset"></select>
       </div>
-      <div class="hint">Each ruleset (PvP, Normal, Roleplay…) has its own Alliance, Horde and Blackwater auction house with its own prices. Trainers and vendors follow the house's faction.</div>
+      <label class="f" for="realm">Auction house</label>
+      <select id="realm" aria-label="Auction house"></select>
+      <div class="hint" id="househint">Each ruleset has its own Alliance, Horde and Blackwater (neutral) auction house, with its own prices. Trainers and vendors follow the house's faction.</div>
 
 
       <label class="f">Learn recipes from</label>
@@ -304,8 +306,12 @@ function houseSets(region) {
     if (!sets.has(key)) sets.set(key, {key, name: h.ruleset_name, houses: [], listings: 0});
     const s = sets.get(key); s.houses.push(h); s.listings += h.listings || 0;
   }
-  for (const s of sets.values()) s.name ||= `Ruleset (houses ${s.houses.map(h => h.id).sort((a, b) => a - b).join(" / ")})`;
-  return [...sets.values()].sort((a, b) => b.listings - a.listings);
+  for (const s of sets.values()) {
+    s.inferred = s.houses.some(h => h.ruleset_inferred);
+    s.name ||= `Ruleset (houses ${s.houses.map(h => h.id).sort((a, b) => a - b).join(" / ")})`;
+  }
+  const rid = s => s.houses[0].ruleset ?? Infinity;
+  return [...sets.values()].sort((a, b) => rid(a) - rid(b) || b.listings - a.listings);
 }
 const houseSet = h => houseSets(h.region).find(s => s.houses.includes(h));
 const houseLabel = h => `${houseSet(h)?.name || ""} · ${FACTION[h.faction] || ""}`;
@@ -393,15 +399,29 @@ async function init() {
   };
   const d = Object.assign({}, OPT.defaults, {wh: "forever"}, store.get("settings") || {});
   if (!regions.includes(d.region)) d.region = OPT.defaults.region;
+  const liveSets = region => houseSets(region).filter(s => s.listings > 0);  // skip rulesets with no auctions yet
+  // Ruleset first, then the faction's house in it.
+  const fillFactions = (set, faction) => {
+    const hs = set ? [...set.houses].filter(h => h.listings > 0).sort((a, b) => FORDER[a.faction] - FORDER[b.faction]) : [];
+    $("#realm").innerHTML = hs.map(h => `<option value="${h.id}">${esc(`${FACTION[h.faction]} (${fmtCount(h.listings)} listings)`)}</option>`).join("");
+    $("#realm").value = (hs.find(h => h.faction === faction) || hs[0])?.id ?? "";
+  };
   const fillHouses = region => {
-    const sets = houseSets(region).filter(s => s.listings > 0);  // skip rulesets with no auctions yet
-    const hs = sets.flatMap(s => s.houses.filter(h => h.listings > 0));
-    $("#realm").innerHTML = sets.map(s => `<optgroup label="${esc(s.name)}">` + [...s.houses]
-      .filter(h => h.listings > 0).sort((a, b) => FORDER[a.faction] - FORDER[b.faction])
-      .map(h => `<option value="${h.id}">${esc(`${FACTION[h.faction]} (#${h.id}, ${fmtCount(h.listings)} listings)`)}</option>`).join("")
-      + `</optgroup>`).join("");
-    const keep = hs.find(h => String(h.id) === String(d.realm));
-    $("#realm").value = keep ? keep.id : (busiest(region)?.id ?? "");
+    const sets = liveSets(region);
+    $("#ruleset").innerHTML = sets.map(s => `<option value="${esc(s.key)}">${esc(s.name)}</option>`).join("");
+    const keep = sets.flatMap(s => s.houses).find(h => String(h.id) === String(d.realm));
+    // Default: US PvP Horde, else the busiest Horde house.
+    const set = keep ? houseSet(keep) : (sets.find(s => s.name === "PvP") || houseSet(busiest(region)) || sets[0]);
+    $("#ruleset").value = set?.key ?? "";
+    fillFactions(set, keep ? keep.faction : "h");
+    $("#househint").textContent = "Each ruleset has its own Alliance, Horde and Blackwater (neutral) auction house, with its own prices. "
+      + (sets.some(s => s.inferred) ? "Blizzard doesn't say which ruleset a house belongs to; the names are inferred from the house IDs. " : "")
+      + "Trainers and vendors follow the house's faction.";
+  };
+  $("#ruleset").onchange = () => {
+    const faction = currentHouse()?.faction || "h";
+    fillFactions(liveSets($("#region").value).find(s => s.key === $("#ruleset").value), faction);
+    readSettings(); route();
   };
   fillSelect($("#region"), regions, d.region, {us: "US", eu: "EU", kr: "KR", tw: "TW"});
   fillHouses(d.region);

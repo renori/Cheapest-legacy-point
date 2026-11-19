@@ -31,14 +31,19 @@ import argparse
 import csv
 import io
 import json
+import os
 import re
 import sys
 import urllib.request
 from collections import defaultdict
 from pathlib import Path
 
-from .prices import default_cache_dir
 from .recipes import DATA_DIR
+
+
+def default_cache_dir() -> Path:
+    root = os.environ.get("XDG_CACHE_HOME") or Path.home() / ".cache"
+    return Path(root) / "cheapest-skillup"
 
 WAGO = "https://wago.tools"
 PRODUCT = "wowf"  # WoW Forever

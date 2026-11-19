@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import argparse
 import base64
+import gzip
 import json
 import os
 import sys
@@ -51,11 +52,14 @@ class Api:
     def get(self, path: str, retries: int = 3) -> dict | None:
         q = urllib.parse.urlencode({"namespace": f"dynamic-forever-{self.region}", "locale": "en_US"})
         req = urllib.request.Request(f"https://{self.region}.api.blizzard.com{path}?{q}",
-                                     headers={**UA, "Authorization": f"Bearer {self._token}"})
+                                     headers={**UA, "Authorization": f"Bearer {self._token}", "Accept-Encoding": "gzip"})
         for attempt in range(retries):
             try:
                 with urllib.request.urlopen(req, timeout=300) as r:
-                    return json.loads(r.read())
+                    body = r.read()
+                    if r.headers.get("Content-Encoding") == "gzip":
+                        body = gzip.decompress(body)  # houses are up to ~10 MB of JSON
+                    return json.loads(body)
             except urllib.error.HTTPError as e:
                 if e.code == 404:
                     return None
@@ -126,6 +130,27 @@ def assign_rulesets(rulesets: dict[int, str], listed: dict[int, list[int]],
     return {h: None for h in houses}
 
 
+def infer_rulesets(rulesets: dict[int, str], houses: list[dict]) -> dict[int, int]:
+    """Guess each house's ruleset when the API doesn't say (so far it never does).
+
+    Houses come in sets of one Alliance, one Horde and one Blackwater house: the n-th house of each
+    faction, by ID. Sets were created in ruleset order (US/EU: 110/113/116, 111/114/117, then later
+    119/120/121 and 123/124/125), and the busy pair matches PvP and Normal, the quieter pair Roleplay
+    and Roleplay PvP. Sets with no auctions at all (112/115/118: a ruleset not live yet) are skipped.
+    Returns {house: ruleset} only when the live sets and the rulesets pair up one to one."""
+    rank = {}
+    for f in ("a", "h", "n"):
+        for i, h in enumerate(sorted((h for h in houses if h["faction"] == f), key=lambda h: h["id"])):
+            rank[h["id"]] = i
+    sets: dict[int, list[dict]] = {}
+    for h in houses:
+        sets.setdefault(rank[h["id"]], []).append(h)
+    live = [hs for _, hs in sorted(sets.items()) if sum(h["listings"] for h in hs) > 0]
+    if len(live) != len(rulesets):
+        return {}
+    return {h["id"]: rid for hs, rid in zip(live, sorted(rulesets)) for h in hs}
+
+
 def fetch_region(region: str, access_token: str, out: Path) -> list[dict]:
     api = Api(region, access_token)
     index = (api.get("/data/wow/ruleset/index") or {}).get("rulesets", [])
@@ -141,9 +166,14 @@ def fetch_region(region: str, access_token: str, out: Path) -> list[dict]:
     listed: dict[int, list[int]] = {}
     names: dict[int, str] = {}
     for rid in rulesets:
-        hs = (api.get(f"/data/wow/ruleset/{rid}/auctions/") or {}).get("auctions", [])
+        hs = ((api.get(f"/data/wow/ruleset/{rid}/auctions/") or api.get(f"/data/wow/ruleset/{rid}/auctions/index") or {})
+              .get("auctions", []))
         listed[rid] = [h["id"] for h in hs]
-        names.update({h["id"]: h.get("name", f"House {h['id']}") for h in hs})
+        for h in hs:
+            name = h.get("name") or f"House {h['id']}"
+            if isinstance(name, dict):  # localized: {"en_US": ...}
+                name = name.get("en_US") or next(iter(name.values()), f"House {h['id']}")
+            names[h["id"]] = name
     print(f"{region} rulesets: " + ", ".join(f"{rid}={n} houses={sorted(listed[rid])}" for rid, n in rulesets.items()),
           file=sys.stderr)
     rs = next(iter(rulesets))
@@ -162,10 +192,16 @@ def fetch_region(region: str, access_token: str, out: Path) -> list[dict]:
         print(f"{region} house {hid} {names[hid]}: ruleset field={data.get('ruleset')!r} "
               f"{result[-1]['listings']} listings, {len(prices)} items", file=sys.stderr)
     owner = assign_rulesets(rulesets, listed, reported)
+    inferred = not any(v is not None for v in owner.values())
+    if inferred:
+        owner = infer_rulesets(rulesets, result)
     for h in result:
         rid = owner.get(h["id"])
         h["ruleset"] = rid
         h["ruleset_name"] = rulesets.get(rid) if rid is not None else None
+        h["ruleset_inferred"] = inferred and rid is not None
+    print(f"{region} ruleset per house{' (inferred from house IDs)' if inferred else ''}: "
+          + ", ".join(f"{h['id']}={h['ruleset_name']}" for h in result), file=sys.stderr)
     return result
 
 

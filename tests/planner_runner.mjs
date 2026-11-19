@@ -1,4 +1,4 @@
-// Runs the browser planner (cheapest_skillup/site/planner.js) on built site data, for tests/test_planner_parity.py.
+// Runs the browser planner (cheapest_skillup/site/planner.js) on built site data, for tests/test_planner.py.
 // Usage: node parity_runner.mjs <site dir> <prices.json> <cases.json>  -> JSON results on stdout
 import { readFileSync } from "node:fs";
 import { join } from "node:path";

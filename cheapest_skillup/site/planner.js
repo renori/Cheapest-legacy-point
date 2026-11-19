@@ -1,5 +1,5 @@
-// Cheapest Skill-up planner, in the browser. A line-for-line port of cheapest_skillup/optimizer.py and
-// the pricing rules in prices.py; tests/test_planner_parity.py checks both give the same routes.
+// Cheapest Skill-up planner, in the browser. Originally a line-for-line port of the Python planner (archive/python-app/) and
+// its pricing rules; tests/test_planner.py runs its unit tests and a route snapshot.
 //
 // Data (built by `python -m cheapest_skillup.build_site`):
 //   professions[key] = {name, recipes: [{n, s, k:[orange,yellow,green,grey], r:{item:qty}, m, q, t, src,

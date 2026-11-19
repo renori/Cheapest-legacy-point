@@ -6,53 +6,7 @@ from pathlib import Path
 from cheapest_skillup.classic_trainers import estimate, parse_trainer_sql
 from cheapest_skillup.foreverdb import parse_recipes_lua
 from cheapest_skillup.gamedata import build_data
-from cheapest_skillup.optimizer import Optimizer, cheapest_plan
-from cheapest_skillup.prices import PriceBook, parse_csv
-from cheapest_skillup.recipes import Profession, Recipe, load_profession
-
-REALM = """itemId,name,marketValue,minBuyout,recent,historical,updatedAt
-1,Cloth,10,10,10,10,x
-50,Pattern: Cheap Hat,500,500,500,500,x
-51,Pattern: Gold Hat,9000000,9000000,9000000,9000000,x
-"""
-
-
-def book():
-    return PriceBook(parse_csv(REALM), {}, {})
-
-
-def hat(name, item, cost=1):
-    # Skills up with certainty from 1 to 100 using `cost` cloth.
-    return Recipe(name, 1, 100, 100, 101, {1: cost}, source="recipe", recipe_items=[item])
-
-
-class RecipeItems(unittest.TestCase):
-    def test_recipe_items_must_be_on_your_ah(self):
-        prof = Profession("t", "T", [hat("Listed", 50), hat("Not listed", 99)])
-        opt = Optimizer(prof, book())
-        self.assertEqual([r.name for r in opt.recipes], ["Listed"])
-        self.assertEqual(opt.learn_cost(opt.recipes[0]), 500)
-
-    def test_disallowing_recipe_items(self):
-        prof = Profession("t", "T", [hat("Listed", 50)])
-        self.assertEqual(Optimizer(prof, book(), {"trainer"}).recipes, [])
-
-    def test_buys_a_recipe_only_when_it_pays_off(self):
-        # Trainer craft costs 3 cloth (30c) per point; the AH recipe saves 20c x 99 points = 19s80c.
-        trainer = Recipe("Trainer Hat", 1, 100, 100, 101, {1: 3}, source="trainer", learn_cost=0)
-        cheap = cheapest_plan(Profession("t", "T", [trainer, hat("Cheap Hat", 50)]), book(), 1, 100)
-        self.assertEqual({s.recipe.name for s in cheap.steps}, {"Cheap Hat"})  # 5s recipe pays off
-        self.assertEqual(cheap.learn_total, 500)
-        dear = cheapest_plan(Profession("t", "T", [trainer, hat("Gold Hat", 51)]), book(), 1, 100)
-        self.assertEqual({s.recipe.name for s in dear.steps}, {"Trainer Hat"})  # 900g recipe doesn't
-        self.assertEqual(dear.learn_total, 0)
-
-    def test_unknown_trainer_fee_counts_as_zero_but_is_reported(self):
-        r = Recipe("Trainer Hat", 1, 100, 100, 101, {1: 1}, source="trainer", learn_cost=None)
-        plan = cheapest_plan(Profession("t", "T", [r]), book(), 1, 10)
-        self.assertEqual(plan.learn_costs, [(r, None)])
-        self.assertEqual(plan.learn_total, 0)
-
+from cheapest_skillup.recipes import load_profession
 
 class TrainerFile(unittest.TestCase):
     def test_trainer_json_sets_fee_and_learn_level(self):

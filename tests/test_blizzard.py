@@ -1,6 +1,6 @@
 import unittest
 
-from cheapest_skillup.blizzard import assign_rulesets, faction, ruleset_ref, summarize
+from cheapest_skillup.blizzard import assign_rulesets, faction, infer_rulesets, ruleset_ref, summarize
 
 
 class Summarize(unittest.TestCase):
@@ -37,6 +37,20 @@ class Rulesets(unittest.TestCase):
     def test_unknown_when_api_does_not_say(self):
         got = assign_rulesets(self.RS, {1: [110, 111], 2: [110, 111]}, {110: 1, 111: 1})
         self.assertEqual(got, {110: None, 111: None})
+
+    def test_infer_from_house_ids(self):
+        listings = {110: 9, 111: 9, 112: 0, 113: 9, 114: 9, 115: 0, 116: 9, 117: 9, 118: 0,
+                    119: 5, 120: 5, 121: 1, 123: 5, 124: 5, 125: 1}
+        fac = lambda i: "a" if i in (110, 111, 112, 119, 123) else "h" if i in (113, 114, 115, 120, 124) else "n"  # noqa: E731
+        houses = [{"id": i, "faction": fac(i), "listings": n} for i, n in listings.items()]
+        rs = {1: "PvP", 2: "Normal", 3: "Roleplay", 15: "Roleplay PvP"}
+        got = infer_rulesets(rs, houses)
+        self.assertEqual([got[i] for i in (110, 113, 116)], [1, 1, 1])
+        self.assertEqual([got[i] for i in (111, 114, 117)], [2, 2, 2])
+        self.assertNotIn(112, got)  # the empty set
+        self.assertEqual([got[i] for i in (119, 120, 121)], [3, 3, 3])
+        self.assertEqual([got[i] for i in (123, 124, 125)], [15, 15, 15])
+        self.assertEqual(infer_rulesets({1: "PvP"}, houses), {})  # sets and rulesets don't pair up: no guess
 
     def test_ruleset_ref(self):
         self.assertEqual(ruleset_ref({"id": 2, "name": "Normal"}), (2, "Normal"))

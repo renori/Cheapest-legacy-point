@@ -1,0 +1,138 @@
+"""Estimate trainer fees and learn levels from Classic (1.12) trainer data.
+
+WoW Forever's game files don't include what trainers charge or the skill
+they require. Classic servers' databases do, and Forever kept most Classic
+recipes, so they make a good first estimate:
+
+    git clone --depth 1 https://github.com/cmangos/classic-db
+    python -m cheapest_skillup.classic_trainers classic-db/Full_DB/ClassicDB_*.sql.gz
+
+writes data/trainer_classic.json. The planner uses those values unless you
+entered your own in data/trainer.json, and labels them as Classic estimates.
+
+Classic trainers list a "teaching" spell; the Classic Era client's
+SpellEffect table (Learn Spell effect) maps it to the craft spell, whose id
+Forever kept. Trainer data: CMaNGOS classic-db (GPL-3.0),
+https://github.com/cmangos/classic-db.
+"""
+
+from __future__ import annotations
+
+import argparse
+import gzip
+import json
+import re
+import sys
+from collections import defaultdict
+from pathlib import Path
+
+from .gamedata import PROFESSIONS, _get, load_table
+from .recipes import DATA_DIR, available_professions
+
+LEARN_SPELL = 36
+ERA_PRODUCT = "wow_classic_era"
+
+
+def parse_trainer_sql(text: str) -> list[tuple[int, int, int, int]]:
+    """(spell, cost, skill line, required skill, character level) rows from npc_trainer(_template) inserts."""
+    rows = []
+    for m in re.finditer(r"INSERT INTO `npc_trainer(?:_template)?` VALUES (.*?);", text, re.S):
+        for tup in re.findall(r"\(([^()]*)\)", m.group(1)):
+            f = [x.strip() for x in tup.split(",")]
+            try:
+                rows.append((int(f[1]), int(f[2]), int(f[3]), int(f[4]), int(f[5]) if len(f) > 5 else 0))
+            except (IndexError, ValueError):
+                continue
+    return rows
+
+
+def estimate(rows, teaches: dict[int, int], recipes: dict[int, dict]) -> dict[int, dict]:
+    """Map trainer rows onto our trainer recipes -> {spell: {cost, learn}} (cheapest trainer)."""
+    found: dict[int, list[tuple[int, int]]] = defaultdict(list)
+    for spell, cost, line, req, _level in rows:
+        if line not in PROFESSIONS:
+            continue
+        craft = spell if spell in recipes else teaches.get(spell)
+        if craft in recipes and recipes[craft]["learn"] == "trainer":
+            found[craft].append((cost, req))
+    out = {}
+    for spell, opts in sorted(found.items()):
+        cost = min(c for c, _ in opts)
+        learn = min(r for _, r in opts)
+        yellow = recipes[spell]["skill"][1]
+        out[spell] = {
+            "name": recipes[spell]["name"],
+            "cost": cost,
+            # Forever sometimes made a recipe easier; never assume it's learnable later than it turns yellow.
+            "learn": max(1, min(learn, yellow)),
+        }
+    return out
+
+
+def classic_ranks(rows, teaches: dict[int, int], rank_spells: dict[str, list[int]]) -> dict[str, list[dict]]:
+    """{profession: [{cap, skill, level, cost}]} for the rank spells Classic trainers teach."""
+    caps = [75, 150, 225, 300]
+    out: dict[str, list[dict]] = {}
+    for key, spells in rank_spells.items():
+        ranks = []
+        for cap, spell in zip(caps, sorted(spells)[:4]):
+            hits = [(cost, req, lvl) for s, cost, _, req, lvl in rows if teaches.get(s, s) == spell]
+            if hits:
+                cost, req, lvl = min(hits)
+                ranks.append({"cap": cap, "skill": req, "level": lvl, "cost": cost})
+        out[key] = ranks
+    return out
+
+
+def main(argv: list[str] | None = None) -> int:
+    ap = argparse.ArgumentParser(prog="cheapest_skillup.classic_trainers", description=__doc__,
+                                 formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("sql", type=Path, help="CMaNGOS classic-db full dump (.sql or .sql.gz)")
+    ap.add_argument("--era-build", help="Classic Era build for the teaching-spell map (default: latest)")
+    args = ap.parse_args(argv)
+
+    opener = gzip.open if args.sql.suffix == ".gz" else open
+    with opener(args.sql, "rt", encoding="utf-8", errors="replace") as fh:
+        rows = parse_trainer_sql(fh.read())
+    print(f"{len(rows)} trainer rows", file=sys.stderr)
+
+    era = args.era_build or json.loads(_get("https://wago.tools/api/builds"))[ERA_PRODUCT][0]["version"]
+    teaches = {}
+    for r in load_table("SpellEffect", era):
+        if r["Effect"] == str(LEARN_SPELL) and r["EffectTriggerSpell"] not in ("", "0"):
+            teaches[int(r["SpellID"])] = int(r["EffectTriggerSpell"])
+
+    recipes = {}
+    for key in available_professions():
+        for r in json.loads((DATA_DIR / "recipes" / f"{key}.json").read_text(encoding="utf-8"))["recipes"]:
+            recipes[r["spell"]] = r
+    est = estimate(rows, teaches, recipes)
+
+    # Rank spells ("Tailoring" = Apprentice, Journeyman...): the profession's own name, never skilling up.
+    build = json.loads((DATA_DIR / "recipes" / "tailoring.json").read_text(encoding="utf-8")).get("build")
+    names = {int(r["ID"]): r["Name_lang"] for r in load_table("SpellName", build)} if build else {}
+    rank_spells: dict[str, list[int]] = defaultdict(list)
+    for r in load_table("SkillLineAbility", build) if build else []:
+        line = int(r["SkillLine"])
+        if line in PROFESSIONS and r["TrivialSkillLineRankHigh"] == "0" and names.get(int(r["Spell"])) == PROFESSIONS[line][1]:
+            rank_spells[PROFESSIONS[line][0]].append(int(r["Spell"]))
+    ranks = classic_ranks(rows, teaches, rank_spells)
+    total = sum(1 for r in recipes.values() if r["learn"] == "trainer")
+
+    out = {
+        "note": ("Classic (1.12) trainer fees (copper) and learn levels used as estimates for WoW Forever. "
+                 "Generated by 'python -m cheapest_skillup.classic_trainers' from CMaNGOS classic-db (GPL-3.0). "
+                 "Your own values in data/trainer.json take priority."),
+        "ranks": ranks,
+        "spells": {str(k): v for k, v in est.items()},
+    }
+    path = DATA_DIR / "trainer_classic.json"
+    path.write_text("{\n" + f'  "note": {json.dumps(out["note"])},\n  "ranks": {json.dumps(out["ranks"])},\n  "spells": {{\n'
+                    + ",\n".join(f"    {json.dumps(k)}: {json.dumps(v)}" for k, v in out["spells"].items())
+                    + "\n  }\n}\n", encoding="utf-8")
+    print(f"Estimated {len(est)} of {total} trainer recipes -> {path}", file=sys.stderr)
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
