@@ -9,3 +9,7 @@ __pycache__/
 *.secret
 secrets*.json
 .foreverdb*
+
+# Built website (python -m cheapest_skillup.build_site)
+/site/
+/_site/

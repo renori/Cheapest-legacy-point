@@ -32,6 +32,41 @@ python -m cheapest_skillup.gui
 This opens http://127.0.0.1:8765/ in your browser. Next time, just double-click `start_gui.bat`.
 Always run the commands from inside the folder that contains `cheapest_skillup`.
 
+## Hosted website (GitHub Pages)
+
+The same app also runs as a static website: the planner (`cheapest_skillup/site/planner.js`) runs in the
+visitor's browser, and an hourly GitHub Action fetches WoW Forever auction prices from the **Blizzard
+Battle.net API** and republishes the site (`.github/workflows/site.yml`).
+
+One-time setup:
+
+1. **Battle.net API client:** at develop.battle.net, *API Access*, create a client (any name; redirect
+   URL `http://localhost`). Note its Client ID and Client Secret.
+2. **Repository secrets:** in this repo, *Settings → Secrets and variables → Actions → New repository
+   secret*: `BLIZZARD_CLIENT_ID` and `BLIZZARD_CLIENT_SECRET`. They're only ever read by the workflow;
+   they're never in the code or on the site.
+3. **Pages:** *Settings → Pages → Build and deployment → Source: GitHub Actions*. GitHub Pages on a
+   free account needs the repository to be **public**; private repositories need a paid plan.
+4. Run it: *Actions → Build and publish the site → Run workflow*. After that it runs every hour and on
+   every push. The site's address is shown on the run and under *Settings → Pages*.
+
+Forever has no realms: auction houses belong to rulesets, with five Alliance, five Horde and five
+neutral (Blackwater) houses per region. Pick yours in the sidebar; trainers and vendors follow its
+faction. Prices are each item's cheapest current listing. Blizzard doesn't document Forever's API yet,
+so the endpoints may change.
+
+Preview the site locally (prices need your client ID and secret in the environment):
+
+```sh
+python -m cheapest_skillup.build_site --out site
+python -m cheapest_skillup.blizzard --out site/data/prices --region us
+python -m http.server -d site 8000      # then open http://localhost:8000
+```
+
+`cheapest_skillup/site/index.html` is generated from `cheapest_skillup/web/index.html` by
+`python tools/make_site_page.py`; a test fails if you forget. `tests/test_planner_parity.py` runs the
+JavaScript and Python planners on the same data and fails if their routes or totals differ.
+
 ## The app
 
 **Overview.** A bar chart with one bar per profession, running from your current skill to 300. Each bar

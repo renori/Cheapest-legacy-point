@@ -1,0 +1,59 @@
+name: Build and publish the site
+
+# Every hour: fetch WoW Forever auction prices from the Blizzard API, build the static site and publish
+# it to GitHub Pages. Also runs on every push to the default branch, and by hand (Actions > Run workflow).
+on:
+  schedule:
+    - cron: "17 * * * *"
+  push:
+    branches: [ccr-8d972126-1vg3tt]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Tests (including Python/JavaScript planner parity)
+        run: python -m unittest
+
+      - name: Build the site
+        run: python -m cheapest_skillup.build_site --out _site
+
+      - name: Fetch prices from the Blizzard API
+        env:
+          BLIZZARD_CLIENT_ID: ${{ secrets.BLIZZARD_CLIENT_ID }}
+          BLIZZARD_CLIENT_SECRET: ${{ secrets.BLIZZARD_CLIENT_SECRET }}
+        run: python -m cheapest_skillup.blizzard --out _site/data/prices --region us eu
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
