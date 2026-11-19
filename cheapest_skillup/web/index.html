@@ -143,6 +143,9 @@ details.cost[open] { background: var(--panel-2); border: 1px solid var(--line); 
 .cost-body { background: var(--panel-2); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; font-size: 13px; }
 tr.bd-row td { border-bottom: 1px solid var(--line); }
 tr.step { cursor: pointer; }
+table.mini.totals { width: auto; min-width: 320px; margin-left: auto; }
+table.mini.totals td { border-bottom: 0; padding: 2px 6px; }
+table.mini.totals tr.sum td { border-top: 1px solid var(--line); padding-top: 4px; }
 tr.step:hover td { background: var(--panel-2); }
 tr.step[aria-expanded=true] td { border-bottom-color: transparent; }
 .learn-sec { padding-bottom: 8px; margin-bottom: 8px; border-bottom: 1px solid var(--line); }
@@ -601,25 +604,35 @@ function learnPanel(s, l, first) {
 function costBreakdown(s, p, learn = "") {
   const crafts = s.expected_crafts;
   const matTotal = s.materials.reduce((a, m) => a + (m.unit_copper ?? 0) * m.total, 0);
+  const matPerCraft = s.materials.reduce((a, m) => a + (m.unit_copper ?? 0) * m.per_craft, 0);
+  const creditPerCraft = s.product && p.sell_back ? s.product.credit_each_copper * s.product.per_craft : 0;
+  const netPerCraft = matPerCraft - creditPerCraft;
   let h = `<div class="cost-body">${learn}
     <div class="src">${qty(crafts)} expected crafts for ${s.to - s.from} points (${(crafts / (s.to - s.from)).toFixed(2)} per point)</div>
-    <div class="table-wrap"><table class="mini"><thead><tr><th>Material</th><th class="num">Per craft</th><th class="num">Total</th><th class="num">Listed (AH)</th><th class="num">You pay</th><th class="num">Vendor pays you</th><th class="num">Cost</th></tr></thead><tbody>` +
+    <div class="table-wrap"><table class="mini"><thead><tr><th>Material</th><th class="num">Per craft</th><th class="num">Total</th><th class="num">Listed (AH)</th><th class="num">You pay</th><th class="num">Vendor pays you</th><th class="num">Cost per craft</th><th class="num">Cost</th></tr></thead><tbody>` +
     s.materials.map(m => `<tr><td>${wh("item", m.item_id, m.name)}</td><td class="num">${qty(m.per_craft)}</td><td class="num">${qty(m.total)}</td>
       <td class="num">${m.ah_copper == null ? '<span class="src">not listed</span>' : money(m.ah_copper)}</td>
       <td class="num">${money(m.unit_copper)} <span class="src">${m.made_from.length ? "you craft it" : SOURCE_TEXT[m.source] || esc(m.source)}</span>${madeFrom(m)}</td>
       <td class="num">${m.vendor_sell_copper ? money(m.vendor_sell_copper) : '<span class="src" title="Vendors won\'t buy it">—</span>'}</td>
+      <td class="num">${money((m.unit_copper ?? 0) * m.per_craft)}</td>
       <td class="num">${money((m.unit_copper ?? 0) * m.total)}</td></tr>`).join("") +
-    `<tr class="sum"><td colspan="6">Materials</td><td class="num">${money(matTotal)}</td></tr></tbody></table></div>`;
+    `<tr class="sum"><td colspan="6">Materials</td><td class="num">${money(matPerCraft)}</td><td class="num">${money(matTotal)}</td></tr></tbody></table></div>`;
   if (s.product) {
     const pr = s.product;
-    h += `<div class="table-wrap"><table class="mini"><thead><tr><th>Makes</th><th class="num">Per craft</th><th class="num">Total</th><th class="num">Listed (AH)</th><th class="num">Vendor pays you</th><th class="num">Credited each</th><th class="num">Credit</th></tr></thead><tbody>
+    h += `<div class="table-wrap"><table class="mini"><thead><tr><th>Makes</th><th class="num">Per craft</th><th class="num">Total</th><th class="num">Listed (AH)</th><th class="num">Vendor pays you</th><th class="num">Credited each</th><th class="num">Credit per craft</th><th class="num">Credit</th></tr></thead><tbody>
       <tr><td>${wh("item", pr.item_id, pr.name)}</td><td class="num">${qty(pr.per_craft)}</td><td class="num">${qty(pr.total)}</td>
         <td class="num">${pr.ah_copper == null ? '<span class="src">not listed</span>' : money(pr.ah_copper)}</td>
         <td class="num">${pr.vendor_sell_copper ? money(pr.vendor_sell_copper) : '<span class="src" title="Vendors won\'t buy it">—</span>'}</td>
         <td class="num">${p.sell_back ? money(pr.credit_each_copper) : '<span class="src">kept</span>'}</td>
+        <td class="num">${p.sell_back ? money(-creditPerCraft) : "—"}</td>
         <td class="num">${p.sell_back ? money(-s.credit_copper) : "—"}</td></tr></tbody></table></div>`;
   }
-  h += `<div><b>Step cost: ${money(s.cost_copper)}</b>${s.cost_copper < 0 ? ` <span class="src">— a profit only if all ${qty(s.product.total)} sell at ${p.sell_back === "ah" ? "the listed price (after the 5% cut and deposit)" : "the vendor price"}</span>` : ""}</div>`;
+  const points = s.to - s.from;
+  h += `<table class="mini totals"><tbody>
+    <tr><td>Per craft</td><td class="num">${money(matPerCraft)}${p.sell_back && s.product ? ` − ${money(creditPerCraft)} credit = <b>${money(netPerCraft)}</b>` : ""}</td></tr>
+    <tr><td>Per skill point <span class="src">(${(crafts / points).toFixed(2)} crafts each on average)</span></td><td class="num">${money(s.cost_copper / points)}</td></tr>
+    <tr class="sum"><td>Step: ${points} point${points > 1 ? "s" : ""}, ${qty(crafts)} crafts</td><td class="num">${money(s.cost_copper)}</td></tr></tbody></table>`;
+  if (s.cost_copper < 0) h += `<div class="src">A profit only if all ${qty(s.product.total)} sell at ${p.sell_back === "ah" ? "the listed price (after the 5% cut and deposit)" : "the vendor price"}.</div>`;
   return h + `</div>`;
 }
 
